@@ -1,11 +1,12 @@
 import { Wrap } from '@/styles/BaseStyles'
-import { NavBar } from '@/components/shared/Navbar'
+import { PostForm } from '@/components/post/Forms'
+import { PostCards } from '@/components/post/Cards'
 
 export default async function HomePage() {
-   return (
-      <>
-         <NavBar />
-         <Wrap></Wrap>
-      </>
-   )
+  return (
+    <Wrap spacing={2}>
+      <PostForm />
+      <PostCards />
+    </Wrap>
+  )
 }

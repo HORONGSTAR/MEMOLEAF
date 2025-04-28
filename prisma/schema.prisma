@@ -9,11 +9,14 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  name      String?
+  credits   String   @unique
+  name      String?  @db.VarChar(12)
+  image     String?
+  info      String?
   createdAt DateTime @default(now())
-  posts     Memo[]
+  memos     Memo[]
+  comments  Comment[]
+  bookmark  BookMark[]
 }
 
 model Memo {
@@ -23,4 +26,55 @@ model Memo {
   updatedAt DateTime @updatedAt
   userId    Int
   user      User     @relation(fields: [userId],references: [id])
+  comments  Comment[]
+  bookmark  BookMark[]
+  images    Image[]
+  styles    Style[]
+  firstMemo Thread[]  @relation("firstMemo")
+  laterMemo Thread[]   @relation("laterMemo")
+  
 }
+
+model Style {
+  id        Int      @id @default(autoincrement())
+  target    String
+  options   String
+  memoId    Int
+  memo      Memo     @relation(fields: [memoId],references: [id])
+}
+
+model Thread {
+  id        Int      @id @default(autoincrement())
+  firstId   Int
+  firstMemo Memo     @relation("firstMemo",fields: [firstId],references: [id])
+  laterId   Int
+  laterMemo Memo     @relation("laterMemo",fields: [laterId],references: [id])
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  url       String
+  createdAt DateTime @default(now())
+  memoId    Int
+  memo      Memo     @relation(fields: [memoId],references: [id])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    Int
+  memoId    Int
+  user      User     @relation(fields: [userId],references: [id])
+  memo      Memo     @relation(fields: [memoId],references: [id])
+}
+
+model BookMark {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  memoId    Int
+  user      User     @relation(fields: [userId],references: [id])
+  memo      Memo     @relation(fields: [memoId],references: [id])
+}
+

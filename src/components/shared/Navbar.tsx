@@ -1,5 +1,6 @@
-import { AppBar, Toolbar, Typography, Container, Button } from '@mui/material'
+import { AppBar, Toolbar, Container } from '@mui/material'
 import { Stack2, Blank } from '@/styles/BaseStyles'
+import { AccountMenu } from './Account'
 import Link from 'next/link'
 import Image from 'next/image'
 
@@ -15,12 +16,8 @@ export const NavBar = () => {
                      </Stack2>
                   </Link>
                   <Blank />
-                  <Link href={'/page/account/login'}>
-                     <Typography variant="button" color="primary">
-                        로그인
-                     </Typography>
-                  </Link>
-                  <Button>user님</Button>
+
+                  <AccountMenu />
                </Toolbar>
             </Container>
          </AppBar>
