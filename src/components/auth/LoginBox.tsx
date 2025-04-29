@@ -3,7 +3,7 @@ import { Button, Stack, SvgIcon } from '@mui/material'
 import { signIn } from 'next-auth/react'
 import { googleIcon, kakaoIcon, naverIcon } from '@/styles/Icons'
 
-export const LoginBox = () => {
+export default function LoginBox() {
   return (
     <Stack spacing={2}>
       <Button

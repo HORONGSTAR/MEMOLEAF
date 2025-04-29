@@ -8,6 +8,7 @@ export interface Props {
   icon?: ReactNode
   imgUrl?: string
   title?: string
+  alt?: string
   label?: string
   size?: number
   user?: {
@@ -17,19 +18,40 @@ export interface Props {
   variant?: 'circular' | 'rounded' | 'square'
 }
 
+export interface User {
+  id: number
+  name: string
+  image: string
+}
+
+export interface Params {
+  id?: number
+  userId?: number
+  name?: string
+  info?: string
+  page?: string
+  content?: string
+  images?: string[]
+  files?: File[]
+}
+
+export interface Image {
+  id: number
+  url: string
+}
+
 export interface Memo {
   id: number
   content?: string
   userId: number
-  user: {
-    name: string
-    image: string
-  }
+  user: User
+  images: Image[]
   createdAt: string
 }
 
 export interface IntiVal {
   id?: number
   content?: string
+  images?: string[]
   onSubmit?: (id: number, content: string) => void
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Noto_Sans_KR, Nanum_Gothic, Nanum_Myeongjo, Nanum_Pen_Script, Do_Hyeon, Jua } from 'next/font/google'
-import { NavBar } from '@/components/shared/Navbar'
+import NavBar from '@/components/shared/Navbar'
 import { ThemeProvider } from '@mui/material'
 import { theme } from '@/styles/MuiTheme'
 import Providers from './Providers'

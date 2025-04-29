@@ -1,19 +1,18 @@
 'use client'
-import { Stack2 } from '@/styles/BaseStyles'
 import { Skeleton, Typography, List, ListItem } from '@mui/material'
-import { getProfile } from '@/lib/fetchData'
+import { Avatar, Stack } from '@/components'
+import { getUser } from '@/lib/api/userApi'
 import { useParams } from 'next/navigation'
-import { UserAvatar } from '../shared/Account'
 import { useState, useEffect, useCallback } from 'react'
 
 type Profile = { name: string; info: string; image: string }
 
-export const InfoBox = () => {
+export default function InfoBox() {
   const [profile, setProfile] = useState<Profile>()
   const { id } = useParams()
 
   const handleLoad = useCallback(async () => {
-    const data = await getProfile(id as string)
+    const data = await getUser(id as string)
     setProfile(data)
   }, [id])
 
@@ -22,10 +21,10 @@ export const InfoBox = () => {
   }, [handleLoad])
 
   return (
-    <Stack2>
+    <Stack>
       {profile ? (
         <>
-          <UserAvatar variant="rounded" size={160} user={profile} />
+          <Avatar variant="rounded" size={160} user={profile} />
           <List sx={{ flexGrow: 1 }}>
             <ListItem>
               <Typography variant="h5" fontWeight={'bold'}>
@@ -47,6 +46,6 @@ export const InfoBox = () => {
           </List>
         </>
       )}
-    </Stack2>
+    </Stack>
   )
 }

@@ -4,19 +4,19 @@ import prisma from '@/lib/prisma'
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const page = parseInt(searchParams.get('page') || '1')
-  const limit = parseInt(searchParams.get('limit') || '10')
+  const limit = 10
 
-  const data = await prisma.memo.findMany({
+  const memos = await prisma.memo.findMany({
     skip: (page - 1) * limit,
-    take: limit,
+    take: 10,
     orderBy: { createdAt: 'desc' },
-    include: { user: true },
+    include: { user: true, images: true },
   })
 
   const totalCount = await prisma.user.count()
 
   return NRes.json({
-    data,
+    memos,
     totalPages: Math.ceil(totalCount / limit),
     currentPage: page,
   })
@@ -24,9 +24,17 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, content } = await req.json()
-    const memo = await prisma.memo.create({ data: { userId, content } })
-    return NRes.json(memo)
+    const { userId, content, images } = await req.json()
+    const newMemo = await prisma.memo.create({ data: { userId, content } })
+    const res = { ...newMemo, images }
+    if (images.length > 0) {
+      await prisma.image.createMany({
+        data: images.map((image: string) => ({ url: image, memoId: newMemo.id })),
+      })
+      res.images = await prisma.image.findMany({ where: { memoId: newMemo.id } })
+    }
+
+    return NRes.json(res)
   } catch (err) {
     console.error(err)
     return NRes.json({ success: false, message: '게시글 등록 중 문제가 발생했습니다.' }, { status: 500 })

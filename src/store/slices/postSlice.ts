@@ -1,55 +1,67 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getMemo, createMemo, updateMemo, deleteMemo } from '@/lib/fetchData'
-import { Memo } from '@/lib/types'
+import { getMemos, createMemo, updateMemo, deleteMemo } from '@/lib/api/postApi'
+import { uploadImages, removeImages } from '@/lib/api/imgApi'
+import { Memo, Params, User } from '@/lib/types'
 
-export const getMemoThunk = createAsyncThunk<Memo[], { page: string; limit: string }>(
-  'memo/getMemo',
-  async ({ page, limit }) => {
-    try {
-      return await getMemo(page, limit)
-    } catch (error) {
-      console.error(error || '게시글 가져오기 실패')
-    }
-  }
-)
+interface Memos {
+  memos: Memo[]
+  page: number
+  total: number
+}
 
-export const createMemoThunk = createAsyncThunk<Memo, { userId: number; content: string }>(
-  'memo/createMemo',
-  async ({ userId, content }) => {
-    try {
-      return await createMemo(userId, content)
-    } catch (error) {
-      console.error(error || '게시글 가져오기 실패')
-    }
-  }
-)
+interface PostParams extends Params {
+  user: User
+}
 
-export const updateMemoThunk = createAsyncThunk<Memo, { memoId: number; content: string }>(
-  'memo/updateMemo',
-  async ({ memoId, content }) => {
-    try {
-      return await updateMemo(memoId, content)
-    } catch (error) {
-      console.error(error || '게시글 가져오기 실패')
-    }
-  }
-)
-
-export const deleteMemoThunk = createAsyncThunk<Memo, { memoId: number }>('memo/deleteMemo', async ({ memoId }) => {
+export const getMemosThunk = createAsyncThunk<Memos, Params>('memo/getMemos', async ({ page }) => {
   try {
-    return await deleteMemo(memoId)
+    return await getMemos({ page })
   } catch (error) {
-    console.error(error || '게시글 가져오기 실패')
+    console.error(error || '메모 조회 실패')
+  }
+})
+
+export const createMemoThunk = createAsyncThunk<Memo, PostParams>('memo/createMemo', async (params) => {
+  const { user, content, images, files } = params
+  try {
+    const memo = await createMemo({ userId: user.id, content, images })
+    if (files && files.length > 0) await uploadImages(files)
+    memo.user = user
+    return memo
+  } catch (error) {
+    console.error(error || '메모 작성 실패')
+  }
+})
+
+export const updateMemoThunk = createAsyncThunk<Memo, Params>('memo/updateMemo', async (params) => {
+  try {
+    return await updateMemo(params)
+  } catch (error) {
+    console.error(error || '메모 수정 실패')
+  }
+})
+
+export const deleteMemoThunk = createAsyncThunk<Memo, Params>('memo/deleteMemo', async (params) => {
+  const { id, images } = params
+  try {
+    if (images && images.length > 0) await removeImages(images)
+    return await deleteMemo({ id })
+  } catch (error) {
+    console.error(error || '메모 삭제 실패')
   }
 })
 
 interface State {
   memos: Memo[] | []
+  page: number
+  total: number
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
 }
 
 const initialState: State = {
   memos: [],
+  page: 1,
+  total: 1,
   status: 'idle',
 }
 
@@ -59,14 +71,16 @@ export const memoSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getMemoThunk.pending, (state) => {
+      .addCase(getMemosThunk.pending, (state) => {
         state.status = 'loading'
       })
-      .addCase(getMemoThunk.fulfilled, (state, action) => {
+      .addCase(getMemosThunk.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        state.memos = action.payload
+        state.memos = action.payload.memos
+        state.page = action.payload.page
+        state.total = action.payload.total
       })
-      .addCase(getMemoThunk.rejected, (state) => {
+      .addCase(getMemosThunk.rejected, (state) => {
         state.status = 'failed'
       })
       .addCase(createMemoThunk.pending, (state) => {

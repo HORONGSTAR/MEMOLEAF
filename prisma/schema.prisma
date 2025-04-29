@@ -10,8 +10,8 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   credits   String   @unique
-  name      String?  @db.VarChar(12)
-  image     String?
+  name      String  @db.VarChar(12)
+  image     String
   info      String?
   createdAt DateTime @default(now())
   memos     Memo[]
@@ -25,7 +25,7 @@ model Memo {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    Int
-  user      User     @relation(fields: [userId],references: [id])
+  user      User     @relation(fields: [userId],references: [id],onDelete: Cascade)
   comments  Comment[]
   bookmark  BookMark[]
   images    Image[]
@@ -40,15 +40,15 @@ model Style {
   target    String
   options   String
   memoId    Int
-  memo      Memo     @relation(fields: [memoId],references: [id])
+  memo      Memo     @relation(fields: [memoId],references: [id],onDelete: Cascade)
 }
 
 model Thread {
   id        Int      @id @default(autoincrement())
   firstId   Int
-  firstMemo Memo     @relation("firstMemo",fields: [firstId],references: [id])
+  firstMemo Memo     @relation("firstMemo",fields: [firstId],references: [id],onDelete: Cascade)
   laterId   Int
-  laterMemo Memo     @relation("laterMemo",fields: [laterId],references: [id])
+  laterMemo Memo     @relation("laterMemo",fields: [laterId],references: [id],onDelete: Cascade)
 }
 
 model Image {
@@ -56,7 +56,7 @@ model Image {
   url       String
   createdAt DateTime @default(now())
   memoId    Int
-  memo      Memo     @relation(fields: [memoId],references: [id])
+  memo      Memo     @relation(fields: [memoId],references: [id],onDelete: Cascade)
 }
 
 model Comment {
@@ -66,15 +66,15 @@ model Comment {
   updatedAt DateTime @updatedAt
   userId    Int
   memoId    Int
-  user      User     @relation(fields: [userId],references: [id])
-  memo      Memo     @relation(fields: [memoId],references: [id])
+  user      User     @relation(fields: [userId],references: [id],onDelete: Cascade)
+  memo      Memo     @relation(fields: [memoId],references: [id],onDelete: Cascade)
 }
 
 model BookMark {
   id        Int      @id @default(autoincrement())
   userId    Int
   memoId    Int
-  user      User     @relation(fields: [userId],references: [id])
-  memo      Memo     @relation(fields: [memoId],references: [id])
+  user      User     @relation(fields: [userId],references: [id],onDelete: Cascade)
+  memo      Memo     @relation(fields: [memoId],references: [id],onDelete: Cascade)
 }
 
