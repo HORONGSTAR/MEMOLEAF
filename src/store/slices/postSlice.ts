@@ -1,16 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getMemos, createMemo, updateMemo, deleteMemo } from '@/lib/api/postApi'
-import { uploadImages, removeImages } from '@/lib/api/imgApi'
-import { Memo, Params, User } from '@/lib/types'
+import { Memo, Params } from '@/lib/types'
 
 interface Memos {
   memos: Memo[]
   page: number
   total: number
-}
-
-interface PostParams extends Params {
-  user: User
 }
 
 export const getMemosThunk = createAsyncThunk<Memos, Params>('memo/getMemos', async ({ page }) => {
@@ -21,12 +16,9 @@ export const getMemosThunk = createAsyncThunk<Memos, Params>('memo/getMemos', as
   }
 })
 
-export const createMemoThunk = createAsyncThunk<Memo, PostParams>('memo/createMemo', async (params) => {
-  const { user, content, images, files } = params
+export const createMemoThunk = createAsyncThunk<Memo, Params>('memo/createMemo', async (params) => {
   try {
-    const memo = await createMemo({ userId: user.id, content, images })
-    if (files && files.length > 0) await uploadImages(files)
-    memo.user = user
+    const memo = await createMemo(params)
     return memo
   } catch (error) {
     console.error(error || '메모 작성 실패')
@@ -42,10 +34,8 @@ export const updateMemoThunk = createAsyncThunk<Memo, Params>('memo/updateMemo',
 })
 
 export const deleteMemoThunk = createAsyncThunk<Memo, Params>('memo/deleteMemo', async (params) => {
-  const { id, images } = params
   try {
-    if (images && images.length > 0) await removeImages(images)
-    return await deleteMemo({ id })
+    return await deleteMemo(params)
   } catch (error) {
     console.error(error || '메모 삭제 실패')
   }
@@ -100,6 +90,7 @@ export const memoSlice = createSlice({
         state.status = 'succeeded'
         for (const i in state.memos) {
           if (state.memos[i].id === action.payload.id) {
+            console.log(action.payload)
             state.memos[i] = { ...state.memos[i], ...action.payload }
           }
         }

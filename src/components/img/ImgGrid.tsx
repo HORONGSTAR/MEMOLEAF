@@ -1,53 +1,24 @@
 import { Image } from '@/lib/types'
 import { imgPath } from '@/lib/utills'
+import { ImgModal } from '@/components'
+import { Grid2, Paper } from '@mui/material'
 
-interface Images {
-  images: Image[]
-}
-export default function ImageGrid({ images }: Images) {
-  if (!images) return
+export default function ImageGrid({ images }: { images: Image[] }) {
   const count = images.length
+  if (count === 0) return null
   const imgUrls = images.map((img) => ({
     id: img.id,
     url: imgPath + img.url,
   }))
-  if (count === 1) {
-    return (
-      <div className="w-full ">
-        <img src={imgUrls[0].url} alt="" className="w-auto" />
-      </div>
-    )
-  }
-
-  if (count === 2) {
-    return (
-      <div className="grid grid-cols-2 gap-1">
-        {imgUrls.map((img) => (
-          <img key={img.id} src={img.url} alt="" className="w-full aspect-square object-cover" />
-        ))}
-      </div>
-    )
-  }
-
-  if (count === 3) {
-    return (
-      <div className="grid grid-cols-3 gap-1 h-72">
-        <div className="col-span-2">
-          <img src={imgUrls[0].url} alt="" className="w-full h-full object-cover" />
-        </div>
-        <div className="flex flex-col gap-1">
-          <img src={imgUrls[1].url} alt="" className="w-full h-1/2 object-cover" />
-          <img src={imgUrls[2].url} alt="" className="w-full h-1/2 object-cover" />
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="grid grid-cols-2 gap-1">
-      {imgUrls.slice(0, 4).map((img) => (
-        <img key={img.id} src={img.url} alt="" className="w-full aspect-square object-cover" />
+    <Grid2 container spacing={0.5} mt={2}>
+      {imgUrls.map((img) => (
+        <Grid2 key={img.id} size={{ md: 12 / count, sm: count % 2 === 1 ? 12 / count : 12 / 2 }} position="relative">
+          <Paper variant="outlined">
+            <ImgModal imgUrl={img.url} label={img.id + 'img'} />
+          </Paper>
+        </Grid2>
       ))}
-    </div>
+    </Grid2>
   )
 }

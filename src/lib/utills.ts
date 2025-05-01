@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import { v4 as uuid } from 'uuid'
 
 export const changeDate = (date: string) => dayjs(date).format('YYYY.MM.DD HH:mm')
 export const imgPath = process.env.NEXT_PUBLIC_IMG_URL + '/uploads/'
@@ -14,6 +15,6 @@ export const randomProfile = () => {
 
 export const setRenameFile = (file: File) => {
   const ext = file.type.split('/')[1]
-  const rename = `${Date.now()}.${ext}`
+  const rename = `${uuid()}.${ext}`
   return new File([file], rename, { type: file.type })
 }

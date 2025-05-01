@@ -2,6 +2,9 @@ import { GridSpacing, Breakpoint } from '@mui/material'
 import { ReactNode } from 'react'
 
 export interface Props {
+  onClick?: () => void
+  items?: ReactNode[]
+  isBlind?: boolean
   spacing?: GridSpacing
   maxWidth?: Breakpoint
   children?: ReactNode
@@ -33,6 +36,7 @@ export interface Params {
   content?: string
   images?: string[]
   files?: File[]
+  rmImgs?: { id: number[]; url: string[] }
 }
 
 export interface Image {
@@ -52,6 +56,6 @@ export interface Memo {
 export interface IntiVal {
   id?: number
   content?: string
-  images?: string[]
-  onSubmit?: (id: number, content: string) => void
+  images?: Image[]
+  onSubmit: (params: Params) => void
 }

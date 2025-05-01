@@ -1,42 +1,27 @@
 'use client'
-import { getMemosThunk, updateMemoThunk, deleteMemoThunk } from '@/store/slices/postSlice'
-import { ImgGrid, MemoForm, Menu, Avatar, AsyncBox, Card } from '@/components'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { changeDate, imgPath } from '@/lib/utills'
-import { Memo, Image } from '@/lib/types'
-import { useSession } from 'next-auth/react'
-import { MenuItem, ListItemIcon } from '@mui/material'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
+import { ImgGrid, MemoForm, Menu, MenuItem, Avatar, Card } from '@/components'
+import { updateMemoThunk, deleteMemoThunk } from '@/store/slices/postSlice'
+import { useCallback, useMemo, useState } from 'react'
+import { changeDate } from '@/lib/utills'
+import { useAppDispatch } from '@/store/hooks'
+import { Memo, Image, Params } from '@/lib/types'
+import { useSession } from 'next-auth/react'
 
-export default function MemoCard() {
-  const { memos, status } = useAppSelector((state) => state.memo)
+export default function MemoCard(memo: Memo) {
   const dispatch = useAppDispatch()
-
-  useEffect(() => {
-    dispatch(getMemosThunk({ page: '1' }))
-  }, [dispatch])
-
-  const cards = memos?.map((memo: Memo) => <CardBox key={memo.id} {...memo} />)
-
-  return <AsyncBox state={status} component={cards} />
-}
-
-const CardBox = (memo: Memo) => {
-  const dispatch = useAppDispatch()
-  const [content, setContent] = useState(memo.content)
   const [isEdit, setEdit] = useState(false)
   const { data: session } = useSession()
   const user = session?.user
+
   const isLogin = useMemo(() => (user?.id === memo.userId ? true : false), [user, memo])
 
   const onSubmit = useCallback(
-    (id: number, content: string) => {
-      dispatch(updateMemoThunk({ id, content }))
-      setContent(content)
+    (params: Params) => {
+      dispatch(updateMemoThunk({ ...params, id: memo?.id }))
       setEdit(false)
     },
-    [dispatch]
+    [dispatch, memo]
   )
 
   const handleDelete = useCallback(
@@ -47,46 +32,49 @@ const CardBox = (memo: Memo) => {
     [dispatch]
   )
 
-  if (isEdit) {
-    const props = { ...memo, onSubmit, images: memo.images.map((img) => imgPath + img.url) }
-    return <MemoForm {...props} />
-  }
+  const meunItems = [
+    {
+      isBlind: !isLogin,
+      label: '글 수정',
+      icon: <EditOutlined fontSize="small" />,
+      onClick: () => setEdit(true),
+    },
+    {
+      isBlind: !isLogin,
+      label: '삭제',
+      icon: <DeleteOutline fontSize="small" />,
+      onClick: () => handleDelete(memo.id, memo.images),
+    },
+    {
+      label: '공유하기',
+      icon: <LinkOutlined fontSize="small" />,
+      onClick: () => handleDelete(memo.id, memo.images),
+    },
+  ]
+
+  const menu = (
+    <Menu icon={<MoreHoriz fontSize="small" />} label="post-menu">
+      {meunItems.map((item) => (
+        <MenuItem key={item.label} {...item} />
+      ))}
+    </Menu>
+  )
 
   const header = {
     avatar: <Avatar user={memo.user} />,
-    action: (
-      <Menu icon={<MoreHoriz fontSize="small" />} label="post-menu">
-        {isLogin && (
-          <MenuItem onClick={() => setEdit(true)}>
-            <ListItemIcon>
-              <EditOutlined fontSize="small" />
-            </ListItemIcon>
-            글 수정
-          </MenuItem>
-        )}
-        {isLogin && (
-          <MenuItem onClick={() => handleDelete(memo.id, memo.images)}>
-            <ListItemIcon>
-              <DeleteOutline fontSize="small" />
-            </ListItemIcon>
-            삭제
-          </MenuItem>
-        )}
-        <MenuItem>
-          <ListItemIcon>
-            <LinkOutlined fontSize="small" />
-          </ListItemIcon>
-          공유하기
-        </MenuItem>
-      </Menu>
-    ),
+    action: menu,
     title: memo.user.name,
     subheader: changeDate(memo.createdAt),
   }
 
+  if (isEdit) {
+    const props = { ...memo, onSubmit }
+    return <MemoForm {...props} />
+  }
+
   return (
     <Card header={header} items={['header']}>
-      {content}
+      {memo.content}
       <ImgGrid images={memo.images} />
     </Card>
   )

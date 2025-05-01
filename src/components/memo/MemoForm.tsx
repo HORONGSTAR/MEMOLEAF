@@ -1,23 +1,21 @@
 'use client'
 import { InputBase, Paper, Button, Typography } from '@mui/material'
-import { useCallback, useState } from 'react'
-import { useAppDispatch } from '@/store/hooks'
-import { createMemoThunk } from '@/store/slices/postSlice'
-import { useSession } from 'next-auth/react'
-import { IntiVal } from '@/lib/types'
-import { setRenameFile } from '@/lib/utills'
 import { ImgForm, Blank, Stack } from '@/components'
+import { useCallback, useState } from 'react'
+import { setRenameFile } from '@/lib/utills'
+import { useSession } from 'next-auth/react'
+import { IntiVal, Image } from '@/lib/types'
 
 export default function MemoForm(inti: IntiVal) {
-  const dispatch = useAppDispatch()
   const [imgFiles, setImgFiles] = useState<File[]>([])
-  const [imgUrls, setImgUrls] = useState<string[]>(inti.images || [])
+  const [rmImgs, setRmImgs] = useState<{ id: number[]; url: string[] }>({ id: [], url: [] })
+  const [images, setImages] = useState<Image[]>(inti.images || [])
   const [content, setContent] = useState(inti.content || '')
   const [length, setLength] = useState(inti.content?.length || 0)
   const { data: session } = useSession()
+  const { onSubmit } = inti
   const user = session?.user
-
-  const imgProps = { imgUrls, setImgFiles, setImgUrls }
+  const imgProps = { images, setImages, setImgFiles, setRmImgs }
 
   const handleChange = (value: string) => {
     if (value.length > 191) return
@@ -33,16 +31,13 @@ export default function MemoForm(inti: IntiVal) {
       images.push(renamedFile.name)
       return renamedFile
     })
-    if (inti.id && inti.onSubmit) {
-      inti.onSubmit(inti.id, content)
-    } else {
-      dispatch(createMemoThunk({ user, content, images, files }))
-      setContent('')
-      setLength(0)
-      setImgUrls([])
-      setImgFiles([])
-    }
-  }, [dispatch, inti, user, content, imgFiles])
+
+    onSubmit({ id: user.id, content, images, files, rmImgs })
+    setContent('')
+    setLength(0)
+    setImages([])
+    setImgFiles([])
+  }, [onSubmit, user, content, imgFiles, rmImgs])
 
   return (
     <Paper variant="outlined" sx={{ p: 2, minHeight: 120 }}>

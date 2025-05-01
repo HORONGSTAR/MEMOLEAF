@@ -3,7 +3,8 @@ import { IconButton, Menu as MuiMenu } from '@mui/material'
 import { useState } from 'react'
 import { Props } from '@/lib/types'
 
-export default function Menu({ label, icon, children }: Props) {
+export default function Menu(props: Props) {
+  const { label, icon, children } = props
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
 

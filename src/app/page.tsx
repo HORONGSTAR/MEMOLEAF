@@ -1,10 +1,9 @@
-import { MemoForm, MemoCard, Wrap } from '@/components'
+import { MemoIndex, Wrap } from '@/components'
 
 export default async function HomePage() {
   return (
     <Wrap spacing={2}>
-      <MemoForm />
-      <MemoCard />
+      <MemoIndex />
     </Wrap>
   )
 }

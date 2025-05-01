@@ -1,24 +1,34 @@
 'use client'
-import { IconButton } from '@mui/material'
+import { IconButton, CircularProgress } from '@mui/material'
 import imageCompression from 'browser-image-compression'
-import { useRef, Dispatch, SetStateAction } from 'react'
+import { useRef, Dispatch, SetStateAction, useState } from 'react'
 import { ImgModal } from '@/components'
 import { ImageSearch } from '@mui/icons-material'
+import { imgPath } from '@/lib/utills'
+import { Image } from '@/lib/types'
 
 interface Props {
-  imgUrls: string[]
+  images: Image[]
+  setImages: Dispatch<SetStateAction<Image[]>>
   setImgFiles: Dispatch<SetStateAction<File[]>>
-  setImgUrls: Dispatch<SetStateAction<string[]>>
+  setRmImgs: Dispatch<
+    SetStateAction<{
+      id: number[]
+      url: string[]
+    }>
+  >
 }
 
 export default function ImgForm(props: Props) {
-  const { setImgFiles, imgUrls, setImgUrls } = props
+  const [loading, setLoading] = useState(false)
+  const { images, setImages, setImgFiles, setRmImgs } = props
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLoading(true)
     const files = e.target.files
     if (!files) return
-    if (files.length > 3) return alert('이미지는 최대 4장까지 첨부할 수 있어요.')
+    if (files.length > 4) return alert('이미지는 최대 4장까지 첨부할 수 있어요.')
 
     const newImgFiles: File[] = []
     const newImgUrls: string[] = []
@@ -33,19 +43,25 @@ export default function ImgForm(props: Props) {
       newImgUrls.push(URL.createObjectURL(file))
     }
     setImgFiles((prev) => [...prev, ...newImgFiles])
-    setImgUrls((prev) => [...prev, ...newImgUrls])
+    setImages((prev) => [...prev, ...newImgUrls.map((img) => ({ id: 0, url: img }))])
+    setLoading(false)
   }
 
-  const removeFile = (index: number) => {
+  const removeFile = (index: number, img: Image) => {
     setImgFiles((prev) => prev.filter((_, i) => i !== index))
-    setImgUrls((prev) => prev.filter((_, i) => i !== index))
+    setImages((prev) => prev.filter((_, i) => i !== index))
+    if (img.id > 0) setRmImgs((prev) => ({ id: [...prev.id, img.id], url: [...prev.url, img.url] }))
   }
 
   return (
     <div>
-      <IconButton disabled={imgUrls.length > 3} onClick={() => fileInputRef.current?.click()}>
-        <ImageSearch />
-      </IconButton>
+      {loading ? (
+        <CircularProgress size={36} />
+      ) : (
+        <IconButton disabled={images.length > 3} onClick={() => fileInputRef.current?.click()}>
+          <ImageSearch />
+        </IconButton>
+      )}
       <input
         className="hidden"
         ref={fileInputRef}
@@ -56,12 +72,12 @@ export default function ImgForm(props: Props) {
         onChange={(e) => handleFileChange(e)}
       />
       <div className="flex gap-2 mt-2 flex-wrap">
-        {imgUrls.map((url, index) => (
+        {images.map((img, index) => (
           <div key={index} className="relative w-24 h-24">
-            <ImgModal imgUrl={url} label={`image${index}`} />
+            <ImgModal imgUrl={img.id > 0 ? imgPath + img.url : img.url} label={`image${index}`} />
             <button
               type="button"
-              onClick={() => removeFile(index)}
+              onClick={() => removeFile(index, img)}
               className="absolute top-[-4px] right-[-4px] bg-black text-white text-xs size-6 rounded-full"
             >
               ✕

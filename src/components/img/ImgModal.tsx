@@ -2,21 +2,13 @@
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import { useState } from 'react'
 import { Props } from '@/lib/types'
-import Image from 'next/image'
 
 export default function ImgModalBox({ imgUrl, label }: Props) {
   const [open, setOpen] = useState(false)
 
   return (
     <>
-      <Image
-        onClick={() => setOpen(true)}
-        src={`${imgUrl}`}
-        alt={`${label}`}
-        fill
-        sizes="(max-width: 768px) 100vw, 50vw"
-        className="object-cover rounded"
-      />
+      <img onClick={() => setOpen(true)} src={`${imgUrl}`} alt={`${label}`} className="aspect-square object-cover" />
       <Dialog open={open}>
         <DialogTitle>미리보기</DialogTitle>
         <DialogContent>
