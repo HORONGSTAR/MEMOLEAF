@@ -5,6 +5,7 @@ export { default as LoginBox } from '@/components/auth/LoginBox'
 export { default as MemoCard } from '@/components/memo/MemoCard'
 export { default as MemoForm } from '@/components/memo/MemoForm'
 export { default as MemoIndex } from '@/components/memo/MemoIndex'
+export { default as MemoStyle } from '@/components/memo/MemoStyle'
 
 //img
 export { default as ImgForm } from '@/components/img/ImgForm'

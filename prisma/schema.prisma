@@ -19,28 +19,24 @@ model User {
   bookmark  BookMark[]
 }
 
+enum Style {
+  collapse
+}
+
 model Memo {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   userId    Int
-  user      User     @relation(fields: [userId],references: [id],onDelete: Cascade)
+  user      User       @relation(fields: [userId],references: [id],onDelete: Cascade)
   comments  Comment[]
   bookmark  BookMark[]
   images    Image[]
-  styles    Style[]
-  firstMemo Thread[]  @relation("firstMemo")
+  style     Style?
+  firstMemo Thread[]   @relation("firstMemo")
   laterMemo Thread[]   @relation("laterMemo")
   
-}
-
-model Style {
-  id        Int      @id @default(autoincrement())
-  target    String
-  options   String
-  memoId    Int
-  memo      Memo     @relation(fields: [memoId],references: [id],onDelete: Cascade)
 }
 
 model Thread {

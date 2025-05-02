@@ -50,6 +50,7 @@ export interface Memo {
   userId: number
   user: User
   images: Image[]
+  style?: string
   createdAt: string
 }
 

@@ -1,6 +1,6 @@
 'use client'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
-import { ImgGrid, MemoForm, Menu, MenuItem, Avatar, Card } from '@/components'
+import { ImgGrid, MemoForm, Menu, MenuItem, Avatar, Card, MemoStyle } from '@/components'
 import { updateMemoThunk, deleteMemoThunk } from '@/store/slices/postSlice'
 import { useCallback, useMemo, useState } from 'react'
 import { changeDate } from '@/lib/utills'
@@ -74,8 +74,10 @@ export default function MemoCard(memo: Memo) {
 
   return (
     <Card header={header} items={['header']}>
-      {memo.content}
-      <ImgGrid images={memo.images} />
+      <MemoStyle>
+        {memo.content}
+        <ImgGrid images={memo.images} />
+      </MemoStyle>
     </Card>
   )
 }
