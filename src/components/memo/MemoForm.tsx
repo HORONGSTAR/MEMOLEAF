@@ -1,27 +1,20 @@
 'use client'
-import { InputBase, Paper, Button, Typography } from '@mui/material'
-import { ImgForm, Blank, Stack } from '@/components'
+import { Paper, Button } from '@mui/material'
+import { ImgForm, ImgPreview, Blank, Stack, TextCount, MemoOption, InputText } from '@/components'
 import { useCallback, useState } from 'react'
 import { setRenameFile } from '@/lib/utills'
 import { useSession } from 'next-auth/react'
-import { IntiVal, Image } from '@/lib/types'
+import { IntiMemoVal, Image, RmImgs } from '@/lib/types'
 
-export default function MemoForm(inti: IntiVal) {
+export default function MemoForm(inti: IntiMemoVal) {
   const [imgFiles, setImgFiles] = useState<File[]>([])
-  const [rmImgs, setRmImgs] = useState<{ id: number[]; url: string[] }>({ id: [], url: [] })
+  const [rmImgs, setRmImgs] = useState<RmImgs>({ id: [], url: [] })
   const [images, setImages] = useState<Image[]>(inti.images || [])
   const [content, setContent] = useState(inti.content || '')
-  const [length, setLength] = useState(inti.content?.length || 0)
   const { data: session } = useSession()
   const { onSubmit } = inti
   const user = session?.user
   const imgProps = { images, setImages, setImgFiles, setRmImgs }
-
-  const handleChange = (value: string) => {
-    if (value.length > 191) return
-    setContent(value)
-    setLength(value.length)
-  }
 
   const handleSubmit = useCallback(() => {
     if (!user) return
@@ -34,30 +27,32 @@ export default function MemoForm(inti: IntiVal) {
 
     onSubmit({ id: user.id, content, images, files, rmImgs })
     setContent('')
-    setLength(0)
     setImages([])
     setImgFiles([])
   }, [onSubmit, user, content, imgFiles, rmImgs])
 
   return (
     <Paper variant="outlined" sx={{ p: 2, minHeight: 120 }}>
-      <InputBase
+      <MemoOption />
+      <InputText
         fullWidth
         multiline
-        autoFocus
         minRows={3}
+        placeholder="기록을 남겨보세요!"
         value={content}
-        placeholder={'기록을 남겨보세요!'}
-        onChange={(e) => handleChange(e.target.value)}
+        max={191}
+        fontSize="body1"
+        setValue={setContent}
       />
       <Stack alignItems={'center'} spacing={2}>
         <ImgForm {...imgProps} />
         <Blank />
-        <Typography variant="body2">{length} / 191</Typography>
+        <TextCount text={content} max={191} />
         <Button variant="contained" onClick={handleSubmit}>
           메모
         </Button>
       </Stack>
+      <ImgPreview {...imgProps} />
     </Paper>
   )
 }

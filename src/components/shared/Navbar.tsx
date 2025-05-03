@@ -3,7 +3,7 @@ import { Stack, Blank, Account } from '@/components'
 import Link from 'next/link'
 import Image from 'next/image'
 
-export default function Navvar() {
+export default function Navbar() {
   return (
     <>
       <AppBar sx={{ bgcolor: 'Background', color: 'inherit' }} elevation={1}>

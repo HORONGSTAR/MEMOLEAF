@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const user = await prisma.user.findUnique({ where: { id } })
     if (!user) return NRes.json({ error: '유저 정보를 찾을 수 없습니다.' }, { status: 404 })
 
-    const newMemo = await prisma.memo.create({ data: { userId: user.id, content } })
+    const newMemo = await prisma.memo.create({ data: { userId: user.id, content, markdown: false } })
     const res = { ...newMemo, user, images }
 
     if (images.length > 0) {

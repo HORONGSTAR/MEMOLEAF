@@ -1,27 +1,13 @@
 'use client'
 import { IconButton, CircularProgress } from '@mui/material'
 import imageCompression from 'browser-image-compression'
-import { useRef, Dispatch, SetStateAction, useState } from 'react'
-import { ImgModal } from '@/components'
+import { useRef, useState } from 'react'
 import { ImageSearch } from '@mui/icons-material'
-import { imgPath } from '@/lib/utills'
-import { Image } from '@/lib/types'
+import { ImageState } from '@/lib/types'
 
-interface Props {
-  images: Image[]
-  setImages: Dispatch<SetStateAction<Image[]>>
-  setImgFiles: Dispatch<SetStateAction<File[]>>
-  setRmImgs: Dispatch<
-    SetStateAction<{
-      id: number[]
-      url: string[]
-    }>
-  >
-}
-
-export default function ImgForm(props: Props) {
+export default function ImgForm(props: ImageState) {
   const [loading, setLoading] = useState(false)
-  const { images, setImages, setImgFiles, setRmImgs } = props
+  const { images, setImages, setImgFiles } = props
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,18 +33,16 @@ export default function ImgForm(props: Props) {
     setLoading(false)
   }
 
-  const removeFile = (index: number, img: Image) => {
-    setImgFiles((prev) => prev.filter((_, i) => i !== index))
-    setImages((prev) => prev.filter((_, i) => i !== index))
-    if (img.id > 0) setRmImgs((prev) => ({ id: [...prev.id, img.id], url: [...prev.url, img.url] }))
-  }
-
   return (
-    <div>
+    <>
       {loading ? (
         <CircularProgress size={36} />
       ) : (
-        <IconButton disabled={images.length > 3} onClick={() => fileInputRef.current?.click()}>
+        <IconButton
+          aria-label="이미지 업로드"
+          disabled={images.length > 3}
+          onClick={() => fileInputRef.current?.click()}
+        >
           <ImageSearch />
         </IconButton>
       )}
@@ -71,20 +55,6 @@ export default function ImgForm(props: Props) {
         multiple
         onChange={(e) => handleFileChange(e)}
       />
-      <div className="flex gap-2 mt-2 flex-wrap">
-        {images.map((img, index) => (
-          <div key={index} className="relative w-24 h-24">
-            <ImgModal imgUrl={img.id > 0 ? imgPath + img.url : img.url} label={`image${index}`} />
-            <button
-              type="button"
-              onClick={() => removeFile(index, img)}
-              className="absolute top-[-4px] right-[-4px] bg-black text-white text-xs size-6 rounded-full"
-            >
-              ✕
-            </button>
-          </div>
-        ))}
-      </div>
-    </div>
+    </>
   )
 }

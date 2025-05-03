@@ -1,8 +1,7 @@
 'use client'
-import { ExpandMore } from '@mui/icons-material'
 import { ReactNode, useState } from 'react'
 import { Collapse, Typography, Chip, Box } from '@mui/material'
-
+import { ExpandMore } from '@mui/icons-material'
 type Styles = { [key: string]: ReactNode }
 
 interface Props {
@@ -19,10 +18,10 @@ const CollapseBox = (props: Props) => {
       </Typography>
       <Chip
         sx={{ px: 0.5, my: 1 }}
-        icon={<ExpandMore sx={{ transform: checked ? 'rotate(180deg)' : '' }} />}
         onClick={() => setChecked((prev) => !prev)}
         label={checked ? '접기' : '더 보기'}
         size="small"
+        icon={<ExpandMore />}
       />
       <Collapse in={checked}>{props.children}</Collapse>
     </Box>

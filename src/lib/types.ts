@@ -1,5 +1,21 @@
 import { GridSpacing, Breakpoint } from '@mui/material'
-import { ReactNode } from 'react'
+import { Dispatch, ReactNode, SetStateAction } from 'react'
+
+export type RmImgs = {
+  id: number[]
+  url: string[]
+}
+
+export type Image = {
+  id: number
+  url: string
+}
+
+export type User = {
+  id: number
+  name: string
+  image: string
+}
 
 export interface Props {
   onClick?: () => void
@@ -21,12 +37,6 @@ export interface Props {
   variant?: 'circular' | 'rounded' | 'square'
 }
 
-export interface User {
-  id: number
-  name: string
-  image: string
-}
-
 export interface Params {
   id?: number
   userId?: number
@@ -36,12 +46,7 @@ export interface Params {
   content?: string
   images?: string[]
   files?: File[]
-  rmImgs?: { id: number[]; url: string[] }
-}
-
-export interface Image {
-  id: number
-  url: string
+  rmImgs?: RmImgs
 }
 
 export interface Memo {
@@ -54,9 +59,21 @@ export interface Memo {
   createdAt: string
 }
 
-export interface IntiVal {
+export interface IntiMemoVal {
   id?: number
   content?: string
   images?: Image[]
   onSubmit: (params: Params) => void
+}
+
+export interface ImageState {
+  images: Image[]
+  setImages: Dispatch<SetStateAction<Image[]>>
+  setImgFiles: Dispatch<SetStateAction<File[]>>
+  setRmImgs: Dispatch<
+    SetStateAction<{
+      id: number[]
+      url: string[]
+    }>
+  >
 }

@@ -53,7 +53,7 @@ export default function MemoCard(memo: Memo) {
   ]
 
   const menu = (
-    <Menu icon={<MoreHoriz fontSize="small" />} label="post-menu">
+    <Menu icon={<MoreHoriz fontSize="small" />} label="메모 메뉴 열기">
       {meunItems.map((item) => (
         <MenuItem key={item.label} {...item} />
       ))}

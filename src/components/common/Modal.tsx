@@ -3,7 +3,8 @@ import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/
 import { useState } from 'react'
 import { Props } from '@/lib/types'
 
-export default function Modal({ label, title, children }: Props) {
+export default function Modal(props: Props) {
+  const { label, title, children } = props
   const [open, setOpen] = useState(false)
 
   return (

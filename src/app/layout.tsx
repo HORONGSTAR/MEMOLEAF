@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { Noto_Sans_KR, Nanum_Gothic, Nanum_Myeongjo, Nanum_Pen_Script, Do_Hyeon, Jua } from 'next/font/google'
-import NavBar from '@/components/shared/Navbar'
 import { ThemeProvider } from '@mui/material'
 import { theme } from '@/styles/MuiTheme'
 import Providers from './Providers'
@@ -57,10 +56,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${notoSans.variable} antialiased`}>
         <Providers>
-          <ThemeProvider theme={theme}>
-            <NavBar />
-            {children}
-          </ThemeProvider>
+          <ThemeProvider theme={theme}>{children}</ThemeProvider>
         </Providers>
       </body>
     </html>

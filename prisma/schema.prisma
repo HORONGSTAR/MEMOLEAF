@@ -10,7 +10,7 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   credits   String   @unique
-  name      String  @db.VarChar(12)
+  name      String   @db.VarChar(12)
   image     String
   info      String?
   createdAt DateTime @default(now())
@@ -19,9 +19,6 @@ model User {
   bookmark  BookMark[]
 }
 
-enum Style {
-  collapse
-}
 
 model Memo {
   id        Int        @id @default(autoincrement())
@@ -30,47 +27,64 @@ model Memo {
   updatedAt DateTime   @updatedAt
   userId    Int
   user      User       @relation(fields: [userId],references: [id],onDelete: Cascade)
+  styles    Style[] 
   comments  Comment[]
   bookmark  BookMark[]
   images    Image[]
-  style     Style?
   firstMemo Thread[]   @relation("firstMemo")
   laterMemo Thread[]   @relation("laterMemo")
   
 }
 
+enum Option {
+  info
+  folder
+  secret
+  font
+  color
+}
+
+model Style {
+  id        Int        @id @default(autoincrement())
+  option    Option
+  extra     String     @db.VarChar(30)
+  memoId    Int
+  memo      Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
+}
+
 model Thread {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   firstId   Int
-  firstMemo Memo     @relation("firstMemo",fields: [firstId],references: [id],onDelete: Cascade)
+  firstMemo Memo       @relation("firstMemo",fields: [firstId],references: [id],onDelete: Cascade)
   laterId   Int
-  laterMemo Memo     @relation("laterMemo",fields: [laterId],references: [id],onDelete: Cascade)
+  laterMemo Memo       @relation("laterMemo",fields: [laterId],references: [id],onDelete: Cascade)
 }
 
 model Image {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   url       String
-  createdAt DateTime @default(now())
+  alt       String?
+  createdAt DateTime   @default(now())
   memoId    Int
-  memo      Memo     @relation(fields: [memoId],references: [id],onDelete: Cascade)
+  memo      Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   userId    Int
   memoId    Int
-  user      User     @relation(fields: [userId],references: [id],onDelete: Cascade)
-  memo      Memo     @relation(fields: [memoId],references: [id],onDelete: Cascade)
+  user      User       @relation(fields: [userId],references: [id],onDelete: Cascade)
+  memo      Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
 }
 
 model BookMark {
-  id        Int      @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   userId    Int
   memoId    Int
-  user      User     @relation(fields: [userId],references: [id],onDelete: Cascade)
-  memo      Memo     @relation(fields: [memoId],references: [id],onDelete: Cascade)
+  user      User       @relation(fields: [userId],references: [id],onDelete: Cascade)
+  memo      Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
 }
 

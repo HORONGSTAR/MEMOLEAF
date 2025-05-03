@@ -1,9 +1,12 @@
-import { MemoIndex, Wrap } from '@/components'
+import { MemoIndex, Wrap, Navbar } from '@/components'
 
 export default async function HomePage() {
   return (
-    <Wrap spacing={2}>
-      <MemoIndex />
-    </Wrap>
+    <>
+      <Navbar />
+      <Wrap spacing={2}>
+        <MemoIndex />
+      </Wrap>
+    </>
   )
 }
