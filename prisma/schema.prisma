@@ -37,9 +37,9 @@ model Memo {
 }
 
 enum Option {
+  secret
   info
   folder
-  secret
   font
   color
 }
@@ -63,7 +63,7 @@ model Thread {
 model Image {
   id        Int        @id @default(autoincrement())
   url       String
-  alt       String?
+  alt       String
   createdAt DateTime   @default(now())
   memoId    Int
   memo      Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)

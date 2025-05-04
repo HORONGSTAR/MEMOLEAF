@@ -1,17 +1,18 @@
 'use client'
 import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import { useState } from 'react'
-import { Props } from '@/lib/types'
+import { BasicProps } from '@/lib/types'
 import Image from 'next/image'
 
-export default function ImgModalBox({ imgUrl, label }: Props) {
+export default function ImgModalBox(props: BasicProps) {
+  const { image, label } = props
   const [open, setOpen] = useState(false)
 
   return (
     <>
       <Image
         onClick={() => setOpen(true)}
-        src={`${imgUrl}`}
+        src={`${image}`}
         alt={`${label}`}
         width={852}
         height={852}
@@ -20,7 +21,7 @@ export default function ImgModalBox({ imgUrl, label }: Props) {
       <Dialog open={open}>
         <DialogTitle>미리보기</DialogTitle>
         <DialogContent>
-          <Image src={`${imgUrl}`} alt={`${label}`} width={1024} height={1024} />
+          <Image src={`${image}`} alt={`${label}`} width={1024} height={1024} />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>취소</Button>

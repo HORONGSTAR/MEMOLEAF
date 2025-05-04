@@ -1,9 +1,9 @@
 'use client'
-import { Props } from '@/lib/types'
+import { BasicProps } from '@/lib/types'
 import { Popover as MuiPopover, IconButton } from '@mui/material'
 import { useState } from 'react'
 
-export default function Popover(props: Props) {
+export default function Popover(props: BasicProps) {
   const { label, children, icon } = props
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 

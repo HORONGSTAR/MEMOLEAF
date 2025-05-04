@@ -5,10 +5,10 @@ import { updateMemoThunk, deleteMemoThunk } from '@/store/slices/postSlice'
 import { useCallback, useMemo, useState } from 'react'
 import { changeDate } from '@/lib/utills'
 import { useAppDispatch } from '@/store/hooks'
-import { Memo, Image, Params } from '@/lib/types'
+import { MemoProps, MemoParamsCU, Options, Image } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 
-export default function MemoCard(memo: Memo) {
+export default function MemoCard(memo: MemoProps) {
   const dispatch = useAppDispatch()
   const [isEdit, setEdit] = useState(false)
   const { data: session } = useSession()
@@ -17,17 +17,16 @@ export default function MemoCard(memo: Memo) {
   const isLogin = useMemo(() => (user?.id === memo.userId ? true : false), [user, memo])
 
   const onSubmit = useCallback(
-    (params: Params) => {
-      dispatch(updateMemoThunk({ ...params, id: memo?.id }))
+    (params: MemoParamsCU) => {
+      dispatch(updateMemoThunk({ ...params, id: memo.id }))
       setEdit(false)
     },
     [dispatch, memo]
   )
 
   const handleDelete = useCallback(
-    (id: number, imageList: Image[]) => {
-      const images = imageList.map((img) => img.url)
-      dispatch(deleteMemoThunk({ id, images }))
+    (id: number, images: Image[]) => {
+      dispatch(deleteMemoThunk({ id, images: { create: [], remove: images } }))
     },
     [dispatch]
   )
@@ -72,9 +71,23 @@ export default function MemoCard(memo: Memo) {
     return <MemoForm {...props} />
   }
 
+  const options: Options = {
+    info: {
+      activate: 'off',
+    },
+    secret: {
+      activate: 'off',
+    },
+    folder: {
+      activate: 'off',
+    },
+  }
+
+  memo.styles.forEach((style) => (options[style.option] = { activate: 'on', extra: style.extra }))
+
   return (
-    <Card header={header} items={['header']}>
-      <MemoStyle>
+    <Card header={header}>
+      <MemoStyle options={options}>
         {memo.content}
         <ImgGrid images={memo.images} />
       </MemoStyle>

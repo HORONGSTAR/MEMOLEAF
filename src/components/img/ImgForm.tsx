@@ -7,7 +7,7 @@ import { ImageState } from '@/lib/types'
 
 export default function ImgForm(props: ImageState) {
   const [loading, setLoading] = useState(false)
-  const { images, setImages, setImgFiles } = props
+  const { imgList, setImgList, setImgFiles } = props
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,7 +29,10 @@ export default function ImgForm(props: ImageState) {
       newImgUrls.push(URL.createObjectURL(file))
     }
     setImgFiles((prev) => [...prev, ...newImgFiles])
-    setImages((prev) => [...prev, ...newImgUrls.map((img) => ({ id: 0, url: img }))])
+    setImgList((prev) => ({
+      create: [...prev.create, ...newImgUrls.map((img) => ({ url: img, alt: '' }))],
+      remove: prev.remove,
+    }))
     setLoading(false)
   }
 
@@ -40,7 +43,7 @@ export default function ImgForm(props: ImageState) {
       ) : (
         <IconButton
           aria-label="이미지 업로드"
-          disabled={images.length > 3}
+          disabled={imgList.create.length > 3}
           onClick={() => fileInputRef.current?.click()}
         >
           <ImageSearch />

@@ -1,6 +1,12 @@
 import { Typography } from '@mui/material'
 
-export default function TextCount({ text, max }: { text: string; max: number }) {
+interface Props {
+  text: string
+  max: number
+}
+
+export default function TextCount(props: Props) {
+  const { text, max } = props
   return (
     <Typography color="textSecondary" variant="caption" whiteSpace="nowrap">
       {text?.length || 0} / {max}

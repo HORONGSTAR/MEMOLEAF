@@ -1,9 +1,9 @@
 'use client'
 import { IconButton, Menu as MuiMenu } from '@mui/material'
 import { useState } from 'react'
-import { Props } from '@/lib/types'
+import { BasicProps } from '@/lib/types'
 
-export default function Menu(props: Props) {
+export default function Menu(props: BasicProps) {
   const { label, icon, children } = props
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)

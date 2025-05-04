@@ -1,31 +1,30 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getMemos, createMemo, updateMemo, deleteMemo } from '@/lib/api/postApi'
-import { Memo, Params } from '@/lib/types'
+import { MemoProps, MemoParamsD, MemoParamsCU } from '@/lib/types'
 
 interface Memos {
-  memos: Memo[]
+  memos: MemoProps[]
   page: number
   total: number
 }
 
-export const getMemosThunk = createAsyncThunk<Memos, Params>('memo/getMemos', async ({ page }) => {
+export const getMemosThunk = createAsyncThunk<Memos, number>('memo/getMemos', async (page) => {
   try {
-    return await getMemos({ page })
+    return await getMemos(page)
   } catch (error) {
     console.error(error || '메모 조회 실패')
   }
 })
 
-export const createMemoThunk = createAsyncThunk<Memo, Params>('memo/createMemo', async (params) => {
+export const createMemoThunk = createAsyncThunk<MemoProps, MemoParamsCU>('memo/createMemo', async (params) => {
   try {
-    const memo = await createMemo(params)
-    return memo
+    return await createMemo(params)
   } catch (error) {
     console.error(error || '메모 작성 실패')
   }
 })
 
-export const updateMemoThunk = createAsyncThunk<Memo, Params>('memo/updateMemo', async (params) => {
+export const updateMemoThunk = createAsyncThunk<MemoProps, MemoParamsCU>('memo/updateMemo', async (params) => {
   try {
     return await updateMemo(params)
   } catch (error) {
@@ -33,7 +32,7 @@ export const updateMemoThunk = createAsyncThunk<Memo, Params>('memo/updateMemo',
   }
 })
 
-export const deleteMemoThunk = createAsyncThunk<Memo, Params>('memo/deleteMemo', async (params) => {
+export const deleteMemoThunk = createAsyncThunk<MemoProps, MemoParamsD>('memo/deleteMemo', async (params) => {
   try {
     return await deleteMemo(params)
   } catch (error) {
@@ -42,7 +41,7 @@ export const deleteMemoThunk = createAsyncThunk<Memo, Params>('memo/deleteMemo',
 })
 
 interface State {
-  memos: Memo[] | []
+  memos: MemoProps[] | []
   page: number
   total: number
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
@@ -103,7 +102,7 @@ export const memoSlice = createSlice({
       })
       .addCase(deleteMemoThunk.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        state.memos = state.memos?.filter((memo) => memo.id !== action.payload.id)
+        state.memos = state.memos.filter((memo) => memo.id !== action.payload.id)
       })
       .addCase(deleteMemoThunk.rejected, (state) => {
         state.status = 'failed'

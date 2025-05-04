@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     skip: (page - 1) * limit,
     take: 10,
     orderBy: { createdAt: 'desc' },
-    include: { user: true, images: true },
+    include: { user: true, images: true, styles: true },
   })
 
   const totalCount = await prisma.user.count()
@@ -24,20 +24,23 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { id, content, images } = await req.json()
+    const { id, content, images, styles } = await req.json()
+
     const user = await prisma.user.findUnique({ where: { id } })
     if (!user) return NRes.json({ error: '유저 정보를 찾을 수 없습니다.' }, { status: 404 })
 
-    const newMemo = await prisma.memo.create({ data: { userId: user.id, content, markdown: false } })
-    const res = { ...newMemo, user, images }
-
-    if (images.length > 0) {
-      await prisma.image.createMany({
-        data: images.map((image: string) => ({ url: image, memoId: newMemo.id })),
-      })
-    }
+    const newMemo = await prisma.memo.create({
+      data: {
+        userId: user.id,
+        content,
+        ...(images?.length > 0 && { images: { create: images } }),
+        ...(styles?.length > 0 && { styles: { create: styles } }),
+      },
+    })
+    const res = { ...newMemo, user, images, styles }
 
     res.images = await prisma.image.findMany({ where: { memoId: newMemo.id } })
+    res.styles = await prisma.style.findMany({ where: { memoId: newMemo.id } })
 
     return NRes.json(res)
   } catch (err) {
@@ -48,22 +51,24 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const { id, content, images, rmImgs } = await req.json()
+    const { id, content, images, styles } = await req.json()
     const search = await prisma.memo.findUnique({ where: { id } })
     if (!search) return NRes.json({ error: '메모를 찾을 수 없습니다.' }, { status: 404 })
 
-    const memo = await prisma.memo.update({ where: { id }, data: { content } })
-    const res = { ...memo, images }
+    const memo = await prisma.memo.update({
+      where: { id },
+      data: {
+        content,
+        images: { deleteMany: {}, ...(images?.length > 0 && { create: images }) },
+        styles: { deleteMany: {}, ...(styles?.length > 0 && { create: styles }) },
+      },
+    })
 
-    if (images.length > 0) {
-      await prisma.image.createMany({
-        data: images.map((image: string) => ({ url: image, memoId: id })),
-      })
-    }
-
-    for (const id of rmImgs) await prisma.image.delete({ where: { id } })
+    const res = { ...memo, images, styles }
 
     res.images = await prisma.image.findMany({ where: { memoId: memo.id } })
+    res.styles = await prisma.style.findMany({ where: { memoId: memo.id } })
+
     return NRes.json(res)
   } catch (err) {
     console.error(err)

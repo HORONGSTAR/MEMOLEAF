@@ -1,13 +1,20 @@
 'use client'
-import * as React from 'react'
-import { MenuItem } from '@mui/material'
+import { useState } from 'react'
+import { MenuItem, Button } from '@mui/material'
 import { useSession, signOut } from 'next-auth/react'
-import { LoginBox, Modal, Menu, Avatar } from '@/components'
+import { LoginBox, Dialog, Menu, Avatar } from '@/components'
 import Link from 'next/link'
 
 export default function Account() {
+  const [open, setOpen] = useState(false)
   const { data: session } = useSession()
   const user = session?.user
+
+  const dialogProps = {
+    open,
+    actions: <Button onClick={() => setOpen(false)}>닫기</Button>,
+    label: '소셜 로그인',
+  }
 
   return (
     <>
@@ -22,10 +29,11 @@ export default function Account() {
           <MenuItem onClick={() => signOut()}>로그아웃</MenuItem>
         </Menu>
       ) : (
-        <Modal label="로그인" title="소셜 로그인">
-          <LoginBox />
-        </Modal>
+        <Button>로그인</Button>
       )}
+      <Dialog {...dialogProps}>
+        <LoginBox />
+      </Dialog>
     </>
   )
 }

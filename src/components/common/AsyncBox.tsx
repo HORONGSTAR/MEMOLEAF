@@ -6,6 +6,14 @@ interface Props {
   component: ReactNode
 }
 export default function AsyncBox(props: Props) {
-  const components = { idle: null, loading: <CircularProgress />, succeeded: props.component, failed: null }
-  return components[props.state]
+  const { state, component } = props
+
+  const components = {
+    idle: null,
+    loading: <CircularProgress />,
+    succeeded: component,
+    failed: null,
+  }
+
+  return components[state]
 }

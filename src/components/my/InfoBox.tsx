@@ -1,6 +1,6 @@
 'use client'
-import { Skeleton, Typography, List, ListItem } from '@mui/material'
-import { Avatar, Stack } from '@/components'
+import { Skeleton, Typography, List, ListItem, Stack } from '@mui/material'
+import { Avatar } from '@/components'
 import { getUser } from '@/lib/api/userApi'
 import { useParams } from 'next/navigation'
 import { useState, useEffect, useCallback } from 'react'
@@ -21,7 +21,7 @@ export default function InfoBox() {
   }, [handleLoad])
 
   return (
-    <Stack>
+    <Stack direction="row">
       {profile ? (
         <>
           <Avatar variant="rounded" size={160} user={profile} />

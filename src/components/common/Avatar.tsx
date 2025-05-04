@@ -1,14 +1,23 @@
 'use client'
 import { Avatar as MuiAvatar } from '@mui/material'
-import { Props } from '@/lib/types'
+
+interface Props {
+  variant?: 'circular' | 'rounded' | 'square'
+  size?: number
+  user?: {
+    name?: string | null
+    image?: string | null
+  }
+}
 
 export default function UserAvatar(props: Props) {
+  const { variant, size, user } = props
   return (
     <MuiAvatar
-      variant={props.variant}
-      sx={{ width: props.size || 32, height: props.size || 32 }}
-      src={`${process.env.NEXT_PUBLIC_IMG_URL}/uploads${props.user?.image || ''}`}
-      alt={`${props.user?.name}프로필 사진`}
+      variant={variant}
+      sx={{ width: size || 32, height: size || 32 }}
+      src={`${process.env.NEXT_PUBLIC_IMG_URL}/uploads${user?.image}`}
+      alt={`${user?.name}프로필 사진`}
     />
   )
 }

@@ -13,8 +13,8 @@ export async function uploadImages(files: File[]) {
   return res.json()
 }
 
-export async function deleteImages(fileNames: string[]) {
-  const data = metaData('DELETE', { fileNames })
+export async function deleteImages(files: { url: string }[]) {
+  const data = metaData('DELETE', { files })
   await fetch(imgUrl, data)
   return
 }

@@ -1,5 +1,5 @@
 import { userUrl, metaData } from '@/lib/api/fetchApi'
-import { Params } from '@/lib/types'
+import { UserParams } from '@/lib/types'
 
 export const getUser = async (id: string) => {
   const res = await fetch(userUrl + `?id=${id}`)
@@ -7,7 +7,7 @@ export const getUser = async (id: string) => {
   return res.json()
 }
 
-export const updateUser = async (params: Params) => {
+export const updateUser = async (params: UserParams) => {
   const { id, name, info } = params
   const data = metaData('POST', { id, name, info })
   const res = await fetch(userUrl, data)
