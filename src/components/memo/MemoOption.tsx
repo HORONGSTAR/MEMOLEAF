@@ -1,118 +1,73 @@
 'use client'
-import { Typography, Checkbox, FormControlLabel, Stack, Chip, IconButton, Divider, ChipProps, Button } from '@mui/material'
-import { ExpandMore, DriveFileRenameOutline, LockOutline, Check } from '@mui/icons-material'
-import { InputText, Dialog } from '@/components'
-import { useCallback, useState } from 'react'
+import { ReactNode, useMemo, useState } from 'react'
+import { Collapse, Typography, Chip, Box, Paper, Stack, Divider } from '@mui/material'
+import { ExpandMore } from '@mui/icons-material'
+import InputText from '../common/InputText'
+import { Style } from '@/lib/types'
+import { swapOnOff } from '@/lib/utills'
 
-type Checked = { [key: string]: boolean }
+interface Props extends Style {
+  children?: ReactNode
+  form?: ReactNode
+}
 
-export default function MemoOption() {
-  const [isEdit, setEdit] = useState(false)
-  const [open, setOpen] = useState(false)
-  const [subtext, setSubtext] = useState('')
-  const [folder, setFolder] = useState('')
-  const [secret, setSecret] = useState('')
-  const [checked, setChecked] = useState<Checked>({ subtext: false, folder: false, secret: false })
+type Component = { [key: string]: ReactNode }
 
-  const handleChange = useCallback((value: boolean, field: string) => {
-    setChecked((prev) => ({ ...prev, [field]: value }))
-  }, [])
+export default function MemoOption(props: Props) {
+  const { option, extra, children } = props
+  const [password, setPassword] = useState('')
+  const [checked, setChecked] = useState('off')
 
-  const handleSave = useCallback(() => {
-    setOpen(false)
-  }, [])
+  const isUnLock = useMemo(() => (extra !== password ? false : true), [extra, password])
+  const transform: { [key: string]: string } = { on: '180deg', off: '0deg' }
 
-  const handleCancel = useCallback(() => {
-    setOpen(false)
-    setSecret('')
-    handleChange(false, 'secret')
-  }, [handleChange])
+  const handleChange = (value: string) => {
+    setPassword(value)
+  }
 
-  const dialogProps = {
-    open: open,
-    actions: (
+  const component: Component = {
+    subtext: (
+      <Box>
+        <Typography variant="body2" color="textSecondary">
+          {extra}
+        </Typography>
+        <Divider sx={{ my: 2 }} />
+      </Box>
+    ),
+    folder: (
+      <Box>
+        <Chip
+          onClick={() => setChecked(swapOnOff[checked].next)}
+          label={checked ? '접기' : extra || '더 보기'}
+          size="small"
+          icon={
+            <ExpandMore
+              sx={{
+                transform: `rotate(${transform[checked]})`,
+                transition: 'transform 0.3s ease',
+              }}
+            />
+          }
+        />
+        <Collapse in={swapOnOff[checked].bool}>{children}</Collapse>
+      </Box>
+    ),
+    secret: (
       <>
-        <Button onClick={handleSave}>완료</Button>
-        <Button onClick={handleCancel}>취소</Button>
+        {isUnLock ? (
+          <Box>{children}</Box>
+        ) : (
+          <Stack alignItems="center" spacing={1}>
+            <Typography variant="body2">비공개 글입니다.</Typography>
+            <Typography variant="body2">열람 비밀번호가 필요합니다.</Typography>
+            <Paper variant="outlined" sx={{ px: 1, maxWidth: 120 }}>
+              <InputText fontSize="body2" value={password} onChange={(e) => handleChange(e.target.value)} placeholder="비밀번호 입력" />
+            </Paper>
+          </Stack>
+        )}
       </>
     ),
-    label: '감추기 비밀번호 설정',
   }
 
-  const formItems = [
-    { field: 'subtext', label: '덧붙임' },
-    { field: 'folder', label: '접힌 글' },
-    { field: 'secret', label: '감추기' },
-  ]
-
-  const inputProps = {
-    subtext: {
-      'aria-label': '덧붙임 내용 입력',
-      placeholder: '안내문이나 주의사항을 추가할 수 있어요.',
-      value: subtext,
-      fullWidth: true,
-      max: 30,
-      setValue: setSubtext,
-    },
-    folder: {
-      'aria-label': '접힌글 더 보기 버튼 문구 입력',
-      placeholder: '예: 더 보기, 펼쳐보기',
-      value: folder,
-      max: 20,
-      setValue: setFolder,
-    },
-    secret: {
-      'aria-label': '감추기 해제용 비밀번호 입력',
-      placeholder: '비밀번호 입력',
-      value: secret,
-      max: 12,
-      type: 'password',
-      fontSize: 'body1',
-      setValue: setSecret,
-    },
-  }
-
-  const folderChipProps: ChipProps = isEdit
-    ? { variant: 'outlined', label: <InputText {...inputProps.folder} /> }
-    : { variant: 'filled', label: folder || '더 보기' }
-
-  const secretChipProps: ChipProps = secret
-    ? { icon: <Check />, label: '비밀번호 설정 완료', color: 'success' }
-    : { icon: <LockOutline />, label: '비밀번호 설정 필요' }
-
-  return (
-    <Stack spacing={1}>
-      <Stack direction="row" flexWrap="wrap" alignItems="center">
-        {formItems.map((item) => (
-          <FormControlLabel
-            key={item.field}
-            control={<Checkbox onChange={(e) => handleChange(e.target.checked, item.field)} checked={checked[item.field]} size="small" />}
-            label={<Typography variant="body2">{item.label}</Typography>}
-          />
-        ))}
-        {checked.secret && <Chip size="small" onClick={() => setOpen(true)} {...secretChipProps} />}
-        <Dialog {...dialogProps}>
-          <InputText {...inputProps.secret} />
-          <Divider />
-          <Typography width={300} mt={2} variant="body2">
-            간단한 비밀번호로 메모를 잠글 수 있어요. 하지만 완전한 보안은 아니니 개인정보나 중요한 내용은 적지 말아주세요!
-          </Typography>
-        </Dialog>
-      </Stack>
-      {checked.subtext && (
-        <div>
-          <InputText {...inputProps.subtext} />
-          <Divider />
-        </div>
-      )}
-      {checked.folder && (
-        <Stack direction="row" alignItems="center">
-          <Chip color="secondary" size="small" icon={<ExpandMore />} {...folderChipProps} />
-          <IconButton onClick={() => setEdit((prev) => !prev)} size="small" aria-label="더 보기 버튼 라벨 수정">
-            <DriveFileRenameOutline fontSize="small" />
-          </IconButton>
-        </Stack>
-      )}
-    </Stack>
-  )
+  return <>{component[option]}</>
 }

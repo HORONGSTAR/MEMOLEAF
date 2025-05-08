@@ -3,10 +3,10 @@ import { Dispatch, ReactNode, SetStateAction } from 'react'
 export type Image = {
   id?: number
   url: string
-  alt: string
+  alt?: string
 }
 
-export type ImgList = { create: Image[]; remove: Image[] }
+export type ImgList = { files: File[]; create: Image[]; remove: Image[] }
 
 export interface User {
   id: number
@@ -25,7 +25,6 @@ export interface MemoParamsD {
 
 export interface MemoParamsCU extends MemoParamsD {
   content: string
-  files: File[]
   styles: Style[]
 }
 
@@ -54,21 +53,14 @@ export interface BasicProps {
   component?: ReactNode
 }
 
-export type Activate = 'on' | 'off'
-
-export type Options = {
-  info: { activate: Activate; extra?: string }
-  secret: { activate: Activate; extra?: string }
-  folder: { activate: Activate; extra?: string }
-}
+export type Option = { [key: string]: { activate: string; extra?: string } }
 
 export type Style = {
-  option: 'info' | 'secret' | 'folder'
-  extra: string
+  option: string
+  extra?: string
 }
 
 export interface ImageState {
   imgList: ImgList
   setImgList: Dispatch<SetStateAction<ImgList>>
-  setImgFiles: Dispatch<SetStateAction<File[]>>
 }

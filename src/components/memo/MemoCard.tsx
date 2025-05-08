@@ -1,11 +1,11 @@
 'use client'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
-import { ImgGrid, MemoForm, Menu, MenuItem, Avatar, Card, MemoStyle } from '@/components'
+import { ImgGrid, MemoForm, Menu, Avatar, Card, MemoStyle } from '@/components'
 import { updateMemoThunk, deleteMemoThunk } from '@/store/slices/postSlice'
 import { useCallback, useMemo, useState } from 'react'
-import { changeDate } from '@/lib/utills'
+import { changeDate, imgPath } from '@/lib/utills'
 import { useAppDispatch } from '@/store/hooks'
-import { MemoProps, MemoParamsCU, Options, Image } from '@/lib/types'
+import { MemoProps, MemoParamsCU, Image } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 
 export default function MemoCard(memo: MemoProps) {
@@ -26,7 +26,7 @@ export default function MemoCard(memo: MemoProps) {
 
   const handleDelete = useCallback(
     (id: number, images: Image[]) => {
-      dispatch(deleteMemoThunk({ id, images: { create: [], remove: images } }))
+      dispatch(deleteMemoThunk({ id, images: { files: [], create: [], remove: images } }))
     },
     [dispatch]
   )
@@ -51,13 +51,7 @@ export default function MemoCard(memo: MemoProps) {
     },
   ]
 
-  const menu = (
-    <Menu icon={<MoreHoriz fontSize="small" />} label="메모 메뉴 열기">
-      {meunItems.map((item) => (
-        <MenuItem key={item.label} {...item} />
-      ))}
-    </Menu>
-  )
+  const menu = <Menu icon={<MoreHoriz fontSize="small" />} label="메모 메뉴 열기" items={meunItems} />
 
   const header = {
     avatar: <Avatar user={memo.user} />,
@@ -71,25 +65,13 @@ export default function MemoCard(memo: MemoProps) {
     return <MemoForm {...props} />
   }
 
-  const options: Options = {
-    info: {
-      activate: 'off',
-    },
-    secret: {
-      activate: 'off',
-    },
-    folder: {
-      activate: 'off',
-    },
-  }
-
-  memo.styles.forEach((style) => (options[style.option] = { activate: 'on', extra: style.extra }))
+  const imgUrls = memo.images.map((img) => ({ id: img.id, url: imgPath + img.url }))
 
   return (
     <Card header={header}>
-      <MemoStyle options={options}>
+      <MemoStyle styles={memo.styles}>
         {memo.content}
-        <ImgGrid images={memo.images} />
+        <ImgGrid images={imgUrls} />
       </MemoStyle>
     </Card>
   )

@@ -1,5 +1,5 @@
 'use client'
-import { ListItemIcon, MenuItem as MuiMenuItem } from '@mui/material'
+import { ListItemIcon, ListItemText, MenuItem as MuiMenuItem } from '@mui/material'
 import { BasicProps } from '@/lib/types'
 
 interface Props extends BasicProps {
@@ -13,7 +13,7 @@ export default function MenuItem(props: Props) {
   const item = (
     <MuiMenuItem onClick={onClick}>
       <ListItemIcon>{icon}</ListItemIcon>
-      {label}
+      <ListItemText>{label}</ListItemText>
     </MuiMenuItem>
   )
 

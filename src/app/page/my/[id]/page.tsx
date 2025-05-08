@@ -1,9 +1,9 @@
-import { InfoBox } from '@/components/my/Info'
-import { Wrap } from '@/styles/BaseStyles'
+import { InfoBox } from '@/components'
+import { Wrap } from '@/components'
 
 function MyPage() {
   return (
-    <Wrap spacing={4}>
+    <Wrap>
       <InfoBox />
     </Wrap>
   )

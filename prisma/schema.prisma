@@ -36,17 +36,17 @@ model Memo {
   
 }
 
-enum Option {
-  secret
-  info
-  folder
-  font
-  color
-}
+// enum Option {
+//   secret
+//   info
+//   folder
+//   font
+//   color
+// }
 
 model Style {
   id        Int        @id @default(autoincrement())
-  option    Option
+  option    String     @db.VarChar(10)
   extra     String     @db.VarChar(30)
   memoId    Int
   memo      Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)

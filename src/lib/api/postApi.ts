@@ -9,9 +9,9 @@ export const getMemos = async (page: number) => {
 }
 
 export const createMemo = async (params: MemoParamsCU) => {
-  const { id, content, images, files } = params
-  const data = metaData('POST', { id, content, images: images.create })
-  if (files.length > 0) await uploadImages(files)
+  const { id, content, images, styles } = params
+  const data = metaData('POST', { id, content, images: images.create, styles })
+  if (images.files.length > 0) await uploadImages(images.files)
 
   const res = await fetch(postUrl, data)
   if (!res.ok) throw new Error('메모 작성 중 에러')
@@ -19,9 +19,9 @@ export const createMemo = async (params: MemoParamsCU) => {
 }
 
 export const updateMemo = async (params: MemoParamsCU) => {
-  const { id, content, images, files } = params
+  const { id, content, images } = params
 
-  if (files.length > 0) await uploadImages(files)
+  if (images.files.length > 0) await uploadImages(images.files)
   if (images.remove.length > 0) await deleteImages(images.remove)
 
   const data = metaData('PATCH', { id, content, images: images.create })

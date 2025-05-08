@@ -7,7 +7,7 @@ import { ImageState } from '@/lib/types'
 
 export default function ImgForm(props: ImageState) {
   const [loading, setLoading] = useState(false)
-  const { imgList, setImgList, setImgFiles } = props
+  const { imgList, setImgList } = props
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,8 +28,8 @@ export default function ImgForm(props: ImageState) {
       newImgFiles.push(file)
       newImgUrls.push(URL.createObjectURL(file))
     }
-    setImgFiles((prev) => [...prev, ...newImgFiles])
     setImgList((prev) => ({
+      files: [...prev.files, ...newImgFiles],
       create: [...prev.create, ...newImgUrls.map((img) => ({ url: img, alt: '' }))],
       remove: prev.remove,
     }))
@@ -41,23 +41,11 @@ export default function ImgForm(props: ImageState) {
       {loading ? (
         <CircularProgress size={36} />
       ) : (
-        <IconButton
-          aria-label="이미지 업로드"
-          disabled={imgList.create.length > 3}
-          onClick={() => fileInputRef.current?.click()}
-        >
+        <IconButton size="small" aria-label="이미지 업로드" disabled={imgList.create.length > 3} onClick={() => fileInputRef.current?.click()}>
           <ImageSearch />
         </IconButton>
       )}
-      <input
-        className="hidden"
-        ref={fileInputRef}
-        id="image"
-        type="file"
-        accept="image/*"
-        multiple
-        onChange={(e) => handleFileChange(e)}
-      />
+      <input className="hidden" ref={fileInputRef} id="image" type="file" accept="image/*" multiple onChange={(e) => handleFileChange(e)} />
     </>
   )
 }

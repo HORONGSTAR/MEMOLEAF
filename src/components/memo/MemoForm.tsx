@@ -1,52 +1,63 @@
 'use client'
 import { Paper, Button, Stack } from '@mui/material'
-import { ImgForm, ImgPreview, Blank, TextCount, MemoOption, InputText } from '@/components'
+import { ImgForm, ImgPreview, Blank, InputText, ToolBox } from '@/components'
 import { useCallback, useState } from 'react'
 import { setRenameFile } from '@/lib/utills'
-import { useSession } from 'next-auth/react'
 import { IntiMemoProps, ImgList, Style } from '@/lib/types'
 
 export default function MemoForm(inti: IntiMemoProps) {
-  const [imgFiles, setImgFiles] = useState<File[]>([])
-  const [imgList, setImgList] = useState<ImgList>({ create: inti.images || [], remove: [] })
+  const [imgList, setImgList] = useState<ImgList>({ files: [], create: inti.images || [], remove: [] })
   const [styles, setStyles] = useState<Style[]>(inti.styles || [])
   const [content, setContent] = useState(inti.content || '')
-  const { data: session } = useSession()
-  const { onSubmit } = inti
-  const user = session?.user
-  const imgProps = { imgList, setImgList, setImgFiles }
+  const imgProps = { imgList, setImgList }
+
+  console.log(styles)
 
   const handleSubmit = useCallback(() => {
-    if (!user) return
     const images: ImgList = {
+      files: [],
       create: imgList.create.filter((img) => img.id).map((img) => ({ url: img.url, alt: img.alt })),
       remove: imgList.remove,
     }
-    const files = imgFiles.map((file) => {
+    const renamedFiles = imgList.files.map((file) => {
       const renamedFile = setRenameFile(file)
       images.create.push({ url: renamedFile.name, alt: '' })
       return renamedFile
     })
 
-    onSubmit({ id: user.id, content, files, styles, images })
+    images.files = renamedFiles
+    inti.onSubmit({ id: 0, content, styles, images })
     setContent('')
-    setImgList({ create: [], remove: [] })
-    setImgFiles([])
-  }, [imgList, user, imgFiles, content, styles, onSubmit])
+    setImgList({ files: [], create: [], remove: [] })
+  }, [imgList, content, styles, inti])
+
+  const handleChange = (value: string) => {
+    if (value.length > 191) return
+    setContent(value)
+  }
 
   return (
-    <Paper variant="outlined" sx={{ p: 2, minHeight: 120 }}>
-      <MemoOption />
-      <InputText fullWidth multiline minRows={3} placeholder="기록을 남겨보세요!" value={content} max={191} fontSize="body1" setValue={setContent} />
-      <Stack direction="row" alignItems={'center'} spacing={2}>
+    <Paper variant="outlined" sx={{ p: 1 }}>
+      <ToolBox setStyles={setStyles} />
+      <InputText
+        sx={{ p: 1 }}
+        fullWidth
+        multiline
+        minRows={3}
+        aria-label="메모 입력"
+        placeholder="기록을 남겨보세요!"
+        value={content}
+        fontSize="body1"
+        onChange={(e) => handleChange(e.target.value)}
+      />
+      <ImgPreview {...imgProps} />
+      <Stack direction="row" alignItems="center">
         <ImgForm {...imgProps} />
         <Blank />
-        <TextCount text={content} max={191} />
         <Button variant="contained" onClick={handleSubmit}>
           메모
         </Button>
       </Stack>
-      <ImgPreview {...imgProps} />
     </Paper>
   )
 }

@@ -1,5 +1,5 @@
 function SettingPage() {
-   return <>신기하군</>
+  return <>신기하군</>
 }
 
 export default SettingPage

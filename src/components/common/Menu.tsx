@@ -1,10 +1,19 @@
 'use client'
-import { IconButton, Menu as MuiMenu } from '@mui/material'
+import { IconButton, Menu as MuiMenu, MenuItem, ListItemIcon, ListItemText } from '@mui/material'
 import { useState } from 'react'
 import { BasicProps } from '@/lib/types'
 
-export default function Menu(props: BasicProps) {
-  const { label, icon, children } = props
+interface ItmeProps extends BasicProps {
+  isBlind?: boolean
+  onClick: () => void
+}
+
+interface Props extends BasicProps {
+  items: ItmeProps[]
+}
+
+export default function Menu(props: Props) {
+  const { label, icon, items } = props
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
 
@@ -29,20 +38,25 @@ export default function Menu(props: BasicProps) {
       </IconButton>
 
       <MuiMenu
-        anchorEl={anchorEl}
         id={label}
+        anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
-        onClick={handleClose}
         slotProps={{
-          paper: {
-            elevation: 3,
-          },
+          paper: { elevation: 3 },
+          list: { 'aria-labelledby': label },
         }}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {children}
+        {items.map((item) =>
+          item.isBlind ? null : (
+            <MenuItem key={item.label} onClick={item.onClick}>
+              <ListItemIcon>{item.icon}</ListItemIcon>
+              <ListItemText>{item.label}</ListItemText>
+            </MenuItem>
+          )
+        )}
       </MuiMenu>
     </>
   )

@@ -4,20 +4,23 @@ import { AsyncBox, MemoCard, MemoForm } from '@/components'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { useCallback, useEffect } from 'react'
 import { MemoProps, MemoParamsCU } from '@/lib/types'
+import { useSession } from 'next-auth/react'
 
 export default function MemoIndex() {
   const { memos, status } = useAppSelector((state) => state.memo)
   const dispatch = useAppDispatch()
+  const { data: session } = useSession()
+  const user = session?.user
 
   useEffect(() => {
     dispatch(getMemosThunk(1))
   }, [dispatch])
 
   const onSubmit = useCallback(
-    (props: MemoParamsCU) => {
-      dispatch(createMemoThunk(props))
+    (params: MemoParamsCU) => {
+      if (user) dispatch(createMemoThunk({ ...params, id: user.id }))
     },
-    [dispatch]
+    [dispatch, user]
   )
 
   const intiMemoProps = { id: 0, content: '', images: [], styles: [], onSubmit }

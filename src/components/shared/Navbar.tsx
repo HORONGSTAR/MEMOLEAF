@@ -13,6 +13,7 @@ export default function Navbar() {
               <Image
                 src={'/memoleaf.svg'}
                 alt="MEMOLEAF"
+                aria-label="메모리프 홈"
                 width={120}
                 height={20}
                 style={{ width: 126, height: 21 }}

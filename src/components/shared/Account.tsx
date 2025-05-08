@@ -1,11 +1,13 @@
 'use client'
 import { useState } from 'react'
-import { MenuItem, Button } from '@mui/material'
+import { Button } from '@mui/material'
 import { useSession, signOut } from 'next-auth/react'
 import { LoginBox, Dialog, Menu, Avatar } from '@/components'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { Logout, PersonOutlineOutlined, SettingsOutlined } from '@mui/icons-material'
 
 export default function Account() {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const { data: session } = useSession()
   const user = session?.user
@@ -16,21 +18,27 @@ export default function Account() {
     label: '소셜 로그인',
   }
 
+  const meunItems = [
+    {
+      label: '내 계정',
+      icon: <PersonOutlineOutlined fontSize="small" />,
+      onClick: () => router.push('/page/my/' + user?.id),
+    },
+    {
+      label: '설정',
+      icon: <SettingsOutlined fontSize="small" />,
+      onClick: () => router.push('/page/setting'),
+    },
+    {
+      label: '로그아웃',
+      icon: <Logout fontSize="small" />,
+      onClick: () => signOut(),
+    },
+  ]
+
   return (
     <>
-      {user ? (
-        <Menu icon={<Avatar user={user} />} label={'account-menu'}>
-          <Link href={`/page/my/${user?.id}`}>
-            <MenuItem>내 계정</MenuItem>
-          </Link>
-          <Link href={'/page/setting'}>
-            <MenuItem>설정</MenuItem>
-          </Link>
-          <MenuItem onClick={() => signOut()}>로그아웃</MenuItem>
-        </Menu>
-      ) : (
-        <Button>로그인</Button>
-      )}
+      {user ? <Menu icon={<Avatar user={user} />} label={'계정 메뉴'} items={meunItems} /> : <Button>로그인</Button>}
       <Dialog {...dialogProps}>
         <LoginBox />
       </Dialog>

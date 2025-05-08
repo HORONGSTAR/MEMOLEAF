@@ -1,59 +1,53 @@
 'use client'
-import { ReactNode, useState } from 'react'
-import { Collapse, Typography, Chip, Box, Paper, Stack } from '@mui/material'
-import { ExpandMore } from '@mui/icons-material'
-import InputText from '../common/InputText'
-import { Options } from '@/lib/types'
+import { ReactNode } from 'react'
+import { MemoOption } from '@/components'
+import { Style, Option } from '@/lib/types'
 
 interface Props {
   children: ReactNode
-  options: Options
+  styles: Style[]
 }
 
+type Component = { [key: string]: ReactNode }
+
 export default function MemoStyle(props: Props) {
-  const [password, setPassword] = useState('')
-  const [checked, setChecked] = useState(false)
-  const { options, children } = props
-
-  const info = (
-    <Typography variant="body2" color="textSecondary">
-      {options.info.extra}
-    </Typography>
-  )
-
-  const secret = (
-    <Stack alignItems="center" spacing={1}>
-      <Typography variant="body2">비공개 글입니다.</Typography>
-      <Typography variant="body2">열람 비밀번호가 필요합니다.</Typography>
-      <Paper variant="outlined" sx={{ px: 1, maxWidth: 120 }}>
-        <InputText fontSize="body2" value={password} setValue={setPassword} max={12} placeholder="비밀번호 입력" />
-      </Paper>
-    </Stack>
-  )
-
-  const folder = (
-    <Box>
-      <Chip
-        onClick={() => setChecked((prev) => !prev)}
-        label={checked ? '접기' : options.folder.extra}
-        size="small"
-        icon={<ExpandMore />}
-      />
-      <Collapse in={checked}>{children}</Collapse>
-    </Box>
-  )
-
-  const components = {
-    info: { on: info, off: null },
-    secret: { on: secret, off: null },
-    folder: { on: folder, off: children },
+  const { styles, children } = props
+  const option: Option = {
+    subtext: { activate: 'off', extra: '' },
+    folder: { activate: 'off', extra: '' },
+    secret: { activate: 'off', extra: '' },
   }
 
-  return (
-    <>
-      {components.info[options.info.activate]}
-      {components.secret[options.secret.activate]}
-      {components.folder[options.folder.activate]}
-    </>
-  )
+  styles.forEach((style) => (option[style.option] = { activate: 'on', extra: style.extra }))
+
+  const subtext: Component = {
+    on: <MemoOption option="subtext" extra={option.subtext.extra} />,
+    off: null,
+  }
+
+  const folder: Component = {
+    on: (
+      <MemoOption option="folder" extra={option.folder.extra}>
+        {children}
+      </MemoOption>
+    ),
+    off: children,
+  }
+
+  const secret: Component = {
+    on: (
+      <MemoOption option="secret" extra={option.secret.extra}>
+        {subtext[option.subtext.activate]}
+        {folder[option.folder.activate]}
+      </MemoOption>
+    ),
+    off: (
+      <>
+        {subtext[option.subtext.activate]}
+        {folder[option.folder.activate]}
+      </>
+    ),
+  }
+
+  return <>{secret[option.secret.activate]}</>
 }
