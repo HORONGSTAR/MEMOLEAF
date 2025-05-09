@@ -1,21 +1,26 @@
-'use client'
 import { ListItemIcon, ListItemText, MenuItem as MuiMenuItem } from '@mui/material'
 import { BasicProps } from '@/lib/types'
+import { ReactNode } from 'react'
 
 interface Props extends BasicProps {
-  isBlind?: boolean
+  active: 'on' | 'off'
   onClick: () => void
 }
 
+type Item = { [key: string]: ReactNode }
+
 export default function MenuItem(props: Props) {
-  const { isBlind, label, icon, onClick } = props
+  const { active, label, icon, onClick } = props
 
-  const item = (
-    <MuiMenuItem onClick={onClick}>
-      <ListItemIcon>{icon}</ListItemIcon>
-      <ListItemText>{label}</ListItemText>
-    </MuiMenuItem>
-  )
+  const item: Item = {
+    on: (
+      <MuiMenuItem onClick={onClick}>
+        <ListItemIcon>{icon}</ListItemIcon>
+        <ListItemText>{label}</ListItemText>
+      </MuiMenuItem>
+    ),
+    off: null,
+  }
 
-  return isBlind ? null : item
+  return item[active]
 }

@@ -1,19 +1,24 @@
 'use client'
 import { ImgGrid } from '@/components'
 import { imgPath } from '@/lib/utills'
-import { ImageState, Image } from '@/lib/types'
+import { EditImage, Image } from '@/lib/types'
 import { IconButton } from '@mui/material'
 import { Cancel } from '@mui/icons-material'
+import { Dispatch, SetStateAction } from 'react'
 
-export default function ImgForm(props: ImageState) {
-  const { imgList, setImgList } = props
+interface Props {
+  images: EditImage
+  setImages: Dispatch<SetStateAction<EditImage>>
+}
+export default function ImgForm(props: Props) {
+  const { images, setImages } = props
 
   const removeFile = (img: Image, index: number) => {
-    const files = imgList.files.filter((_, i) => i !== index)
-    const create = imgList.create.filter((_, i) => i !== index)
-    const remove = img.id ? [...imgList.remove, img] : imgList.remove
+    const file = images.file.filter((_, i) => i !== index)
+    const add = images.add.filter((_, i) => i !== index)
+    const del = img.id ? [...images.del, img] : images.del
 
-    setImgList({ files, create, remove })
+    setImages({ file, add, del })
   }
 
   const remove = (img: Image, index: number) => (
@@ -22,7 +27,7 @@ export default function ImgForm(props: ImageState) {
     </IconButton>
   )
 
-  const list = imgList.create.map((img, index) => ({ id: img.id, url: img.id ? imgPath + img.url : img.url, remove: remove(img, index) }))
+  const list = images.add.map((img, index) => ({ id: img.id, url: img.id ? imgPath + img.url : img.url, remove: remove(img, index) }))
 
   return <ImgGrid images={list} />
 }

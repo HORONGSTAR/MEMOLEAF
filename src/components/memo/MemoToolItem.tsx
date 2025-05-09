@@ -3,25 +3,25 @@ import { Typography, Chip, IconButton, Divider, ChipProps, Button, Box } from '@
 import { ExpandMore, DriveFileRenameOutline, Check, LockOutlined } from '@mui/icons-material'
 import { InputText, Dialog } from '@/components'
 import { Dispatch, ReactNode, SetStateAction, useCallback, useState } from 'react'
-import { Option } from '@/lib/types'
+import { EditDeco } from '@/lib/types'
 
 interface Props {
-  option: Option
-  setOption: Dispatch<SetStateAction<Option>>
+  decos: EditDeco
+  setDecos: Dispatch<SetStateAction<EditDeco>>
 }
 
 type Component = { [key: string]: ReactNode }
 
-export default function ToolBoxItem(props: Props) {
-  const { option, setOption } = props
+export default function MemoToolItem(props: Props) {
+  const { decos, setDecos } = props
   const [isEdit, setEdit] = useState(false)
   const [open, setOpen] = useState(false)
 
   const handleChange = useCallback(
     (value: string, field: string) => {
-      setOption((prev) => ({ ...prev, [field]: { activate: 'on', extra: value } }))
+      setDecos((prev) => ({ ...prev, [field]: { active: 'on', extra: value } }))
     },
-    [setOption]
+    [setDecos]
   )
 
   const handleSave = useCallback(() => {
@@ -30,8 +30,8 @@ export default function ToolBoxItem(props: Props) {
 
   const handleCancel = useCallback(() => {
     setOpen(false)
-    setOption((prev) => ({ ...prev, secret: { activate: 'off', extra: '' } }))
-  }, [setOption])
+    setDecos((prev) => ({ ...prev, secret: { active: 'off', extra: '' } }))
+  }, [setDecos])
 
   const dialogProps = {
     open: open,
@@ -64,11 +64,11 @@ export default function ToolBoxItem(props: Props) {
   const folderChipProps: ChipProps = isEdit
     ? {
         variant: 'outlined',
-        label: <InputText {...inputProps.folder} value={option.folder.extra || ''} onChange={(e) => handleChange(e.target.value, 'folder')} />,
+        label: <InputText {...inputProps.folder} value={decos.folder.extra || ''} onChange={(e) => handleChange(e.target.value, 'folder')} />,
       }
-    : { variant: 'filled', label: option.folder.extra || '더 보기' }
+    : { variant: 'filled', label: decos.folder.extra || '더 보기' }
 
-  const secretChipProps: ChipProps = option.secret.extra
+  const secretChipProps: ChipProps = decos.secret.extra
     ? { icon: <Check />, label: '비밀번호 설정 완료', color: 'success' }
     : { icon: <LockOutlined />, label: '비밀번호 설정 필요' }
 
@@ -77,7 +77,7 @@ export default function ToolBoxItem(props: Props) {
       <Box>
         <Chip size="small" onClick={() => setOpen(true)} {...secretChipProps} />
         <Dialog {...dialogProps}>
-          <InputText {...inputProps.secret} value={option.secret.extra || ''} onChange={(e) => handleChange(e.target.value, 'secret')} />
+          <InputText {...inputProps.secret} value={decos.secret.extra || ''} onChange={(e) => handleChange(e.target.value, 'secret')} />
           <Divider />
           <Typography width={300} mt={2} variant="body2">
             간단한 비밀번호로 메모를 잠글 수 있어요. 하지만 완전한 보안은 아니니 개인정보나 중요한 내용은 적지 말아주세요!
@@ -91,7 +91,7 @@ export default function ToolBoxItem(props: Props) {
   const subtextBox: Component = {
     on: (
       <Box>
-        <InputText {...inputProps.subtext} value={option.subtext.extra || ''} onChange={(e) => handleChange(e.target.value, 'subtext')} />
+        <InputText {...inputProps.subtext} value={decos.subtext.extra || ''} onChange={(e) => handleChange(e.target.value, 'subtext')} />
         <Divider />
       </Box>
     ),
@@ -111,9 +111,9 @@ export default function ToolBoxItem(props: Props) {
 
   return (
     <>
-      {secretBox[option.secret.activate]}
-      {subtextBox[option.subtext.activate]}
-      {folderBox[option.folder.activate]}
+      {secretBox[decos.secret.active]}
+      {subtextBox[decos.subtext.active]}
+      {folderBox[decos.folder.active]}
     </>
   )
 }

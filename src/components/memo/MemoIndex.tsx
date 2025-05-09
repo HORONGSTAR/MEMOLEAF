@@ -3,7 +3,7 @@ import { getMemosThunk, createMemoThunk } from '@/store/slices/postSlice'
 import { AsyncBox, MemoCard, MemoForm } from '@/components'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { useCallback, useEffect } from 'react'
-import { MemoProps, MemoParamsCU } from '@/lib/types'
+import { Memo, MemoParams } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 
 export default function MemoIndex() {
@@ -17,18 +17,16 @@ export default function MemoIndex() {
   }, [dispatch])
 
   const onSubmit = useCallback(
-    (params: MemoParamsCU) => {
+    (params: MemoParams) => {
       if (user) dispatch(createMemoThunk({ ...params, id: user.id }))
     },
     [dispatch, user]
   )
 
-  const intiMemoProps = { id: 0, content: '', images: [], styles: [], onSubmit }
-
   const components = (
     <>
-      <MemoForm {...intiMemoProps} />
-      {memos?.map((memo: MemoProps) => (
+      <MemoForm onSubmit={onSubmit} />
+      {memos?.map((memo: Memo) => (
         <MemoCard key={memo.id} {...memo} />
       ))}
     </>

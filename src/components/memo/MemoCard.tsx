@@ -1,23 +1,22 @@
 'use client'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
-import { ImgGrid, MemoForm, Menu, Avatar, Card, MemoStyle } from '@/components'
+import { ImgGrid, MemoForm, Menu, Avatar, Card, MemoDeco } from '@/components'
 import { updateMemoThunk, deleteMemoThunk } from '@/store/slices/postSlice'
 import { useCallback, useMemo, useState } from 'react'
 import { changeDate, imgPath } from '@/lib/utills'
 import { useAppDispatch } from '@/store/hooks'
-import { MemoProps, MemoParamsCU, Image } from '@/lib/types'
+import { Memo, MemoParams, EditDeco } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 
-export default function MemoCard(memo: MemoProps) {
+export default function MemoCard(memo: Memo) {
   const dispatch = useAppDispatch()
   const [isEdit, setEdit] = useState(false)
   const { data: session } = useSession()
-  const user = session?.user
-
-  const isLogin = useMemo(() => (user?.id === memo.userId ? true : false), [user, memo])
+  const auth = session?.user
+  const { id, user, images, decos } = memo
 
   const onSubmit = useCallback(
-    (params: MemoParamsCU) => {
+    (params: MemoParams) => {
       dispatch(updateMemoThunk({ ...params, id: memo.id }))
       setEdit(false)
     },
@@ -25,29 +24,35 @@ export default function MemoCard(memo: MemoProps) {
   )
 
   const handleDelete = useCallback(
-    (id: number, images: Image[]) => {
-      dispatch(deleteMemoThunk({ id, images: { files: [], create: [], remove: images } }))
+    (props: Pick<Memo, 'id' | 'images'>) => {
+      const images = { file: [], add: [], del: props.images }
+      dispatch(deleteMemoThunk({ ...props, images }))
     },
     [dispatch]
   )
 
+  const active = useMemo(() => {
+    return auth?.id === user.id ? 'on' : 'off'
+  }, [auth, user])
+
   const meunItems = [
     {
-      isBlind: !isLogin,
+      active,
       label: '글 수정',
       icon: <EditOutlined fontSize="small" />,
       onClick: () => setEdit(true),
     },
     {
-      isBlind: !isLogin,
+      active,
       label: '삭제',
       icon: <DeleteOutline fontSize="small" />,
-      onClick: () => handleDelete(memo.id, memo.images),
+      onClick: () => handleDelete({ id, images }),
     },
     {
+      active,
       label: '공유하기',
       icon: <LinkOutlined fontSize="small" />,
-      onClick: () => handleDelete(memo.id, memo.images),
+      onClick: () => setEdit(true),
     },
   ]
 
@@ -61,18 +66,19 @@ export default function MemoCard(memo: MemoProps) {
   }
 
   if (isEdit) {
-    const props = { ...memo, onSubmit }
+    const decos: EditDeco = {}
+    memo.decos.forEach((deco) => (decos[deco.kind] = { active: 'on', extra: deco.extra }))
+    const props = { ...memo, onSubmit, decos }
     return <MemoForm {...props} />
   }
-
-  const imgUrls = memo.images.map((img) => ({ id: img.id, url: imgPath + img.url }))
+  const imageData = memo.images.map((img) => ({ ...img, url: imgPath + img.url }))
 
   return (
     <Card header={header}>
-      <MemoStyle styles={memo.styles}>
+      <MemoDeco decos={decos}>
         {memo.content}
-        <ImgGrid images={imgUrls} />
-      </MemoStyle>
+        <ImgGrid images={imageData} />
+      </MemoDeco>
     </Card>
   )
 }

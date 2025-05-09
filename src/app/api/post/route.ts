@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     skip: (page - 1) * limit,
     take: 10,
     orderBy: { createdAt: 'desc' },
-    include: { user: true, images: true, styles: true },
+    include: { user: true, images: true, decos: true },
   })
 
   const totalCount = await prisma.user.count()
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { id, content, images, styles } = await req.json()
+    const { id, content, images, decos } = await req.json()
 
     const user = await prisma.user.findUnique({ where: { id } })
     if (!user) return NRes.json({ error: '유저 정보를 찾을 수 없습니다.' }, { status: 404 })
@@ -34,13 +34,13 @@ export async function POST(req: NextRequest) {
         userId: user.id,
         content,
         ...(images?.length > 0 && { images: { create: images } }),
-        ...(styles?.length > 0 && { styles: { create: styles } }),
+        ...(decos?.length > 0 && { decos: { create: decos } }),
       },
     })
-    const res = { ...newMemo, user, images, styles }
+    const res = { ...newMemo, user, images, decos }
 
     res.images = await prisma.image.findMany({ where: { memoId: newMemo.id } })
-    res.styles = await prisma.style.findMany({ where: { memoId: newMemo.id } })
+    res.decos = await prisma.deco.findMany({ where: { memoId: newMemo.id } })
 
     return NRes.json(res)
   } catch (err) {
@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const { id, content, images, styles } = await req.json()
+    const { id, content, images, decos } = await req.json()
     const search = await prisma.memo.findUnique({ where: { id } })
     if (!search) return NRes.json({ error: '메모를 찾을 수 없습니다.' }, { status: 404 })
 
@@ -60,14 +60,14 @@ export async function PATCH(req: NextRequest) {
       data: {
         content,
         images: { deleteMany: {}, ...(images?.length > 0 && { create: images }) },
-        styles: { deleteMany: {}, ...(styles?.length > 0 && { create: styles }) },
+        decos: { deleteMany: {}, ...(decos?.length > 0 && { create: decos }) },
       },
     })
 
-    const res = { ...memo, images, styles }
+    const res = { ...memo, images, decos }
 
     res.images = await prisma.image.findMany({ where: { memoId: memo.id } })
-    res.styles = await prisma.style.findMany({ where: { memoId: memo.id } })
+    res.decos = await prisma.deco.findMany({ where: { memoId: memo.id } })
 
     return NRes.json(res)
   } catch (err) {

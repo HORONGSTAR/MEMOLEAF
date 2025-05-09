@@ -1,4 +1,3 @@
-'use client'
 import { Dialog as MuiDialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import { ReactNode } from 'react'
 import { BasicProps } from '@/lib/types'

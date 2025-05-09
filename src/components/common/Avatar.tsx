@@ -1,4 +1,3 @@
-'use client'
 import { Avatar as MuiAvatar } from '@mui/material'
 
 interface Props {

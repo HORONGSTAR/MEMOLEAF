@@ -1,31 +1,32 @@
 'use client'
-import { ReactNode, useMemo, useState } from 'react'
-import { Collapse, Typography, Chip, Box, Paper, Stack, Divider } from '@mui/material'
+import { ReactNode, useState } from 'react'
+import { Collapse, Typography, Chip, Box, Paper, Stack, Divider, Button } from '@mui/material'
 import { ExpandMore } from '@mui/icons-material'
 import InputText from '../common/InputText'
-import { Style } from '@/lib/types'
+import { Deco } from '@/lib/types'
 import { swapOnOff } from '@/lib/utills'
 
-interface Props extends Style {
+interface Props extends Deco {
   children?: ReactNode
   form?: ReactNode
 }
 
-type Component = { [key: string]: ReactNode }
+type StringKey = { [key: string]: ReactNode }
 
-export default function MemoOption(props: Props) {
-  const { option, extra, children } = props
+export default function MemoDecoItem(props: Props) {
+  const { kind, extra, children } = props
   const [password, setPassword] = useState('')
   const [checked, setChecked] = useState('off')
+  const [unLock, setUnLock] = useState(false)
 
-  const isUnLock = useMemo(() => (extra !== password ? false : true), [extra, password])
-  const transform: { [key: string]: string } = { on: '180deg', off: '0deg' }
+  const transform: StringKey = { on: '-90deg', off: '0deg' }
+  const chipLabel: StringKey = { on: '접기', off: extra || '더 보기' }
 
   const handleChange = (value: string) => {
     setPassword(value)
   }
 
-  const component: Component = {
+  const component: StringKey = {
     subtext: (
       <Box>
         <Typography variant="body2" color="textSecondary">
@@ -38,7 +39,7 @@ export default function MemoOption(props: Props) {
       <Box>
         <Chip
           onClick={() => setChecked(swapOnOff[checked].next)}
-          label={checked ? '접기' : extra || '더 보기'}
+          label={chipLabel[checked]}
           size="small"
           icon={
             <ExpandMore
@@ -54,7 +55,7 @@ export default function MemoOption(props: Props) {
     ),
     secret: (
       <>
-        {isUnLock ? (
+        {unLock ? (
           <Box>{children}</Box>
         ) : (
           <Stack alignItems="center" spacing={1}>
@@ -63,11 +64,12 @@ export default function MemoOption(props: Props) {
             <Paper variant="outlined" sx={{ px: 1, maxWidth: 120 }}>
               <InputText fontSize="body2" value={password} onChange={(e) => handleChange(e.target.value)} placeholder="비밀번호 입력" />
             </Paper>
+            <Button onClick={() => setUnLock(password === extra ? true : false)}>확인</Button>
           </Stack>
         )}
       </>
     ),
   }
 
-  return <>{component[option]}</>
+  return <>{component[kind]}</>
 }

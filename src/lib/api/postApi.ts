@@ -1,6 +1,6 @@
 import { postUrl, metaData } from '@/lib/api/fetchApi'
 import { uploadImages, deleteImages } from './imgApi'
-import { MemoParamsCU, MemoParamsD } from '@/lib/types'
+import { MemoParams } from '@/lib/types'
 
 export const getMemos = async (page: number) => {
   const res = await fetch(postUrl + `?page=${page}`)
@@ -8,33 +8,33 @@ export const getMemos = async (page: number) => {
   return res.json()
 }
 
-export const createMemo = async (params: MemoParamsCU) => {
-  const { id, content, images, styles } = params
-  const data = metaData('POST', { id, content, images: images.create, styles })
-  if (images.files.length > 0) await uploadImages(images.files)
+export const createMemo = async (params: MemoParams) => {
+  const { id, content, images, decos } = params
+  const data = metaData('POST', { id, content, images: images.add, decos })
+  if (images.file.length > 0) await uploadImages(images.file)
 
   const res = await fetch(postUrl, data)
   if (!res.ok) throw new Error('메모 작성 중 에러')
   return res.json()
 }
 
-export const updateMemo = async (params: MemoParamsCU) => {
-  const { id, content, images } = params
+export const updateMemo = async (params: MemoParams) => {
+  const { id, content, images, decos } = params
 
-  if (images.files.length > 0) await uploadImages(images.files)
-  if (images.remove.length > 0) await deleteImages(images.remove)
+  if (images.file.length > 0) await uploadImages(images.file)
+  if (images.del.length > 0) await deleteImages(images.del)
 
-  const data = metaData('PATCH', { id, content, images: images.create })
+  const data = metaData('PATCH', { id, content, images: images.add, decos })
 
   const res = await fetch(postUrl, data)
   if (!res.ok) throw new Error('메모 수정 중 에러')
   return res.json()
 }
 
-export const deleteMemo = async (params: MemoParamsD) => {
+export const deleteMemo = async (params: Pick<MemoParams, 'id' | 'images'>) => {
   const { id, images } = params
   const data = metaData('DELETE', { id })
-  if (images.remove.length > 0) await deleteImages(images.remove)
+  if (images.del.length > 0) await deleteImages(images.del)
   const res = await fetch(postUrl, data)
   if (!res.ok) throw new Error('메모 삭제 중 에러')
   return res.json()

@@ -1,4 +1,3 @@
-'use client'
 import { CSSProperties, InputBase, InputBaseProps, useTheme } from '@mui/material'
 
 interface Props extends InputBaseProps {

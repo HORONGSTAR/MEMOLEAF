@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getMemos, createMemo, updateMemo, deleteMemo } from '@/lib/api/postApi'
-import { MemoProps, MemoParamsD, MemoParamsCU } from '@/lib/types'
+import { Memo, MemoParams } from '@/lib/types'
 
 interface Memos {
-  memos: MemoProps[]
+  memos: Memo[]
   page: number
   total: number
 }
@@ -16,7 +16,7 @@ export const getMemosThunk = createAsyncThunk<Memos, number>('memo/getMemos', as
   }
 })
 
-export const createMemoThunk = createAsyncThunk<MemoProps, MemoParamsCU>('memo/createMemo', async (params) => {
+export const createMemoThunk = createAsyncThunk<Memo, MemoParams>('memo/createMemo', async (params) => {
   try {
     return await createMemo(params)
   } catch (error) {
@@ -24,7 +24,7 @@ export const createMemoThunk = createAsyncThunk<MemoProps, MemoParamsCU>('memo/c
   }
 })
 
-export const updateMemoThunk = createAsyncThunk<MemoProps, MemoParamsCU>('memo/updateMemo', async (params) => {
+export const updateMemoThunk = createAsyncThunk<Memo, MemoParams>('memo/updateMemo', async (params) => {
   try {
     return await updateMemo(params)
   } catch (error) {
@@ -32,7 +32,7 @@ export const updateMemoThunk = createAsyncThunk<MemoProps, MemoParamsCU>('memo/u
   }
 })
 
-export const deleteMemoThunk = createAsyncThunk<MemoProps, MemoParamsD>('memo/deleteMemo', async (params) => {
+export const deleteMemoThunk = createAsyncThunk<Memo, Pick<MemoParams, 'id' | 'images'>>('memo/deleteMemo', async (params) => {
   try {
     return await deleteMemo(params)
   } catch (error) {
@@ -41,7 +41,7 @@ export const deleteMemoThunk = createAsyncThunk<MemoProps, MemoParamsD>('memo/de
 })
 
 interface State {
-  memos: MemoProps[] | []
+  memos: Memo[] | []
   page: number
   total: number
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
@@ -89,7 +89,6 @@ export const memoSlice = createSlice({
         state.status = 'succeeded'
         for (const i in state.memos) {
           if (state.memos[i].id === action.payload.id) {
-            console.log(action.payload)
             state.memos[i] = { ...state.memos[i], ...action.payload }
           }
         }

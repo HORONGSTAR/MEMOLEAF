@@ -1,15 +1,10 @@
 'use client'
-import { Button, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
 import { useState } from 'react'
 import { BasicProps } from '@/lib/types'
 import Image from 'next/image'
 
-interface Props extends BasicProps {
-  aspect?: string
-}
-
-export default function ImgModalBox(props: Props) {
-  const { image, label, aspect } = props
+export default function ImgModalBox(props: BasicProps) {
+  const { image, label } = props
   const [open, setOpen] = useState(false)
 
   return (
@@ -18,19 +13,15 @@ export default function ImgModalBox(props: Props) {
         onClick={() => setOpen(true)}
         src={`${image}`}
         alt={`${label}`}
-        width={852}
-        height={852}
-        className={`aspect-${aspect || 'square'} object-cover rounded-2xl`}
+        fill
+        sizes="(max-width: 600px) 100vw, 50vw"
+        className="aspect-square object-cover rounded-md cursor-pointer"
       />
-      <Dialog open={open}>
-        <DialogTitle>미리보기</DialogTitle>
-        <DialogContent>
-          <Image src={`${image}`} alt={`${label}`} width={1024} height={1024} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>취소</Button>
-        </DialogActions>
-      </Dialog>
+      {open && (
+        <div className="image-modal" onClick={() => setOpen(false)}>
+          <Image src={`${image}`} alt={`${label}`} width={600} height={600} />
+        </div>
+      )}
     </>
   )
 }

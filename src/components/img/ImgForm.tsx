@@ -1,13 +1,18 @@
 'use client'
 import { IconButton, CircularProgress } from '@mui/material'
 import imageCompression from 'browser-image-compression'
-import { useRef, useState } from 'react'
+import { Dispatch, SetStateAction, useRef, useState } from 'react'
 import { ImageSearch } from '@mui/icons-material'
-import { ImageState } from '@/lib/types'
+import { EditImage } from '@/lib/types'
 
-export default function ImgForm(props: ImageState) {
+interface Props {
+  images: EditImage
+  setImages: Dispatch<SetStateAction<EditImage>>
+}
+
+export default function ImgForm(props: Props) {
   const [loading, setLoading] = useState(false)
-  const { imgList, setImgList } = props
+  const { images, setImages } = props
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -28,10 +33,10 @@ export default function ImgForm(props: ImageState) {
       newImgFiles.push(file)
       newImgUrls.push(URL.createObjectURL(file))
     }
-    setImgList((prev) => ({
-      files: [...prev.files, ...newImgFiles],
-      create: [...prev.create, ...newImgUrls.map((img) => ({ url: img, alt: '' }))],
-      remove: prev.remove,
+    setImages((prev) => ({
+      file: [...prev.file, ...newImgFiles],
+      add: [...prev.add, ...newImgUrls.map((img) => ({ url: img, alt: '' }))],
+      del: prev.del,
     }))
     setLoading(false)
   }
@@ -41,7 +46,7 @@ export default function ImgForm(props: ImageState) {
       {loading ? (
         <CircularProgress size={36} />
       ) : (
-        <IconButton size="small" aria-label="이미지 업로드" disabled={imgList.create.length > 3} onClick={() => fileInputRef.current?.click()}>
+        <IconButton size="small" aria-label="이미지 업로드" disabled={images.add.length > 3} onClick={() => fileInputRef.current?.click()}>
           <ImageSearch />
         </IconButton>
       )}

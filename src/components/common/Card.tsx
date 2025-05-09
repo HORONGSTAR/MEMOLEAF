@@ -1,4 +1,3 @@
-'use client'
 import { Card as MuiCard, CardContent, CardHeader } from '@mui/material'
 import { changeDate } from '@/lib/utills'
 import { ReactNode } from 'react'

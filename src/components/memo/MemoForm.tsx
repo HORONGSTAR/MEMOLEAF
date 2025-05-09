@@ -1,35 +1,52 @@
 'use client'
 import { Paper, Button, Stack } from '@mui/material'
-import { ImgForm, ImgPreview, Blank, InputText, ToolBox } from '@/components'
+import { ImgForm, ImgPreview, Blank, InputText, MemoTool, MemoToolItem } from '@/components'
 import { useCallback, useState } from 'react'
-import { setRenameFile } from '@/lib/utills'
-import { IntiMemoProps, ImgList, Style } from '@/lib/types'
+import { setRenameFile, swapOnOff } from '@/lib/utills'
+import { MemoParams, Image, EditImage, EditDeco } from '@/lib/types'
 
-export default function MemoForm(inti: IntiMemoProps) {
-  const [imgList, setImgList] = useState<ImgList>({ files: [], create: inti.images || [], remove: [] })
-  const [styles, setStyles] = useState<Style[]>(inti.styles || [])
+export interface MemoFormData {
+  id?: number
+  content?: string
+  images?: Image[]
+  decos?: EditDeco
+  onSubmit: (params: MemoParams) => void
+}
+
+const kindData = {
+  subtext: { active: 'off', extra: '' },
+  folder: { active: 'off', extra: '' },
+  secret: { active: 'off', extra: '' },
+}
+
+export default function MemoForm(inti: MemoFormData) {
+  const [images, setImages] = useState<EditImage>({ file: [], add: inti.images || [], del: [] })
+  const [decos, setDecos] = useState<EditDeco>({ ...kindData, ...inti.decos })
   const [content, setContent] = useState(inti.content || '')
-  const imgProps = { imgList, setImgList }
+  const imageProps = { images, setImages }
 
-  console.log(styles)
+  const decoProps = { decos, setDecos }
 
   const handleSubmit = useCallback(() => {
-    const images: ImgList = {
-      files: [],
-      create: imgList.create.filter((img) => img.id).map((img) => ({ url: img.url, alt: img.alt })),
-      remove: imgList.remove,
+    const editImage: EditImage = {
+      file: [],
+      add: images.add.filter((img) => img.id),
+      del: images.del,
     }
-    const renamedFiles = imgList.files.map((file) => {
-      const renamedFile = setRenameFile(file)
-      images.create.push({ url: renamedFile.name, alt: '' })
+    const renamedFiles = images.file.map((f) => {
+      const renamedFile = setRenameFile(f)
+      editImage.add.push({ url: renamedFile.name, alt: '' })
       return renamedFile
     })
 
-    images.files = renamedFiles
-    inti.onSubmit({ id: 0, content, styles, images })
+    const editDecos = Object.keys(decos)
+      .filter((key) => swapOnOff[decos[key].active].bool)
+      .map((key) => ({ kind: key, extra: decos[key].extra }))
+    editImage.file = renamedFiles
+    inti.onSubmit({ id: 0, content, images: editImage, decos: editDecos })
     setContent('')
-    setImgList({ files: [], create: [], remove: [] })
-  }, [imgList, content, styles, inti])
+    setImages({ file: [], add: [], del: [] })
+  }, [content, images, decos, inti])
 
   const handleChange = (value: string) => {
     if (value.length > 191) return
@@ -38,7 +55,7 @@ export default function MemoForm(inti: IntiMemoProps) {
 
   return (
     <Paper variant="outlined" sx={{ p: 1 }}>
-      <ToolBox setStyles={setStyles} />
+      <MemoToolItem {...decoProps} />
       <InputText
         sx={{ p: 1 }}
         fullWidth
@@ -50,9 +67,11 @@ export default function MemoForm(inti: IntiMemoProps) {
         fontSize="body1"
         onChange={(e) => handleChange(e.target.value)}
       />
-      <ImgPreview {...imgProps} />
+
+      <ImgPreview {...imageProps} />
       <Stack direction="row" alignItems="center">
-        <ImgForm {...imgProps} />
+        <ImgForm {...imageProps} />
+        <MemoTool {...decoProps} />
         <Blank />
         <Button variant="contained" onClick={handleSubmit}>
           메모
