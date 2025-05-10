@@ -1,7 +1,8 @@
 'use client'
+import { Card, CardContent, CardHeader } from '@mui/material'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
-import { ImgGrid, MemoForm, Menu, Avatar, Card, MemoDeco } from '@/components'
-import { updateMemoThunk, deleteMemoThunk } from '@/store/slices/postSlice'
+import { ImgGrid, MemoForm, Menu, Avatar, MemoDeco, LinkBox } from '@/components'
+import { updateMemoThunk, deleteMemoThunk } from '@/store/slices/memoSlice'
 import { useCallback, useMemo, useState } from 'react'
 import { changeDate, imgPath } from '@/lib/utills'
 import { useAppDispatch } from '@/store/hooks'
@@ -56,15 +57,6 @@ export default function MemoCard(memo: Memo) {
     },
   ]
 
-  const menu = <Menu icon={<MoreHoriz fontSize="small" />} label="메모 메뉴 열기" items={meunItems} />
-
-  const header = {
-    avatar: <Avatar user={memo.user} />,
-    action: menu,
-    title: memo.user.name,
-    subheader: changeDate(memo.createdAt),
-  }
-
   if (isEdit) {
     const decos: EditDeco = {}
     memo.decos.forEach((deco) => (decos[deco.kind] = { active: 'on', extra: deco.extra }))
@@ -72,13 +64,26 @@ export default function MemoCard(memo: Memo) {
     return <MemoForm {...props} />
   }
   const imageData = memo.images.map((img) => ({ ...img, url: imgPath + img.url }))
-
   return (
-    <Card header={header}>
-      <MemoDeco decos={decos}>
-        {memo.content}
-        <ImgGrid images={imageData} />
-      </MemoDeco>
+    <Card variant="outlined">
+      <CardHeader
+        action={<Menu icon={<MoreHoriz fontSize="small" />} label="메모 메뉴 열기" items={meunItems} />}
+        avatar={
+          <LinkBox link={`/page/my/${memo.user.id}`}>
+            <Avatar user={memo.user} />
+          </LinkBox>
+        }
+        title={<LinkBox link={`/page/my/${memo.user.id}`}>{memo.user.name}</LinkBox>}
+        subheader={changeDate(memo.createdAt)}
+      />
+      <LinkBox link={`/page/memo/${memo.id}`}>
+        <CardContent>
+          <MemoDeco decos={decos}>
+            {memo.content}
+            <ImgGrid images={imageData} />
+          </MemoDeco>
+        </CardContent>
+      </LinkBox>
     </Card>
   )
 }

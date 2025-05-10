@@ -1,5 +1,5 @@
 'use client'
-import { Stack as MuiStack, IconButton, Collapse, StackProps, Checkbox } from '@mui/material'
+import { Stack as MuiStack, IconButton, Collapse, StackProps, Checkbox, Tooltip } from '@mui/material'
 import { AddCircle, AddCircleOutline, Lock, LockOutlined, SubtitlesOutlined, Subtitles, DevicesFoldOutlined, DevicesFold } from '@mui/icons-material'
 import { ReactNode, useState, Dispatch, SetStateAction, useCallback } from 'react'
 import { EditDeco } from '@/lib/types'
@@ -28,7 +28,7 @@ export default function MemoTool(props: Props) {
       const active = decos[field].active
       setDecos((prev) => ({
         ...prev,
-        [field]: { ...prev[field], active: swapOnOff[active].next },
+        [field]: { active: swapOnOff[active].next, extra: '' },
       }))
     },
     [setDecos, decos]
@@ -78,14 +78,15 @@ export default function MemoTool(props: Props) {
       <Collapse orientation="horizontal" in={tool[extend].bool}>
         <Stack>
           {formItems.map((item) => (
-            <Checkbox
-              key={item.field}
-              icon={item.icon}
-              checkedIcon={item.checkedIcon}
-              onChange={() => handleChange(item.field)}
-              checked={item.checked}
-              size="small"
-            />
+            <Tooltip key={item.field} title={item.label}>
+              <Checkbox
+                icon={item.icon}
+                checkedIcon={item.checkedIcon}
+                onChange={() => handleChange(item.field)}
+                checked={item.checked}
+                size="small"
+              />
+            </Tooltip>
           ))}
         </Stack>
       </Collapse>

@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getMemos, createMemo, updateMemo, deleteMemo } from '@/lib/api/postApi'
+import { getMemos, createMemo, updateMemo, deleteMemo } from '@/lib/api/memoApi'
 import { Memo, MemoParams } from '@/lib/types'
 
 interface Memos {
@@ -42,6 +42,7 @@ export const deleteMemoThunk = createAsyncThunk<Memo, Pick<MemoParams, 'id' | 'i
 
 interface State {
   memos: Memo[] | []
+  memo: Memo | null
   page: number
   total: number
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
@@ -49,6 +50,7 @@ interface State {
 
 const initialState: State = {
   memos: [],
+  memo: null,
   page: 1,
   total: 1,
   status: 'idle',

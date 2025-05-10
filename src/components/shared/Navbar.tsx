@@ -17,7 +17,7 @@ export default function Navbar() {
                 width={120}
                 height={20}
                 style={{ width: 126, height: 21 }}
-                priority={true}
+                priority
               />
             </Stack>
           </Link>

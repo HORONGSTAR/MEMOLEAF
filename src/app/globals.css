@@ -23,14 +23,6 @@ body {
   font-family: var(--font-noto-sans), sans-serif;
 }
 
-.splash-screen {
-  display: flex;
-  width: 100%;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
-}
-
 .image-modal {
   position: fixed;
   top: 0;
@@ -42,11 +34,6 @@ body {
   justify-content: center;
   align-items: center;
   z-index: 1000;
-}
-
-.splash-screen div {
-  animation: spinY 1.5s ease-in-out forwards;
-  transform-style: preserve-3d;
 }
 
 @keyframes spinY {

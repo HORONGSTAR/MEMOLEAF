@@ -19,7 +19,7 @@ export default function MemoDecoItem(props: Props) {
   const [checked, setChecked] = useState('off')
   const [unLock, setUnLock] = useState(false)
 
-  const transform: StringKey = { on: '-90deg', off: '0deg' }
+  const transform: StringKey = { on: '-180deg', off: '0deg' }
   const chipLabel: StringKey = { on: '접기', off: extra || '더 보기' }
 
   const handleChange = (value: string) => {
@@ -38,7 +38,10 @@ export default function MemoDecoItem(props: Props) {
     folder: (
       <Box>
         <Chip
-          onClick={() => setChecked(swapOnOff[checked].next)}
+          onClick={(e) => {
+            e.stopPropagation()
+            setChecked(swapOnOff[checked].next)
+          }}
           label={chipLabel[checked]}
           size="small"
           icon={
@@ -64,7 +67,14 @@ export default function MemoDecoItem(props: Props) {
             <Paper variant="outlined" sx={{ px: 1, maxWidth: 120 }}>
               <InputText fontSize="body2" value={password} onChange={(e) => handleChange(e.target.value)} placeholder="비밀번호 입력" />
             </Paper>
-            <Button onClick={() => setUnLock(password === extra ? true : false)}>확인</Button>
+            <Button
+              onClick={(e) => {
+                e.stopPropagation()
+                setUnLock(password === extra ? true : false)
+              }}
+            >
+              확인
+            </Button>
           </Stack>
         )}
       </>

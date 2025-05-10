@@ -1,5 +1,4 @@
-import { InfoBox } from '@/components'
-import { Wrap } from '@/components'
+import { Wrap, InfoBox } from '@/components'
 
 function MyPage() {
   return (

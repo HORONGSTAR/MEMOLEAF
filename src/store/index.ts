@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
-import memoSlice from './slices/postSlice'
+import memoSlice from './slices/memoSlice'
 
 export const store = configureStore({
   reducer: {

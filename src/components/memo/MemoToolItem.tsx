@@ -1,9 +1,10 @@
 'use client'
-import { Typography, Chip, IconButton, Divider, ChipProps, Button, Box } from '@mui/material'
-import { ExpandMore, DriveFileRenameOutline, Check, LockOutlined } from '@mui/icons-material'
-import { InputText, Dialog } from '@/components'
-import { Dispatch, ReactNode, SetStateAction, useCallback, useState } from 'react'
+import { Dialog, InputText } from '@/components'
+import { Dispatch, SetStateAction, useState, useCallback, ReactNode } from 'react'
 import { EditDeco } from '@/lib/types'
+import { Box, Chip, ChipProps, IconButton, Button, Divider, Stack, Typography } from '@mui/material'
+import { ExpandMore, DriveFileRenameOutline, Key } from '@mui/icons-material'
+import { swapOnOff } from '@/lib/utills'
 
 interface Props {
   decos: EditDeco
@@ -14,72 +15,102 @@ type Component = { [key: string]: ReactNode }
 
 export default function MemoToolItem(props: Props) {
   const { decos, setDecos } = props
-  const [isEdit, setEdit] = useState(false)
-  const [open, setOpen] = useState(false)
+  const [edit, setEdit] = useState('off')
+  const [open, setOpen] = useState('off')
 
-  const handleChange = useCallback(
-    (value: string, field: string) => {
-      setDecos((prev) => ({ ...prev, [field]: { active: 'on', extra: value } }))
+  const handleSubtext = useCallback(
+    (value: string) => {
+      if (value.length > 30) return
+      setDecos((prev) => ({ ...prev, subtext: { active: 'on', extra: value } }))
     },
     [setDecos]
   )
 
-  const handleSave = useCallback(() => {
-    setOpen(false)
-  }, [])
+  const handleFolder = useCallback(
+    (value: string) => {
+      if (value.length > 16) return
+      setDecos((prev) => ({ ...prev, folder: { active: 'on', extra: value } }))
+    },
+    [setDecos]
+  )
 
-  const handleCancel = useCallback(() => {
-    setOpen(false)
-    setDecos((prev) => ({ ...prev, secret: { active: 'off', extra: '' } }))
-  }, [setDecos])
+  const handleSecret = useCallback(
+    (value: string) => {
+      if (value.length > 12) return
+      setDecos((prev) => ({ ...prev, secret: { active: 'on', extra: value } }))
+    },
+    [setDecos]
+  )
 
-  const dialogProps = {
-    open: open,
-    actions: (
-      <>
-        <Button onClick={handleSave}>완료</Button>
-        <Button onClick={handleCancel}>취소</Button>
-      </>
+  const handleClose = useCallback(() => {
+    setOpen('off')
+    if (!decos.secret.extra) {
+      setDecos((prev) => ({ ...prev, secret: { active: 'on', extra: Math.random().toString(36).slice(2, 8) } }))
+    }
+  }, [setDecos, decos])
+
+  const chipProps: { [key: string]: ChipProps } = {
+    on: {
+      variant: 'outlined',
+      label: (
+        <InputText
+          id="folder"
+          value={decos.folder.extra}
+          onChange={(e) => handleFolder(e.target.value)}
+          autoFocus
+          aria-label="접힌글 더 보기 버튼 문구 입력"
+          placeholder="예) 더 보기, 펼치기"
+        />
+      ),
+    },
+    off: { variant: 'filled', label: decos.folder.extra || '더 보기' },
+  }
+
+  const subtextBox: Component = {
+    on: (
+      <Box>
+        <InputText
+          id="subtext"
+          value={decos.subtext.extra}
+          onChange={(e) => handleSubtext(e.target.value)}
+          aria-label="덧붙임 내용 입력"
+          placeholder="부연 설명을 덧붙일 수 있어요."
+        />
+        <Divider />
+      </Box>
     ),
-    label: '감추기 비밀번호 설정',
+    off: null,
   }
 
-  const inputProps = {
-    subtext: {
-      'aria-label': '덧붙임 내용 입력',
-      placeholder: '안내문이나 주의사항을 추가할 수 있어요.',
-      fullWidth: true,
-    },
-    folder: {
-      'aria-label': '접힌글 더 보기 버튼 문구 입력',
-      placeholder: '예: 더 보기, 펼쳐보기',
-    },
-    secret: {
-      'aria-label': '감추기 해제용 비밀번호 입력',
-      placeholder: '비밀번호 입력',
-      fontSize: 'body1',
-    },
+  const folderBox: Component = {
+    on: (
+      <Box>
+        <Chip {...chipProps[edit]} icon={<ExpandMore />} size="small" />
+        <IconButton size="small" onClick={() => setEdit(swapOnOff[edit].next)}>
+          <DriveFileRenameOutline fontSize="small" />
+        </IconButton>
+      </Box>
+    ),
+    off: null,
   }
-
-  const folderChipProps: ChipProps = isEdit
-    ? {
-        variant: 'outlined',
-        label: <InputText {...inputProps.folder} value={decos.folder.extra || ''} onChange={(e) => handleChange(e.target.value, 'folder')} />,
-      }
-    : { variant: 'filled', label: decos.folder.extra || '더 보기' }
-
-  const secretChipProps: ChipProps = decos.secret.extra
-    ? { icon: <Check />, label: '비밀번호 설정 완료', color: 'success' }
-    : { icon: <LockOutlined />, label: '비밀번호 설정 필요' }
 
   const secretBox: Component = {
     on: (
       <Box>
-        <Chip size="small" onClick={() => setOpen(true)} {...secretChipProps} />
-        <Dialog {...dialogProps}>
-          <InputText {...inputProps.secret} value={decos.secret.extra || ''} onChange={(e) => handleChange(e.target.value, 'secret')} />
+        <Button startIcon={<Key />} size="small" onClick={() => setOpen('on')}>
+          감추기 비밀번호 설정
+        </Button>
+        <Dialog open={swapOnOff[open].bool} label="비밀번호 변경하기" actions={<Button onClick={handleClose}>확인</Button>}>
+          <InputText
+            id="secret"
+            autoFocus
+            value={decos.secret.extra}
+            onChange={(e) => handleSecret(e.target.value)}
+            aria-label="감추기 해제용 비밀번호 입력"
+            placeholder="입력 없으면 자동 생성됩니다."
+          />
           <Divider />
-          <Typography width={300} mt={2} variant="body2">
+          <Typography maxWidth={300} mt={2} variant="body2">
             간단한 비밀번호로 메모를 잠글 수 있어요. 하지만 완전한 보안은 아니니 개인정보나 중요한 내용은 적지 말아주세요!
           </Typography>
         </Dialog>
@@ -88,32 +119,11 @@ export default function MemoToolItem(props: Props) {
     off: null,
   }
 
-  const subtextBox: Component = {
-    on: (
-      <Box>
-        <InputText {...inputProps.subtext} value={decos.subtext.extra || ''} onChange={(e) => handleChange(e.target.value, 'subtext')} />
-        <Divider />
-      </Box>
-    ),
-    off: null,
-  }
-  const folderBox: Component = {
-    on: (
-      <Box>
-        <Chip color="secondary" size="small" icon={<ExpandMore />} {...folderChipProps} />
-        <IconButton onClick={() => setEdit((prev) => !prev)} size="small" aria-label="더 보기 버튼 라벨 수정">
-          <DriveFileRenameOutline fontSize="small" />
-        </IconButton>
-      </Box>
-    ),
-    off: null,
-  }
-
   return (
-    <>
+    <Stack spacing={1}>
       {secretBox[decos.secret.active]}
       {subtextBox[decos.subtext.active]}
       {folderBox[decos.folder.active]}
-    </>
+    </Stack>
   )
 }

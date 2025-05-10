@@ -1,5 +1,5 @@
 'use client'
-import { getMemosThunk, createMemoThunk } from '@/store/slices/postSlice'
+import { getMemosThunk, createMemoThunk } from '@/store/slices/memoSlice'
 import { AsyncBox, MemoCard, MemoForm } from '@/components'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { useCallback, useEffect } from 'react'

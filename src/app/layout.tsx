@@ -3,7 +3,9 @@ import { Noto_Sans_KR, Nanum_Gothic, Nanum_Myeongjo, Nanum_Pen_Script, Do_Hyeon,
 import { ThemeProvider } from '@mui/material'
 import { theme } from '@/styles/MuiTheme'
 import Providers from './Providers'
+
 import './globals.css'
+import { SplashScreen } from '@/components'
 
 export const notoSans = Noto_Sans_KR({
   variable: '--font-noto-sans',
@@ -56,7 +58,9 @@ export default function RootLayout({
     <html lang="ko">
       <body className={`${notoSans.variable} antialiased`}>
         <Providers>
-          <ThemeProvider theme={theme}>{children}</ThemeProvider>
+          <ThemeProvider theme={theme}>
+            <SplashScreen>{children}</SplashScreen>
+          </ThemeProvider>
         </Providers>
       </body>
     </html>

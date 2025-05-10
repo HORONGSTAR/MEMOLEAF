@@ -13,8 +13,8 @@ export default function ImgModalBox(props: BasicProps) {
         onClick={() => setOpen(true)}
         src={`${image}`}
         alt={`${label}`}
-        fill
-        sizes="(max-width: 600px) 100vw, 50vw"
+        width={150}
+        height={150}
         className="aspect-square object-cover rounded-md cursor-pointer"
       />
       {open && (

@@ -9,6 +9,7 @@ export { default as MemoDeco } from '@/components/memo/MemoDeco'
 export { default as MemoDecoItem } from '@/components/memo/MemoDecoItem'
 export { default as MemoTool } from '@/components/memo/MemoTool'
 export { default as MemoToolItem } from '@/components/memo/MemoToolItem'
+export { default as MemoDetail } from '@/components/memo/MemoDetail'
 
 //img
 export { default as ImgForm } from '@/components/img/ImgForm'
@@ -23,6 +24,8 @@ export { default as InfoBox } from '@/components/my/InfoBox'
 export { default as Account } from '@/components/shared/Account'
 export { default as Navbar } from '@/components/shared/Navbar'
 export { default as Wrap } from '@/components/shared/Wrap'
+export { default as LinkBox } from '@/components/shared/LinkBox'
+export { default as SplashScreen } from '@/components/shared/SplashScreen'
 
 //common
 export { default as Avatar } from '@/components/common/Avatar'
@@ -31,6 +34,5 @@ export { default as MenuItem } from '@/components/common/MenuItem'
 export { default as Dialog } from '@/components/common/Dialog'
 export { default as Blank } from '@/components/common/Blank'
 export { default as AsyncBox } from '@/components/common/AsyncBox'
-export { default as Card } from '@/components/common/Card'
 export { default as TextCount } from '@/components/common/TextCount'
 export { default as InputText } from '@/components/common/InputText'

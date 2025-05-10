@@ -1,7 +1,6 @@
-import { Avatar as MuiAvatar } from '@mui/material'
+import { Avatar as MuiAvatar, AvatarProps } from '@mui/material'
 
-interface Props {
-  variant?: 'circular' | 'rounded' | 'square'
+interface Props extends AvatarProps {
   size?: number
   user?: {
     name?: string | null
@@ -9,13 +8,13 @@ interface Props {
   }
 }
 
-export default function UserAvatar(props: Props) {
+export default function Avatar(props: Props) {
   const { variant, size, user } = props
   return (
     <MuiAvatar
       variant={variant}
       sx={{ width: size || 32, height: size || 32 }}
-      src={`${process.env.NEXT_PUBLIC_IMG_URL}/uploads${user?.image}`}
+      src={`${process.env.NEXT_PUBLIC_IMG_URL}/uploads/${user?.image}`}
       alt={`${user?.name}프로필 사진`}
     />
   )

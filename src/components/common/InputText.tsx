@@ -16,7 +16,7 @@ export default function InputText(props: Props) {
 
   return (
     <>
-      <InputBase {...inputBaseProps} inputProps={{ sx: { ...typography[fontSize || 'body2'] } }} />
+      <InputBase {...inputBaseProps} fullWidth autoComplete="off" inputProps={{ sx: { ...typography[fontSize || 'body2'] } }} />
     </>
   )
 }

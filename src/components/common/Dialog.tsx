@@ -12,7 +12,7 @@ export default function Dialog(props: Props) {
 
   return (
     <>
-      <MuiDialog open={open}>
+      <MuiDialog open={open} keepMounted={false}>
         <DialogTitle>{label}</DialogTitle>
         <DialogContent>{children}</DialogContent>
         <DialogActions>{actions}</DialogActions>

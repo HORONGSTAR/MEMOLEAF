@@ -1,16 +1,11 @@
 import { NextRequest, NextResponse as NRes } from 'next/server'
 import prisma from '@/lib/prisma'
 
-type Params = {
-  params: { id: string }
-}
-
-export async function GET(req: NextRequest, { params }: Params) {
-  const { id } = params
+export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+  const { id } = await params
   const memo = await prisma.memo.findUnique({
     where: { id: parseInt(id) },
-    include: { user: true, images: true },
+    include: { user: true, images: true, decos: true },
   })
-
   return NRes.json({ memo })
 }

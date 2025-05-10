@@ -24,7 +24,6 @@ export default function MemoForm(inti: MemoFormData) {
   const [decos, setDecos] = useState<EditDeco>({ ...kindData, ...inti.decos })
   const [content, setContent] = useState(inti.content || '')
   const imageProps = { images, setImages }
-
   const decoProps = { decos, setDecos }
 
   const handleSubmit = useCallback(() => {
@@ -54,11 +53,10 @@ export default function MemoForm(inti: MemoFormData) {
   }
 
   return (
-    <Paper variant="outlined" sx={{ p: 1 }}>
+    <Paper variant="outlined" sx={{ p: 2 }}>
       <MemoToolItem {...decoProps} />
       <InputText
-        sx={{ p: 1 }}
-        fullWidth
+        id="content"
         multiline
         minRows={3}
         aria-label="메모 입력"
@@ -67,8 +65,8 @@ export default function MemoForm(inti: MemoFormData) {
         fontSize="body1"
         onChange={(e) => handleChange(e.target.value)}
       />
-
       <ImgPreview {...imageProps} />
+
       <Stack direction="row" alignItems="center">
         <ImgForm {...imageProps} />
         <MemoTool {...decoProps} />

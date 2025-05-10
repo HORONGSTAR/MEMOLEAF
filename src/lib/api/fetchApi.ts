@@ -1,6 +1,6 @@
 const ApiUrl = process.env.NEXT_PUBLIC_URL
 export const imgUrl = process.env.NEXT_PUBLIC_IMG_URL + '/'
-export const postUrl = `${ApiUrl}/api/post`
+export const memoUrl = `${ApiUrl}/api/memo`
 export const userUrl = `${ApiUrl}/api/user`
 
 export const metaData = (method: string, data: unknown) => {

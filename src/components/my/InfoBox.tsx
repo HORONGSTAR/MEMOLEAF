@@ -38,7 +38,7 @@ export default function InfoBox() {
         <>
           <Skeleton variant="rounded" width={160} height={160} />
           <List sx={{ flexGrow: 1 }}>
-            {[...Array(4)].map((key, idx) => (
+            {[...Array(4)].map((_, idx) => (
               <ListItem key={'info' + idx}>
                 <Skeleton width={'100%'} height={20} />
               </ListItem>
