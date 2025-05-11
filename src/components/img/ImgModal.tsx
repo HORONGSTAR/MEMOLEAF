@@ -3,22 +3,35 @@ import { useState } from 'react'
 import { BasicProps } from '@/lib/types'
 import Image from 'next/image'
 
-export default function ImgModalBox(props: BasicProps) {
-  const { image, label } = props
+interface Props extends BasicProps {
+  size?: number
+}
+
+export default function ImgModalBox(props: Props) {
+  const { image, label, size } = props
   const [open, setOpen] = useState(false)
 
   return (
     <>
       <Image
-        onClick={() => setOpen(true)}
+        onClick={(e) => {
+          e.stopPropagation()
+          setOpen(true)
+        }}
         src={`${image}`}
         alt={`${label}`}
-        width={150}
-        height={150}
+        width={size || 150}
+        height={size || 150}
         className="aspect-square object-cover rounded-md cursor-pointer"
       />
       {open && (
-        <div className="image-modal" onClick={() => setOpen(false)}>
+        <div
+          className="image-modal"
+          onClick={(e) => {
+            e.stopPropagation()
+            setOpen(false)
+          }}
+        >
           <Image src={`${image}`} alt={`${label}`} width={600} height={600} />
         </div>
       )}

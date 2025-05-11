@@ -1,8 +1,20 @@
 import dayjs from 'dayjs'
 import { v4 as uuid } from 'uuid'
+import { Image } from '@/lib/types'
 
 export const changeDate = (date: string) => dayjs(date).format('YYYY.MM.DD HH:mm')
 export const imgPath = process.env.NEXT_PUBLIC_IMG_URL + '/uploads/'
+export const editImageUrl = (images: Image[]) => images.map((img) => ({ ...img, url: imgPath + img.url }))
+
+export const copyText = async (text: string, label: string) => {
+  try {
+    await navigator.clipboard.writeText(text)
+    return label + ' 클립보드에 복사했습니다.'
+  } catch (err) {
+    console.error('복사 실패:', err)
+    return label + ' 복사하는 중 문제가 발생했습니다.'
+  }
+}
 
 export const swapOnOff: {
   [key: string]: {
@@ -21,6 +33,12 @@ export const randomProfile = () => {
   const index1 = Math.floor(Math.random() * 10)
   const index2 = Math.floor(Math.random() * 8)
   return { name: `${adj[index1]} ${word[index2]}`, image: `/default-avatar-${index2}.png` }
+}
+
+export function generateUserNum(userId: number) {
+  const year = new Date().getFullYear().toString().slice(-2)
+  const padded = userId.toString().padStart(4, '0')
+  return parseInt(`${year}${padded}`)
 }
 
 export const setRenameFile = (file: File) => {

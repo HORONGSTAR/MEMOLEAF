@@ -7,6 +7,7 @@ export default function LoginBox() {
   return (
     <Stack spacing={2}>
       <Button
+        color="inherit"
         sx={{ textTransform: 'none' }}
         size="large"
         startIcon={<SvgIcon>{googleIcon}</SvgIcon>}

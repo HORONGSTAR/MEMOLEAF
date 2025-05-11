@@ -3,16 +3,21 @@ import { ImgModal } from '@/components'
 import { Box, ImageList, ImageListItem } from '@mui/material'
 import { ReactNode } from 'react'
 
-interface Props extends Image {
+interface Images extends Image {
   remove?: ReactNode
 }
 
-export default function ImageGrid({ images }: { images: Props[] }) {
+interface Props {
+  images: Images[]
+  cols?: number
+}
+
+export default function ImageGrid({ images, cols }: Props) {
   const count = images.length
   if (count === 0) return null
 
   return (
-    <ImageList cols={4}>
+    <ImageList cols={cols || 4}>
       {images.map((img) => (
         <ImageListItem key={img.url}>
           <Box position="relative">

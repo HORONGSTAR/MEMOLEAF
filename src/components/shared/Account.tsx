@@ -38,7 +38,11 @@ export default function Account() {
 
   return (
     <>
-      {user ? <Menu icon={<Avatar user={user} />} label={'계정 메뉴'} items={meunItems} /> : <Button>로그인</Button>}
+      {user ? (
+        <Menu icon={<Avatar user={user} />} label={`${user.name}님의 계정`} items={meunItems} />
+      ) : (
+        <Button onClick={() => setOpen(true)}>로그인</Button>
+      )}
       <Dialog {...dialogProps}>
         <LoginBox />
       </Dialog>

@@ -2,8 +2,8 @@ import { memoUrl, metaData } from '@/lib/api/fetchApi'
 import { uploadImages, deleteImages } from './imgApi'
 import { MemoParams } from '@/lib/types'
 
-export const getMemos = async (page: number) => {
-  const res = await fetch(memoUrl + `?page=${page}`)
+export const getMemos = async (page: number, userId?: string) => {
+  const res = await fetch(memoUrl + `?page=${page}&userId=${userId || ''}`)
   if (!res.ok) throw new Error('메모 조회 중 에러')
   return res.json()
 }

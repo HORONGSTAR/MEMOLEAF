@@ -1,5 +1,5 @@
 'use client'
-import { IconButton, Menu as MuiMenu, MenuItem, ListItemIcon, ListItemText } from '@mui/material'
+import { IconButton, Menu as MuiMenu, MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material'
 import { useState } from 'react'
 import { BasicProps } from '@/lib/types'
 
@@ -17,31 +17,32 @@ export default function Menu(props: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
-
   return (
     <>
-      <IconButton
-        size="small"
-        onClick={handleClick}
-        sx={{ ml: 2 }}
-        aria-controls={open ? label : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? 'true' : undefined}
-      >
-        {icon}
-      </IconButton>
+      <Tooltip title={label}>
+        <IconButton
+          size="small"
+          onClick={(e) => {
+            e.stopPropagation()
+            setAnchorEl(e.currentTarget)
+          }}
+          sx={{ ml: 2 }}
+          aria-controls={open ? label : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+        >
+          {icon}
+        </IconButton>
+      </Tooltip>
 
       <MuiMenu
         id={label}
         anchorEl={anchorEl}
         open={open}
-        onClose={handleClose}
+        onClick={(e) => {
+          e.stopPropagation()
+          setAnchorEl(null)
+        }}
         slotProps={{
           paper: { elevation: 3 },
           list: { 'aria-labelledby': label },

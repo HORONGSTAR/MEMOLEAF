@@ -4,16 +4,19 @@ import prisma from '@/lib/prisma'
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const page = parseInt(searchParams.get('page') || '1')
+  const userId = searchParams.get('userId')
+
   const limit = 10
 
   const memos = await prisma.memo.findMany({
+    ...(userId && { where: { userId: parseInt(userId) } }),
     skip: (page - 1) * limit,
     take: 10,
     orderBy: { createdAt: 'desc' },
     include: { user: true, images: true, decos: true },
   })
 
-  const totalCount = await prisma.user.count()
+  const totalCount = await prisma.memo.count()
 
   return NRes.json({
     memos,
@@ -65,7 +68,6 @@ export async function PATCH(req: NextRequest) {
     })
 
     const res = { ...memo, images, decos }
-
     res.images = await prisma.image.findMany({ where: { memoId: memo.id } })
     res.decos = await prisma.deco.findMany({ where: { memoId: memo.id } })
 

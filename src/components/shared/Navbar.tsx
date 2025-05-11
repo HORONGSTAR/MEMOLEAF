@@ -10,15 +10,7 @@ export default function Navbar() {
         <Toolbar>
           <Link href={'/'}>
             <Stack direction="row" spacing={1}>
-              <Image
-                src={'/memoleaf.svg'}
-                alt="MEMOLEAF"
-                aria-label="메모리프 홈"
-                width={120}
-                height={20}
-                style={{ width: 126, height: 21 }}
-                priority
-              />
+              <Image src={'/memoleaf.svg'} alt="MEMOLEAF" aria-label="메모리프 홈" width={126} height={21} priority />
             </Stack>
           </Link>
           <Blank />

@@ -29,7 +29,7 @@ export default function MemoForm(inti: MemoFormData) {
   const handleSubmit = useCallback(() => {
     const editImage: EditImage = {
       file: [],
-      add: images.add.filter((img) => img.id),
+      add: images.add.filter((img) => img.id).map((img) => ({ url: img.url, alt: img.alt })),
       del: images.del,
     }
     const renamedFiles = images.file.map((f) => {
@@ -42,7 +42,9 @@ export default function MemoForm(inti: MemoFormData) {
       .filter((key) => swapOnOff[decos[key].active].bool)
       .map((key) => ({ kind: key, extra: decos[key].extra }))
     editImage.file = renamedFiles
+
     inti.onSubmit({ id: 0, content, images: editImage, decos: editDecos })
+
     setContent('')
     setImages({ file: [], add: [], del: [] })
   }, [content, images, decos, inti])

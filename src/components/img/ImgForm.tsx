@@ -1,5 +1,5 @@
 'use client'
-import { IconButton, CircularProgress } from '@mui/material'
+import { IconButton, Tooltip } from '@mui/material'
 import imageCompression from 'browser-image-compression'
 import { Dispatch, SetStateAction, useRef, useState } from 'react'
 import { ImageSearch } from '@mui/icons-material'
@@ -19,7 +19,7 @@ export default function ImgForm(props: Props) {
     setLoading(true)
     const files = e.target.files
     if (!files) return
-    if (files.length > 4) return alert('이미지는 최대 4장까지 첨부할 수 있어요.')
+    if (images.add.length > 4) return alert('이미지는 최대 4장까지 첨부할 수 있어요.')
 
     const newImgFiles: File[] = []
     const newImgUrls: string[] = []
@@ -43,13 +43,17 @@ export default function ImgForm(props: Props) {
 
   return (
     <>
-      {loading ? (
-        <CircularProgress size={36} />
-      ) : (
-        <IconButton size="small" aria-label="이미지 업로드" disabled={images.add.length > 3} onClick={() => fileInputRef.current?.click()}>
+      <Tooltip title="이미지 업로드">
+        <IconButton
+          loading={loading}
+          size="small"
+          aria-label="이미지 업로드"
+          disabled={images.add.length > 3}
+          onClick={() => fileInputRef.current?.click()}
+        >
           <ImageSearch />
         </IconButton>
-      )}
+      </Tooltip>
       <input className="hidden" ref={fileInputRef} id="image" type="file" accept="image/*" multiple onChange={(e) => handleFileChange(e)} />
     </>
   )

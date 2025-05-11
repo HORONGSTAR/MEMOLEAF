@@ -14,9 +14,18 @@ export interface BasicProps {
 }
 export interface User {
   id: number
+  userNum: number
   name: string
   image: string
   info: string
+}
+
+export interface UserParams {
+  id: number
+  name?: string
+  image?: string
+  info?: string
+  file?: File
 }
 
 export interface Memo {

@@ -2,7 +2,7 @@
 export { default as LoginBox } from '@/components/auth/LoginBox'
 
 //memo
-export { default as MemoCard } from '@/components/memo/MemoCard'
+export { default as MemoBox } from '@/components/memo/MemoBox'
 export { default as MemoForm } from '@/components/memo/MemoForm'
 export { default as MemoIndex } from '@/components/memo/MemoIndex'
 export { default as MemoDeco } from '@/components/memo/MemoDeco'
@@ -16,9 +16,10 @@ export { default as ImgForm } from '@/components/img/ImgForm'
 export { default as ImgPreview } from '@/components/img/ImgPreview'
 export { default as ImgGrid } from '@/components/img/ImgGrid'
 export { default as ImgModal } from '@/components/img/ImgModal'
+export { default as ImgUploader } from '@/components/img/ImgUploader'
 
 //my
-export { default as InfoBox } from '@/components/my/InfoBox'
+export { default as Profile } from '@/components/my/Profile'
 
 //shared
 export { default as Account } from '@/components/shared/Account'
@@ -26,6 +27,7 @@ export { default as Navbar } from '@/components/shared/Navbar'
 export { default as Wrap } from '@/components/shared/Wrap'
 export { default as LinkBox } from '@/components/shared/LinkBox'
 export { default as SplashScreen } from '@/components/shared/SplashScreen'
+export { default as BackButton } from '@/components/shared/BackButton'
 
 //common
 export { default as Avatar } from '@/components/common/Avatar'

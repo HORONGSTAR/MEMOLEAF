@@ -1,11 +1,19 @@
-import { Wrap, InfoBox } from '@/components'
+import { Wrap, Profile } from '@/components'
+import { getMemos } from '@/lib/api/memoApi'
+import { getUser } from '@/lib/api/userApi'
 
-function MyPage() {
+interface PageProps {
+  params: { id: string }
+}
+
+export default async function Page({ params }: PageProps) {
+  const { id } = await params
+  const user = await getUser(id as string)
+  const myMemos = await getMemos(1, id as string)
+
   return (
     <Wrap>
-      <InfoBox />
+      <Profile user={user} myMemos={myMemos} />
     </Wrap>
   )
 }
-
-export default MyPage
