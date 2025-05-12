@@ -5,11 +5,14 @@ export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const page = parseInt(searchParams.get('page') || '1')
   const userId = searchParams.get('userId')
+  const parentId = searchParams.get('parentId')
 
   const limit = 10
 
   const memos = await prisma.memo.findMany({
+    where: { parentId: null },
     ...(userId && { where: { userId: parseInt(userId) } }),
+    ...(parentId && { where: { parentId: parseInt(parentId) } }),
     skip: (page - 1) * limit,
     take: 10,
     orderBy: { createdAt: 'desc' },
@@ -27,7 +30,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { id, content, images, decos } = await req.json()
+    const { id, content, images, decos, parentId } = await req.json()
 
     const user = await prisma.user.findUnique({ where: { id } })
     if (!user) return NRes.json({ error: '유저 정보를 찾을 수 없습니다.' }, { status: 404 })
@@ -36,6 +39,7 @@ export async function POST(req: NextRequest) {
       data: {
         userId: user.id,
         content,
+        parentId,
         ...(images?.length > 0 && { images: { create: images } }),
         ...(decos?.length > 0 && { decos: { create: decos } }),
       },

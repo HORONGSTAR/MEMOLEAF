@@ -1,9 +1,14 @@
 import { memoUrl, metaData } from '@/lib/api/fetchApi'
 import { uploadImages, deleteImages } from './imgApi'
-import { MemoParams } from '@/lib/types'
+import { MemoParams, QueryString } from '@/lib/types'
 
-export const getMemos = async (page: number, userId?: string) => {
-  const res = await fetch(memoUrl + `?page=${page}&userId=${userId || ''}`)
+export const getMemos = async (params: QueryString) => {
+  const keys = Object.keys(params)
+  let query = ''
+  for (const key of keys) {
+    query += `${key}=${params[key]}&`
+  }
+  const res = await fetch(memoUrl + `?${query}`)
   if (!res.ok) throw new Error('메모 조회 중 에러')
   return res.json()
 }
@@ -15,8 +20,8 @@ export const getMemoById = async (id: string) => {
 }
 
 export const createMemo = async (params: MemoParams) => {
-  const { id, content, images, decos } = params
-  const data = metaData('POST', { id, content, images: images.add, decos })
+  const { id, content, images, decos, parentId } = params
+  const data = metaData('POST', { id, content, images: images.add, decos, parentId })
   if (images.file.length > 0) await uploadImages(images.file)
 
   const res = await fetch(memoUrl, data)

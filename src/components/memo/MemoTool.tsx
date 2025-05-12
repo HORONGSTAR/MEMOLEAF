@@ -35,7 +35,7 @@ export default function MemoTool(props: Props) {
   )
 
   const tool: Tool = {
-    on: { bgcolor: '#eee', rotate: '45deg', bool: true, icon: <AddCircle /> },
+    on: { bgcolor: '#d4e4d1', rotate: '45deg', bool: true, icon: <AddCircle /> },
     off: { bgcolor: 'none', rotate: '0deg', bool: false, icon: <AddCircleOutline /> },
   }
 
@@ -66,6 +66,7 @@ export default function MemoTool(props: Props) {
   return (
     <Stack sx={{ bgcolor: tool[extend].bgcolor, borderRadius: 10 }}>
       <IconButton
+        color="primary"
         size="small"
         sx={{
           transform: `rotate(${tool[extend].rotate})`,

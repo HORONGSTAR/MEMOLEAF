@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getMemos, createMemo, updateMemo, deleteMemo } from '@/lib/api/memoApi'
-import { Memo, MemoParams } from '@/lib/types'
+import { Memo, MemoParams, QueryString } from '@/lib/types'
 
 interface Memos {
   memos: Memo[]
@@ -8,9 +8,9 @@ interface Memos {
   total: number
 }
 
-export const getMemosThunk = createAsyncThunk<Memos, number>('memo/getMemos', async (page) => {
+export const getMemosThunk = createAsyncThunk<Memos, QueryString>('memo/getMemos', async (params) => {
   try {
-    return await getMemos(page)
+    return await getMemos(params)
   } catch (error) {
     console.error(error || '메모 조회 실패')
   }

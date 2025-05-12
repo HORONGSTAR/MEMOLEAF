@@ -8,77 +8,93 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  userNum   Int?
-  credits   String   @unique
-  name      String   @db.VarChar(12)
-  image     String
-  info      String?
-  createdAt DateTime @default(now())
-  memos     Memo[]
-  comments  Comment[]
-  bookmark  BookMark[]
+  id           Int      @id @default(autoincrement())
+  userNum      Int?
+  credits      String   @unique
+  name         String   @db.VarChar(12)
+  image        String
+  info         String?
+  memos        Memo[]
+  bookmark     BookMark[]
+  followedBy   Follows[] @relation("followedBy")
+  following    Follows[] @relation("following")
+  createdAt    DateTime @default(now())
+}
+
+model Follows {
+  followedById Int
+  followingId  Int
+  followedBy   User @relation("followedBy", fields: [followedById], references: [id])
+  following    User @relation("following", fields: [followingId], references: [id])
+  @@id([followingId, followedById])
 }
 
 
 model Memo {
-  id        Int        @id @default(autoincrement())
-  content   String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  userId    Int
-  user      User       @relation(fields: [userId],references: [id],onDelete: Cascade)
-  decos     Deco[] 
-  comments  Comment[]
-  bookmark  BookMark[]
-  images    Image[]
-  firstMemo Thread[]   @relation("firstMemo")
-  laterMemo Thread[]   @relation("laterMemo")
-  
+  id           Int        @id @default(autoincrement())
+  content      String
+  replies      Memo[]     @relation("Thread")
+  decos        Deco[] 
+  images       Image[]
+  bookmark     BookMark[]
+  userId       Int
+  noteId       Int?
+  parentId     Int?
+  user         User       @relation(fields: [userId],references: [id],onDelete: Cascade)
+  note         Note?      @relation(fields: [noteId],references: [id])
+  parent       Memo?      @relation("Thread", fields: [parentId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
 }
 
+enum Kind {
+  subtext
+  folder
+  secret
+}
 
 model Deco {
-  id        Int        @id @default(autoincrement())
-  kind      String     @db.VarChar(10)
-  extra     String     @db.VarChar(60)
-  memoId    Int
-  memo      Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
+  id           Int        @id @default(autoincrement())
+  kind         Kind
+  extra        String     @db.VarChar(60)
+  memoId       Int
+  memo         Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
 }
 
-model Thread {
-  id        Int        @id @default(autoincrement())
-  firstId   Int
-  firstMemo Memo       @relation("firstMemo",fields: [firstId],references: [id],onDelete: Cascade)
-  laterId   Int
-  laterMemo Memo       @relation("laterMemo",fields: [laterId],references: [id],onDelete: Cascade)
+model Note {
+  id           Int        @id @default(autoincrement())
+  title        String     @db.VarChar(60)
+  notice       String
+  image        String
+  memos        Memo[]
 }
 
 model Image {
-  id        Int        @id @default(autoincrement())
-  url       String
-  alt       String
-  createdAt DateTime   @default(now())
-  memoId    Int
-  memo      Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
-}
-
-model Comment {
-  id        Int        @id @default(autoincrement())
-  content   String
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  userId    Int
-  memoId    Int
-  user      User       @relation(fields: [userId],references: [id],onDelete: Cascade)
-  memo      Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
+  id           Int        @id @default(autoincrement())
+  url          String
+  alt          String
+  memoId       Int
+  memo         Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
+  createdAt    DateTime   @default(now())
 }
 
 model BookMark {
-  id        Int        @id @default(autoincrement())
-  userId    Int
-  memoId    Int
-  user      User       @relation(fields: [userId],references: [id],onDelete: Cascade)
-  memo      Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
+  id           Int        @id @default(autoincrement())
+  userId       Int
+  memoId       Int
+  user         User       @relation(fields: [userId],references: [id],onDelete: Cascade)
+  memo         Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
+  createdAt    DateTime   @default(now())
 }
 
+enum Aria {
+  replies
+  follow
+  schedule
+}
+
+model Alarm{
+  id           Int        @id @default(autoincrement())
+  aria         Aria
+  link         Int
+}

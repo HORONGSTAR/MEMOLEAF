@@ -5,6 +5,14 @@ export type EditImage = { file: File[]; add: Image[]; del: Image[] }
 export type Deco = { kind: string; extra: string }
 export type EditDeco = { [key: string]: { active: string; extra: string } }
 
+export interface QueryString {
+  [key: string]: unknown
+  page?: number | string
+  id?: number | string
+  userId?: number | string
+  parentId?: number | string
+}
+
 export interface BasicProps {
   image?: string
   children?: ReactNode
@@ -35,6 +43,7 @@ export interface Memo {
   decos: Deco[]
   user: User
   createdAt: string
+  replies: Memo[]
 }
 
 export interface MemoParams {
@@ -42,4 +51,5 @@ export interface MemoParams {
   content: string
   images: EditImage
   decos: Deco[]
+  parentId?: number
 }

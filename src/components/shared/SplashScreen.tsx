@@ -6,7 +6,7 @@ import { BasicProps } from '@/lib/types'
 
 export default function SplashScreen(props: BasicProps) {
   const { children } = props
-  const [ready, setReady] = useState(typeof window === 'undefined' ? true : false)
+  const [ready, setReady] = useState(false)
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {

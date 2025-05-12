@@ -14,6 +14,7 @@ export default function LinkBox(props: Props) {
 
   return (
     <Box
+      component="span"
       onClick={(e) => {
         e.stopPropagation()
         router.push(link)

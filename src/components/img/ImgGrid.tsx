@@ -17,7 +17,7 @@ export default function ImageGrid({ images, cols }: Props) {
   if (count === 0) return null
 
   return (
-    <ImageList cols={cols || 4}>
+    <ImageList cols={cols || 4} sx={{ mt: 2 }}>
       {images.map((img) => (
         <ImageListItem key={img.url}>
           <Box position="relative">

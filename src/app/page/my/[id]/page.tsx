@@ -1,5 +1,4 @@
-import { Wrap, Profile } from '@/components'
-import { getMemos } from '@/lib/api/memoApi'
+import { Wrap, MyProfile, MyPost } from '@/components'
 import { getUser } from '@/lib/api/userApi'
 
 interface PageProps {
@@ -8,12 +7,12 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   const { id } = await params
-  const user = await getUser(id as string)
-  const myMemos = await getMemos(1, id as string)
+  const user = await getUser(id)
 
   return (
     <Wrap>
-      <Profile user={user} myMemos={myMemos} />
+      <MyProfile {...user} />
+      <MyPost id={id} />
     </Wrap>
   )
 }

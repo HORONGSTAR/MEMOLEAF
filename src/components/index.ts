@@ -1,8 +1,11 @@
 //auth
 export { default as LoginBox } from '@/components/auth/LoginBox'
+export { default as Account } from '@/components/auth/Account'
 
 //memo
 export { default as MemoBox } from '@/components/memo/MemoBox'
+export { default as MemoBoxHeader } from '@/components/memo/MemoBoxHeader'
+export { default as MemoBoxFooter } from '@/components/memo/MemoBoxFooter'
 export { default as MemoForm } from '@/components/memo/MemoForm'
 export { default as MemoIndex } from '@/components/memo/MemoIndex'
 export { default as MemoDeco } from '@/components/memo/MemoDeco'
@@ -19,10 +22,11 @@ export { default as ImgModal } from '@/components/img/ImgModal'
 export { default as ImgUploader } from '@/components/img/ImgUploader'
 
 //my
-export { default as Profile } from '@/components/my/Profile'
+export { default as MyProfile } from '@/components/my/MyProfile'
+export { default as MyPost } from '@/components/my/MyPost'
+export { default as MyPostItem } from '@/components/my/MyPostItem'
 
 //shared
-export { default as Account } from '@/components/shared/Account'
 export { default as Navbar } from '@/components/shared/Navbar'
 export { default as Wrap } from '@/components/shared/Wrap'
 export { default as LinkBox } from '@/components/shared/LinkBox'

@@ -20,9 +20,6 @@ const handler = NextAuth({
       clientSecret: process.env.NAVER_CLIENT_SECRET as string,
     }),
   ],
-  session: {
-    strategy: 'jwt',
-  },
   pages: { signIn: '/page/account/login' },
   callbacks: {
     async redirect({ baseUrl }) {
@@ -68,7 +65,6 @@ const handler = NextAuth({
     async session({ session, token }) {
       if (typeof token.id === 'number') {
         session.user.id = token.id
-        console.log(session.user.name)
       }
       if (typeof token.name === 'string') {
         session.user.name = token.name

@@ -2,29 +2,25 @@
 import { Dispatch, ReactNode, SetStateAction, useCallback, useMemo, useState } from 'react'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
 import { updateMemoThunk, deleteMemoThunk } from '@/store/slices/memoSlice'
-import { Card, CardContent, CardHeader, CardHeaderProps, Snackbar } from '@mui/material'
+import { Snackbar, CardContent } from '@mui/material'
 import { Memo, MemoParams, EditDeco } from '@/lib/types'
 import { useAppDispatch } from '@/store/hooks'
-import { Avatar, LinkBox, MemoForm, Menu } from '@/components'
-import { changeDate, copyText } from '@/lib/utills'
+import { MemoForm, Menu, MemoBoxHeader, MemoDeco } from '@/components'
+import { copyText } from '@/lib/utills'
 import { useSession } from 'next-auth/react'
 
 interface Props extends Memo {
-  activeUserInfo?: string
+  headerStyle?: 'card' | 'list'
   children: ReactNode
   setMemo?: Dispatch<SetStateAction<Memo>>
 }
 
-type UserInfo = {
-  [key: string]: CardHeaderProps
-}
-
-export default function MemoContent(inti: Props) {
+export default function MemoBox(inti: Props) {
   const dispatch = useAppDispatch()
   const [isEdit, setEdit] = useState(false)
   const [message, setMessage] = useState('')
   const { data: session } = useSession()
-  const { children, user, id, images, activeUserInfo, setMemo } = inti
+  const { children, user, id, images, headerStyle, setMemo } = inti
   const auth = session?.user
 
   const onSubmit = useCallback(
@@ -76,33 +72,21 @@ export default function MemoContent(inti: Props) {
     },
   ]
 
-  const userInfo: UserInfo = {
-    on: {
-      avatar: (
-        <LinkBox link={`/page/my/${inti.user.id}`}>
-          <Avatar user={inti.user} />
-        </LinkBox>
-      ),
-      title: <LinkBox link={`/page/my/${inti.user.id}`}>{inti.user.name}</LinkBox>,
-      subheader: changeDate(inti.createdAt),
-    },
-    off: { subheader: <small>{changeDate(inti.createdAt)}</small> },
-  }
+  const menu = <Menu icon={<MoreHoriz fontSize="small" />} label="메모 메뉴 열기" items={meunItems} />
 
   if (isEdit) {
     const decos: EditDeco = {}
     inti.decos.forEach((deco) => (decos[deco.kind] = { active: 'on', extra: deco.extra }))
     const props = { ...inti, onSubmit, decos }
-    return <MemoForm {...props} />
+    return <MemoForm {...props} placeholder="메모 내용 수정하기" />
   }
 
   return (
-    <Card variant="outlined">
-      <CardHeader
-        {...userInfo[activeUserInfo || 'on']}
-        action={<Menu icon={<MoreHoriz fontSize="small" />} label="메모 메뉴 열기" items={meunItems} />}
-      />
-      <CardContent>{children}</CardContent>
+    <>
+      <MemoBoxHeader {...inti} action={menu} headerStyle={headerStyle} />
+      <CardContent>
+        <MemoDeco decos={inti.decos}>{children}</MemoDeco>
+      </CardContent>
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={message ? true : false}
@@ -110,6 +94,6 @@ export default function MemoContent(inti: Props) {
         onClose={() => setMessage('')}
         message={message}
       />
-    </Card>
+    </>
   )
 }

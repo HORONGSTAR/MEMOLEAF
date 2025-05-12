@@ -2,6 +2,7 @@
 import { ReactNode } from 'react'
 import { MemoDecoItem } from '@/components'
 import { Deco, EditDeco } from '@/lib/types'
+import { Box } from '@mui/material'
 
 interface Props {
   children: ReactNode
@@ -49,5 +50,5 @@ export default function MemoDeco(props: Props) {
     ),
   }
 
-  return <>{secret[kind.secret.active]}</>
+  return <Box whiteSpace="pre-line">{secret[kind.secret.active]}</Box>
 }

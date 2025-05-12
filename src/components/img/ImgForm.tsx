@@ -45,6 +45,7 @@ export default function ImgForm(props: Props) {
     <>
       <Tooltip title="이미지 업로드">
         <IconButton
+          color="primary"
           loading={loading}
           size="small"
           aria-label="이미지 업로드"

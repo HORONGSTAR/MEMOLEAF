@@ -1,8 +1,8 @@
 import { userUrl, metaData } from '@/lib/api/fetchApi'
 import { UserParams } from '@/lib/types'
-import { uploadImages } from './imgApi'
+import { uploadImages } from '@/lib/api/imgApi'
 
-export const getUser = async (id: string) => {
+export const getUser = async (id: number | string) => {
   const res = await fetch(userUrl + `/${id}`)
   if (!res.ok) throw new Error('유저 정보 조회 중 에러')
   return res.json()
