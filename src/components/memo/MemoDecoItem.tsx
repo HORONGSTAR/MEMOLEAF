@@ -38,10 +38,7 @@ export default function MemoDecoItem(props: Props) {
     folder: (
       <Box>
         <Chip
-          onClick={(e) => {
-            e.stopPropagation()
-            setChecked(swapOnOff[checked].next)
-          }}
+          onClick={() => setChecked(swapOnOff[checked].next)}
           label={chipLabel[checked]}
           size="small"
           icon={

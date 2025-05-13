@@ -3,7 +3,9 @@ import { v4 as uuid } from 'uuid'
 import { Image } from '@/lib/types'
 
 export const changeDate = (date: string, format?: string) => dayjs(date).format(format || 'YYYY.MM.DD HH:mm')
+
 export const imgPath = process.env.NEXT_PUBLIC_IMG_URL + '/uploads/'
+
 export const editImageUrl = (images: Image[]) => images.map((img) => ({ ...img, url: imgPath + img.url }))
 
 export const copyText = async (text: string, label: string) => {

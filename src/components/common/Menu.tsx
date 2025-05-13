@@ -1,10 +1,10 @@
 'use client'
 import { IconButton, Menu as MuiMenu, MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material'
 import { useState } from 'react'
-import { BasicProps } from '@/lib/types'
+import { BasicProps, Active } from '@/lib/types'
 
 interface ItmeProps extends BasicProps {
-  isBlind?: boolean
+  active?: Active
   onClick: () => void
 }
 
@@ -22,10 +22,7 @@ export default function Menu(props: Props) {
       <Tooltip title={label}>
         <IconButton
           size="small"
-          onClick={(e) => {
-            e.stopPropagation()
-            setAnchorEl(e.currentTarget)
-          }}
+          onClick={(e) => setAnchorEl(e.currentTarget)}
           sx={{ ml: 2 }}
           aria-controls={open ? label : undefined}
           aria-haspopup="true"
@@ -39,10 +36,7 @@ export default function Menu(props: Props) {
         id={label}
         anchorEl={anchorEl}
         open={open}
-        onClick={(e) => {
-          e.stopPropagation()
-          setAnchorEl(null)
-        }}
+        onClick={() => setAnchorEl(null)}
         slotProps={{
           paper: { elevation: 3 },
           list: { 'aria-labelledby': label },
@@ -50,13 +44,17 @@ export default function Menu(props: Props) {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        {items.map((item) =>
-          item.isBlind ? null : (
-            <MenuItem key={item.label} onClick={item.onClick}>
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText>{item.label}</ListItemText>
-            </MenuItem>
-          )
+        {items.map(
+          (item) =>
+            ({
+              on: (
+                <MenuItem key={item.label} onClick={item.onClick}>
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText>{item.label}</ListItemText>
+                </MenuItem>
+              ),
+              off: null,
+            }[item.active || 'on'])
         )}
       </MuiMenu>
     </>

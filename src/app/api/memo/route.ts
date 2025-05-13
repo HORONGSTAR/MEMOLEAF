@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     skip: (page - 1) * limit,
     take: 10,
     orderBy: { createdAt: 'desc' },
-    include: { user: true, images: true, decos: true },
+    include: { user: true, images: true, decos: true, _count: { select: { comments: true, bookmarks: true } } },
   })
 
   const totalCount = await prisma.memo.count()
@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
         userId: user.id,
         content,
         parentId,
+
         ...(images?.length > 0 && { images: { create: images } }),
         ...(decos?.length > 0 && { decos: { create: decos } }),
       },
@@ -85,8 +86,8 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const { id } = await req.json()
-    const memo = await prisma.memo.findUnique({ where: { id } })
-    if (memo) {
+    const search = await prisma.memo.findUnique({ where: { id } })
+    if (search) {
       await prisma.memo.delete({ where: { id } })
       return NRes.json({ id })
     } else {

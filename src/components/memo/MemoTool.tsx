@@ -2,7 +2,7 @@
 import { Stack as MuiStack, IconButton, Collapse, StackProps, Checkbox, Tooltip } from '@mui/material'
 import { AddCircle, AddCircleOutline, Lock, LockOutlined, SubtitlesOutlined, Subtitles, DevicesFoldOutlined, DevicesFold } from '@mui/icons-material'
 import { ReactNode, useState, Dispatch, SetStateAction, useCallback } from 'react'
-import { EditDeco } from '@/lib/types'
+import { Active, EditDeco } from '@/lib/types'
 import { swapOnOff } from '@/lib/utills'
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 }
 
 type Tool = {
-  [key: string]: {
+  [key: Active]: {
     bgcolor: string
     rotate: string
     bool: boolean
@@ -28,7 +28,7 @@ export default function MemoTool(props: Props) {
       const active = decos[field].active
       setDecos((prev) => ({
         ...prev,
-        [field]: { active: swapOnOff[active].next, extra: '' },
+        [field]: { ...prev[field], active: swapOnOff[active].next },
       }))
     },
     [setDecos, decos]

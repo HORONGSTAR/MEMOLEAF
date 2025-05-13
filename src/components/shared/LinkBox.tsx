@@ -1,7 +1,7 @@
 'use client'
-import { Box } from '@mui/material'
-import { useRouter } from 'next/navigation'
+import { Link as MuiLink } from '@mui/material'
 import { ReactNode } from 'react'
+import Link from 'next/link'
 
 interface Props {
   link: string
@@ -10,18 +10,10 @@ interface Props {
 
 export default function LinkBox(props: Props) {
   const { link, children } = props
-  const router = useRouter()
 
   return (
-    <Box
-      component="span"
-      onClick={(e) => {
-        e.stopPropagation()
-        router.push(link)
-      }}
-      sx={{ cursor: 'pointer' }}
-    >
+    <MuiLink variant="body2" fontWeight={500} component={Link} href={link} underline="hover">
       {children}
-    </Box>
+    </MuiLink>
   )
 }

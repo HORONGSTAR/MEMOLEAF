@@ -14,6 +14,10 @@ export { default as MemoTool } from '@/components/memo/MemoTool'
 export { default as MemoToolItem } from '@/components/memo/MemoToolItem'
 export { default as MemoDetail } from '@/components/memo/MemoDetail'
 
+//feedback
+export { default as CommentForm } from '@/components/feedback/CommentForm'
+export { default as CommentBox } from '@/components/feedback/CommentBox'
+
 //img
 export { default as ImgForm } from '@/components/img/ImgForm'
 export { default as ImgPreview } from '@/components/img/ImgPreview'
@@ -36,9 +40,9 @@ export { default as BackButton } from '@/components/shared/BackButton'
 //common
 export { default as Avatar } from '@/components/common/Avatar'
 export { default as Menu } from '@/components/common/Menu'
-export { default as MenuItem } from '@/components/common/MenuItem'
 export { default as Dialog } from '@/components/common/Dialog'
 export { default as Blank } from '@/components/common/Blank'
 export { default as AsyncBox } from '@/components/common/AsyncBox'
 export { default as TextCount } from '@/components/common/TextCount'
 export { default as InputText } from '@/components/common/InputText'
+export { default as Card } from '@/components/common/Card'

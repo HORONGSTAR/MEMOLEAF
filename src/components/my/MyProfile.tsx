@@ -19,6 +19,16 @@ export default function MyProfile(user: User) {
 
   const isMyPage = useMemo(() => auth && auth.id === user.id, [auth, user])
 
+  const handleChangeName = useCallback((value: string) => {
+    if (value.length > 12) return
+    setName(value)
+  }, [])
+
+  const handleChangeInfo = useCallback((value: string) => {
+    if (value.length > 191) return
+    setInfo(value)
+  }, [])
+
   const handleSubmit = useCallback(async () => {
     setOpen(false)
     const userData: UserParams = {
@@ -61,8 +71,8 @@ export default function MyProfile(user: User) {
       <Dialog label="프로필 수정하기" open={open} actions={<Button onClick={handleSubmit}>확인</Button>}>
         <Stack spacing={3} mt={2}>
           <ImgUploader image={image} setImage={setImage} />
-          <TextField label="이름" size="small" value={name} onChange={(e) => setName(e.target.value)} />
-          <TextField label="자기소개" size="small" multiline rows={3} value={info} onChange={(e) => setInfo(e.target.value)} />
+          <TextField label="이름" size="small" value={name} onChange={(e) => handleChangeName(e.target.value)} />
+          <TextField label="자기소개" size="small" multiline rows={3} value={info} onChange={(e) => handleChangeInfo(e.target.value)} />
         </Stack>
       </Dialog>
     </Stack>

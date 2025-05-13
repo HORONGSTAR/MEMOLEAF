@@ -18,7 +18,7 @@ export default function MemoToolItem(props: Props) {
   const [edit, setEdit] = useState('off')
   const [open, setOpen] = useState('off')
 
-  const handleSubtext = useCallback(
+  const handleChangeSubtext = useCallback(
     (value: string) => {
       if (value.length > 30) return
       setDecos((prev) => ({ ...prev, subtext: { active: 'on', extra: value } }))
@@ -26,7 +26,7 @@ export default function MemoToolItem(props: Props) {
     [setDecos]
   )
 
-  const handleFolder = useCallback(
+  const handleChangeFolder = useCallback(
     (value: string) => {
       if (value.length > 16) return
       setDecos((prev) => ({ ...prev, folder: { active: 'on', extra: value } }))
@@ -34,7 +34,7 @@ export default function MemoToolItem(props: Props) {
     [setDecos]
   )
 
-  const handleSecret = useCallback(
+  const handleChangeSecret = useCallback(
     (value: string) => {
       if (value.length > 12) return
       setDecos((prev) => ({ ...prev, secret: { active: 'on', extra: value } }))
@@ -56,7 +56,7 @@ export default function MemoToolItem(props: Props) {
         <InputText
           id="folder"
           value={decos.folder.extra}
-          onChange={(e) => handleFolder(e.target.value)}
+          onChange={(e) => handleChangeFolder(e.target.value)}
           autoFocus
           aria-label="접힌글 더 보기 버튼 문구 입력"
           placeholder="예) 더 보기, 펼치기"
@@ -72,7 +72,7 @@ export default function MemoToolItem(props: Props) {
         <InputText
           id="subtext"
           value={decos.subtext.extra}
-          onChange={(e) => handleSubtext(e.target.value)}
+          onChange={(e) => handleChangeSubtext(e.target.value)}
           aria-label="덧붙임 내용 입력"
           placeholder="부연 설명을 덧붙일 수 있어요."
         />
@@ -105,7 +105,7 @@ export default function MemoToolItem(props: Props) {
             id="secret"
             autoFocus
             value={decos.secret.extra}
-            onChange={(e) => handleSecret(e.target.value)}
+            onChange={(e) => handleChangeSecret(e.target.value)}
             aria-label="감추기 해제용 비밀번호 입력"
             placeholder="입력 없으면 자동 생성됩니다."
           />

@@ -15,7 +15,8 @@ model User {
   image        String
   info         String?
   memos        Memo[]
-  bookmark     BookMark[]
+  comments     Comment[]
+  bookmarks    BookMark[]
   followedBy   Follows[] @relation("followedBy")
   following    Follows[] @relation("following")
   createdAt    DateTime @default(now())
@@ -36,12 +37,11 @@ model Memo {
   replies      Memo[]     @relation("Thread")
   decos        Deco[] 
   images       Image[]
-  bookmark     BookMark[]
+  comments     Comment[]
+  bookmarks    BookMark[]
   userId       Int
-  noteId       Int?
   parentId     Int?
   user         User       @relation(fields: [userId],references: [id],onDelete: Cascade)
-  note         Note?      @relation(fields: [noteId],references: [id])
   parent       Memo?      @relation("Thread", fields: [parentId], references: [id])
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
@@ -61,13 +61,6 @@ model Deco {
   memo         Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
 }
 
-model Note {
-  id           Int        @id @default(autoincrement())
-  title        String     @db.VarChar(60)
-  notice       String
-  image        String
-  memos        Memo[]
-}
 
 model Image {
   id           Int        @id @default(autoincrement())
@@ -75,6 +68,16 @@ model Image {
   alt          String
   memoId       Int
   memo         Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+}
+
+model Comment{
+  id           Int        @id @default(autoincrement())
+  text         String
+  userId       Int
+  memoId       Int
+  memo         Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
+  user         User       @relation(fields: [userId],references: [id],onDelete: Cascade)
   createdAt    DateTime   @default(now())
 }
 
@@ -98,3 +101,4 @@ model Alarm{
   aria         Aria
   link         Int
 }
+
