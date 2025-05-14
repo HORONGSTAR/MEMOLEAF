@@ -1,12 +1,13 @@
 'use client'
-import { CommentForm, MemoBoxHeader, Dialog } from '@/components'
+import { CommentForm, MemoHeader, Dialog } from '@/components'
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react'
 import { Active, Comment } from '@/lib/types'
 import { createComment, deleteComment, getComments, updateComment } from '@/lib/api/feedbackApi'
 import { useAppSelector } from '@/store/hooks'
 import { swapOnOff } from '@/lib/utills'
-import { List, ListItem, Box, Typography, IconButton, Button } from '@mui/material'
+import { List, ListItem, Box, Typography, IconButton, Button, Stack } from '@mui/material'
 import { DriveFileRenameOutline, DeleteForever, ExitToApp } from '@mui/icons-material'
+import { useSession } from 'next-auth/react'
 
 interface Props {
   id: number
@@ -26,6 +27,8 @@ export default function CommentBox(props: Props) {
   const [comments, setComments] = useState<Comment[]>([])
   const [mounted, setMounted] = useState(false)
   const { id, active, setCount } = props
+  const { data: session } = useSession()
+  const user = session?.user
 
   useEffect(() => {
     if (!swapOnOff[active].bool || mounted) return
@@ -72,12 +75,16 @@ export default function CommentBox(props: Props) {
   const Action = ({ id }: { id: number }) => {
     return (
       <>
-        <IconButton size="small" aria-label="댓글 수정폼 열기" onClick={() => setEdit(editId ? null : id)}>
-          {Boolean(editId) ? <ExitToApp fontSize="small" /> : <DriveFileRenameOutline fontSize="small" />}
-        </IconButton>
-        <IconButton size="small" aria-label="댓글 삭제" onClick={() => setRemove(id)}>
-          <DeleteForever fontSize="small" />
-        </IconButton>
+        <Box my={0.2}>
+          <IconButton size="small" aria-label="댓글 수정폼 열기" onClick={() => setEdit(editId ? null : id)}>
+            {Boolean(editId) ? <ExitToApp fontSize="small" /> : <DriveFileRenameOutline fontSize="small" />}
+          </IconButton>
+        </Box>
+        <Box m={0.2}>
+          <IconButton size="small" aria-label="댓글 삭제" onClick={() => setRemove(id)}>
+            <DeleteForever fontSize="small" />
+          </IconButton>
+        </Box>
       </>
     )
   }
@@ -93,15 +100,26 @@ export default function CommentBox(props: Props) {
 
   return (
     <>
-      <Box sx={{ bgcolor: '#eee', p: 2 }}>
+      <Box sx={{ bgcolor: '#eee', p: 1 }}>
         <CommentForm onSubmit={onSubmit} />
       </Box>
       <List disablePadding>
         {comments.map((comment) => (
           <Box key={comment.id} whiteSpace="pre-line">
-            <MemoBoxHeader {...comment} variant="list" action={<Action id={comment.id} />} />
-            <ListItem divider>
-              {editId !== comment.id ? <Typography variant="body2">{comment.text}</Typography> : <CommentForm onSubmit={onSubmit} {...comment} />}
+            <Stack direction="row" justifyContent="space-between">
+              <MemoHeader {...comment} variant="list" />
+              {user?.id === comment.user.id && <Action id={comment.id} />}
+            </Stack>
+            <ListItem divider disablePadding>
+              {editId !== comment.id ? (
+                <Typography px={2} pb={2} variant="body2">
+                  {comment.text}
+                </Typography>
+              ) : (
+                <Box sx={{ p: 1 }}>
+                  <CommentForm onSubmit={onSubmit} {...comment} />
+                </Box>
+              )}
             </ListItem>
           </Box>
         ))}

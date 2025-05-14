@@ -23,7 +23,6 @@ export default function Menu(props: Props) {
         <IconButton
           size="small"
           onClick={(e) => setAnchorEl(e.currentTarget)}
-          sx={{ ml: 2 }}
           aria-controls={open ? label : undefined}
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}

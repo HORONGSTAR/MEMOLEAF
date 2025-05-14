@@ -20,7 +20,7 @@ export default function CommentForm(inti: CommentFormData) {
   }, [onSubmit, text, id])
 
   return (
-    <Stack spacing={1} alignItems="end" sx={{ width: '100%' }}>
+    <Stack spacing={1} alignItems="end">
       <Card sx={{ p: 1, width: '100%' }}>
         <InputText
           fullWidth
@@ -32,7 +32,12 @@ export default function CommentForm(inti: CommentFormData) {
         />
       </Card>
       <Box>
-        <Chip onClick={handleSubmit} label={id ? '수정 완료' : '댓글 쓰기'} />
+        <Chip
+          sx={{ bgcolor: '#ccc', fontWeight: 500 }}
+          onClick={handleSubmit}
+          label={id ? '수정 완료' : '댓글 쓰기'}
+          disabled={!text || inti.text === text}
+        />
       </Box>
     </Stack>
   )

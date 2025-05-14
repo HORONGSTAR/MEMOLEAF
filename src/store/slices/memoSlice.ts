@@ -43,7 +43,6 @@ export const deleteMemoThunk = createAsyncThunk<Memo, Pick<MemoParams, 'id' | 'i
 interface State {
   memos: Memo[] | []
   memo: Memo | null
-  page: number
   total: number
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
 }
@@ -51,7 +50,6 @@ interface State {
 const initialState: State = {
   memos: [],
   memo: null,
-  page: 1,
   total: 1,
   status: 'idle',
 }
@@ -68,7 +66,6 @@ export const memoSlice = createSlice({
       .addCase(getMemosThunk.fulfilled, (state, action) => {
         state.status = 'succeeded'
         state.memos = action.payload.memos
-        state.page = action.payload.page
         state.total = action.payload.total
       })
       .addCase(getMemosThunk.rejected, (state) => {

@@ -1,12 +1,12 @@
 'use client'
 import { Typography, List, ListItem, Stack, IconButton, Box, TextField, Button } from '@mui/material'
-import { DriveFileRenameOutline } from '@mui/icons-material'
+import { DriveFileRenameOutline, PersonAddAltOutlined } from '@mui/icons-material'
 import { Avatar, Dialog, ImgUploader } from '@/components'
 import { useState, useMemo, useCallback } from 'react'
 import { User, UserParams } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 import { imgPath, setRenameFile } from '@/lib/utills'
-import { updateUser } from '@/lib/api/userApi'
+import { followUser, updateUser } from '@/lib/api/userApi'
 
 export default function MyProfile(user: User) {
   const [profile, setProfile] = useState(user)
@@ -46,6 +46,10 @@ export default function MyProfile(user: User) {
     setProfile((prev) => ({ ...prev, ...userData }))
   }, [user, name, info, image])
 
+  const handleFollow = useCallback(() => {
+    if (auth) followUser({ followedById: user.id, followingId: auth?.id })
+  }, [user, auth])
+
   return (
     <Stack spacing={2}>
       <Stack direction={{ sm: 'row', xs: 'column' }}>
@@ -54,7 +58,7 @@ export default function MyProfile(user: User) {
           <ListItem>
             <Typography variant="h6">{profile.name}</Typography>
             {isMyPage && (
-              <IconButton size="small" onClick={() => setOpen(true)}>
+              <IconButton size="small" aria-label="프로필 수정하기" onClick={() => setOpen(true)}>
                 <DriveFileRenameOutline fontSize="small" />
               </IconButton>
             )}

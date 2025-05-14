@@ -4,27 +4,31 @@ import prisma from '@/lib/prisma'
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const page = parseInt(searchParams.get('page') || '1')
+  const limit = parseInt(searchParams.get('limit') || '5')
   const userId = searchParams.get('userId')
   const parentId = searchParams.get('parentId')
+  const keyword = searchParams.get('keyword')
 
-  const limit = 10
+  const whereData = {
+    ...(userId && { where: { userId: parseInt(userId) } }),
+    ...(parentId && { where: { parentId: parseInt(parentId) } }),
+    ...(keyword && { where: { content: { contains: keyword } } }),
+  }
 
   const memos = await prisma.memo.findMany({
     where: { parentId: null },
-    ...(userId && { where: { userId: parseInt(userId) } }),
-    ...(parentId && { where: { parentId: parseInt(parentId) } }),
+    ...whereData,
     skip: (page - 1) * limit,
-    take: 10,
+    take: limit,
     orderBy: { createdAt: 'desc' },
-    include: { user: true, images: true, decos: true, _count: { select: { comments: true, bookmarks: true } } },
+    include: { user: true, images: true, decos: true, _count: { select: { comments: true, bookmarks: true, leafs: true } } },
   })
 
-  const totalCount = await prisma.memo.count()
+  const totalCount = await prisma.memo.count({ ...whereData })
 
   return NRes.json({
     memos,
-    totalPages: Math.ceil(totalCount / limit),
-    currentPage: page,
+    total: Math.ceil(totalCount / limit),
   })
 }
 
@@ -45,7 +49,7 @@ export async function POST(req: NextRequest) {
         ...(decos?.length > 0 && { decos: { create: decos } }),
       },
     })
-    const res = { ...newMemo, user, images, decos }
+    const res = { ...newMemo, user, images, decos, _count: { leafs: 0, comments: 0, bookmarks: 0 } }
 
     res.images = await prisma.image.findMany({ where: { memoId: newMemo.id } })
     res.decos = await prisma.deco.findMany({ where: { memoId: newMemo.id } })

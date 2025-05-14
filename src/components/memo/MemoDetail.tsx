@@ -1,39 +1,36 @@
 'use client'
-import { BackButton, MemoBox, ImgModal, MemoForm, ImgGrid, Card } from '@/components'
+import { BackButton, MemoBox, ImgModal, MemoForm, Card, MemoHeader, MemoFooter, ImgGrid, ExpandButton } from '@/components'
 import { useCallback, useEffect, useState } from 'react'
-import { createMemoThunk, getMemosThunk } from '@/store/slices/memoSlice'
-import { ImageList, ImageListItem } from '@mui/material'
+import { CardContent, ImageList, ImageListItem, ListItem } from '@mui/material'
 import { Memo, MemoParams } from '@/lib/types'
-import { useAppDispatch } from '@/store/hooks'
 import { editImageUrl } from '@/lib/utills'
 import { useSession } from 'next-auth/react'
+import { createMemo, getMemos } from '@/lib/api/memoApi'
+import { AutoStoriesOutlined } from '@mui/icons-material'
+import Link from 'next/link'
 
 interface Props {
   memo: Memo
 }
 export default function MemoDetail(props: Props) {
-  const dispatch = useAppDispatch()
   const [memo, setMemo] = useState(props.memo)
-  const [replies, setReplies] = useState<Memo[]>([])
+  const [leafs, setLeafs] = useState<Memo[]>([])
   const { data: session } = useSession()
   const user = session?.user
 
   useEffect(() => {
     if (!memo) return
-    dispatch(getMemosThunk({ page: 1, parentId: memo.id }))
-      .unwrap()
-      .then((result) => setReplies(result.memos))
-  }, [dispatch, memo])
+    getMemos({ page: 1, parentId: memo.id }).then((result) => setLeafs(result.memos))
+  }, [memo])
 
   const handleCreateMemo = useCallback(
     (params: Omit<MemoParams, 'id'>) => {
       if (!user) return
-      dispatch(createMemoThunk({ ...params, id: user.id, parentId: memo.id }))
-        .unwrap()
-        .then((result) => setReplies((prev) => [...prev, result]))
+      createMemo({ ...params, id: user.id, parentId: memo.id })
+        .then((result) => setLeafs((prev) => [result, ...prev]))
         .catch()
     },
-    [dispatch, user, memo]
+    [user, memo]
   )
 
   if (!memo) return null
@@ -54,31 +51,43 @@ export default function MemoDetail(props: Props) {
     </ImageListItem>
   ))
 
-  const thread = replies.map((reply) => (
-    <Card key={reply.id}>
-      <MemoBox {...reply} setMemo={setMemo} headerStyle="list" footerStyle="detail">
-        {reply.content}
-        <ImgGrid images={images} />
-      </MemoBox>
-    </Card>
-  ))
-
   return (
     <>
       <Card sx={{ border: 'none', boxShadow: 'none' }}>
         <BackButton />
-        <MemoBox {...memo} setMemo={setMemo}>
-          {memo.content}
+        <MemoBox {...memo} header={<MemoHeader {...memo} />} footer={<MemoFooter id={memo.id} _count={memo._count} />} setMemo={setMemo}>
+          <CardContent>{memo.content}</CardContent>
           <ImageList cols={cols[count]} sx={{ mt: 2 }}>
             {imgListRow1}
             {imgListRow2}
           </ImageList>
         </MemoBox>
       </Card>
-      <Card use="create">
-        <MemoForm onSubmit={handleCreateMemo} placeholder="메모 타래 추가하기" />
-      </Card>
-      {thread}
+      {memo.parentId === null && memo.user.id === user?.id && (
+        <Card use="create">
+          <MemoForm onSubmit={handleCreateMemo} placeholder="메모 타래 추가하기" />
+        </Card>
+      )}
+      {leafs.map((leaf) => (
+        <Card key={leaf.id}>
+          <MemoBox
+            {...leaf}
+            setLeafs={setLeafs}
+            header={<MemoHeader {...leaf} variant="list" />}
+            footer={
+              <MemoFooter id={leaf.id} _count={leaf._count}>
+                <ExpandButton LinkComponent={Link} href={`/page/memo/${leaf.id}`}>
+                  <AutoStoriesOutlined fontSize="small" />
+                  <span className="label">페이지</span>
+                </ExpandButton>
+              </MemoFooter>
+            }
+          >
+            <ListItem>{leaf.content}</ListItem>
+            <ImgGrid images={editImageUrl(leaf.images)} />
+          </MemoBox>
+        </Card>
+      ))}
     </>
   )
 }

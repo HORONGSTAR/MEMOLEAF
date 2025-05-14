@@ -14,7 +14,7 @@ export default function MyPost({ id }: { id: string }) {
     dispatch(getMemosThunk({ page: 1, userId: id }))
   }, [dispatch, id])
 
-  const labels = ['내 메모', '내 노트', '북마크']
+  const labels = ['내 메모']
 
   const panels = labels.map((_, i) => (
     <Box key={`panel${i}`} role={`panel${i}`} id={`panel${i}`} aria-labelledby={`tab${i}`} hidden={value !== i}>

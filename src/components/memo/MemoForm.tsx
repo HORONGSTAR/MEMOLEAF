@@ -1,5 +1,5 @@
 'use client'
-import { Button, Stack } from '@mui/material'
+import { Button, Snackbar, Stack } from '@mui/material'
 import { ImgForm, ImgPreview, Blank, InputText, MemoTool, MemoToolItem } from '@/components'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { setRenameFile, swapOnOff } from '@/lib/utills'
@@ -22,12 +22,13 @@ export default function MemoForm(inti: MemoFormData) {
   const [images, setImages] = useState<EditImage>({ file: [], add: inti.images || [], del: [] })
   const [decos, setDecos] = useState<EditDeco>({ ...kindData, ...inti.decos })
   const [content, setContent] = useState(inti.content || '')
+  const [message, setMessage] = useState('')
   const imageProps = { images, setImages }
   const decoProps = { decos, setDecos }
-
   const { children, placeholder } = inti
 
   const handleSubmit = useCallback(() => {
+    if (!content) return setMessage('내용을 입력하세요.')
     const editImage: EditImage = {
       file: [],
       add: images.add.filter((img) => img.id).map((img) => ({ url: img.url, alt: img.alt })),
@@ -83,10 +84,17 @@ export default function MemoForm(inti: MemoFormData) {
         <MemoTool {...decoProps} />
         <Blank />
         {children}
-        <Button size="large" variant={isEdit ? 'text' : 'contained'} onClick={handleSubmit}>
+        <Button disabled={content === inti.content} size="large" variant={isEdit ? 'text' : 'contained'} onClick={handleSubmit}>
           {isEdit ? '수정' : '메모'}
         </Button>
       </Stack>
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={message ? true : false}
+        autoHideDuration={6000}
+        onClose={() => setMessage('')}
+        message={message}
+      />
     </>
   )
 }

@@ -1,7 +1,8 @@
-import { AppBar, Toolbar, Container, Stack } from '@mui/material'
-import { Blank, Account } from '@/components'
+import { AppBar, Toolbar, Container, IconButton } from '@mui/material'
+import { Blank, Account, Bubble } from '@/components'
 import Link from 'next/link'
 import Image from 'next/image'
+import { Search, NotificationsNone } from '@mui/icons-material'
 
 export default function Navbar() {
   return (
@@ -9,11 +10,12 @@ export default function Navbar() {
       <Container>
         <Toolbar>
           <Link href={'/'}>
-            <Stack direction="row" spacing={1}>
-              <Image src={'/memoleaf.svg'} alt="MEMOLEAF" aria-label="메모리프 홈" width={126} height={21} priority />
-            </Stack>
+            <Image src={'/memoleaf.svg'} alt="MEMOLEAF" aria-label="메모리프 홈" width={120} height={20} priority />
           </Link>
           <Blank />
+          <IconButton size="small" LinkComponent={Link} href="/page/search">
+            <Search fontSize="small" />
+          </IconButton>
           <Account />
         </Toolbar>
       </Container>
