@@ -1,8 +1,8 @@
 import { AppBar, Toolbar, Container, IconButton } from '@mui/material'
-import { Blank, Account, Bubble } from '@/components'
+import { Blank, Account } from '@/components'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Search, NotificationsNone } from '@mui/icons-material'
+import { Search } from '@mui/icons-material'
 
 export default function Navbar() {
   return (

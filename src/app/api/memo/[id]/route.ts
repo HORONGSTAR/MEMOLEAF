@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse as NRes } from 'next/server'
 import prisma from '@/lib/prisma'
 
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const memo = await prisma.memo.findUnique({
     where: { id: parseInt(id) },
@@ -15,7 +15,7 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
   return NRes.json({ memo })
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const { parentId } = await req.json()
 

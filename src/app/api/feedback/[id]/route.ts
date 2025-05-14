@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse as NRes } from 'next/server'
 import prisma from '@/lib/prisma'
 
-type Params = { params: { id: string } }
-
-export async function GET(req: NextRequest, { params }: Params) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const { searchParams } = new URL(req.url)
   const page = parseInt(searchParams.get('page') || '1')
@@ -17,7 +15,7 @@ export async function GET(req: NextRequest, { params }: Params) {
     orderBy: { createdAt: 'desc' },
   })
 
-  const totalCount = await prisma.comment.count()
+  const totalCount = await prisma.comment.count({ where: { memoId: parseInt(id) } })
   return NRes.json({
     comments,
     totalPages: Math.ceil(totalCount / limit),

@@ -3,11 +3,7 @@ import { Wrap, MemoDetail, BackButton } from '@/components'
 import { Stack, Typography } from '@mui/material'
 import { Error } from '@mui/icons-material'
 
-interface PageProps {
-  params: { id: string }
-}
-
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const memo = await getMemoById(id)
 

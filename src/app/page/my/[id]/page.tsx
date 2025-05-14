@@ -3,11 +3,7 @@ import { Typography, Stack } from '@mui/material'
 import { getUser } from '@/lib/api/userApi'
 import { Error } from '@mui/icons-material'
 
-interface PageProps {
-  params: { id: string }
-}
-
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const user = await getUser(id)
 

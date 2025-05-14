@@ -1,10 +1,9 @@
 import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse as NRes } from 'next/server'
 
-export async function GET(_: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    if (!params) return NRes.json({ error: '잘못된 요청입니다.' }, { status: 400 })
     const user = await prisma.user.findUnique({ where: { id: parseInt(id) } })
     if (user) {
       return NRes.json(user)

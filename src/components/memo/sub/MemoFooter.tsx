@@ -1,6 +1,6 @@
 'use client'
-import { ForumOutlined, BookmarkBorder } from '@mui/icons-material'
-import { Typography, CardActions, IconButton } from '@mui/material'
+import { ForumOutlined } from '@mui/icons-material'
+import { Typography, CardActions } from '@mui/material'
 import { CommentBox, Bubble } from '@/components'
 import { ReactNode, useState } from 'react'
 import { Active } from '@/lib/types'
@@ -32,12 +32,6 @@ export default function MemoFooter(props: Props) {
         >
           <CommentBox id={id} active={active} setCount={setCount} />
         </Bubble>
-        {/* <IconButton sx={{ position: 'relative' }} onClick={(e) => e.stopPropagation()}>
-          <BookmarkBorder fontSize="small" />
-          <Typography variant="body2" sx={{ position: 'absolute', right: -2, fontWeight: 'bold' }}>
-            {count.bookmarks}
-          </Typography>
-        </IconButton> */}
         {children}
       </CardActions>
     </>
