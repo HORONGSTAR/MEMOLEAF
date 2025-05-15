@@ -28,17 +28,17 @@ const handler = NextAuth({
     async jwt({ token, profile, account }) {
       const key = account ? account.provider : 'none'
 
-      const credits = {
+      const credit = {
         google: 'google' + profile?.sub,
         kakao: 'kakao' + profile?.id,
         naver: 'naver' + profile?.response?.id,
       }[key]
 
-      if (credits) {
-        const user = await prisma.user.findUnique({ where: { credits } })
+      if (credit) {
+        const user = await prisma.user.findUnique({ where: { credit } })
         if (!user) {
           const { name, image } = randomProfile()
-          const newUser = await prisma.user.create({ data: { credits, name, image } })
+          const newUser = await prisma.user.create({ data: { credit, name, image } })
 
           const userNum = generateUserNum(newUser.id)
 

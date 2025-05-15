@@ -18,7 +18,10 @@ export const getMemosThunk = createAsyncThunk<Memos, QueryString>('memo/getMemos
 
 export const createMemoThunk = createAsyncThunk<Memo, MemoParams>('memo/createMemo', async (params) => {
   try {
-    return await createMemo(params)
+    const { id, content, images, decos, parentId, user } = params
+    const data = await createMemo({ id, content, images, decos, parentId })
+    data.user = user
+    return data
   } catch (error) {
     console.error(error || '메모 작성 실패')
   }
@@ -32,9 +35,9 @@ export const updateMemoThunk = createAsyncThunk<Memo, MemoParams>('memo/updateMe
   }
 })
 
-export const deleteMemoThunk = createAsyncThunk<Memo, Pick<MemoParams, 'id' | 'images'>>('memo/deleteMemo', async (params) => {
+export const deleteMemoThunk = createAsyncThunk<Memo, number>('memo/deleteMemo', async (id) => {
   try {
-    return await deleteMemo(params)
+    return await deleteMemo(id)
   } catch (error) {
     console.error(error || '메모 삭제 실패')
   }

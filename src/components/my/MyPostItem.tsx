@@ -1,7 +1,7 @@
 'use client'
 import { Card, CardContent, Stack } from '@mui/material'
 import { ExpandButton, ImgGrid, MemoBox, MemoFooter, MemoHeader } from '@/components'
-import { editImageUrl } from '@/lib/utills'
+import { addImagePath } from '@/lib/utills'
 import { Memo } from '@/lib/types'
 import { AutoStoriesOutlined } from '@mui/icons-material'
 import Link from 'next/link'
@@ -20,7 +20,7 @@ export default function MyPostItem({ posts }: Props) {
             header={<MemoHeader variant="list" {...post} />}
             footer={
               <MemoFooter id={post.id} _count={post._count}>
-                <ExpandButton LinkComponent={Link} href={`/page/memo/${post.id}`}>
+                <ExpandButton component={Link} href={`/memo/${post.id}`}>
                   <AutoStoriesOutlined fontSize="small" />
                   <span className="label">페이지</span>
                 </ExpandButton>
@@ -28,7 +28,7 @@ export default function MyPostItem({ posts }: Props) {
             }
           >
             <CardContent>{post.content}</CardContent>
-            <ImgGrid images={editImageUrl(post.images)} />
+            <ImgGrid images={addImagePath(post.images)} />
           </MemoBox>
         </Card>
       ))}

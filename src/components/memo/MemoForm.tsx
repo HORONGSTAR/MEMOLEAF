@@ -19,7 +19,7 @@ const kindData = {
 }
 
 export default function MemoForm(inti: MemoFormData) {
-  const [images, setImages] = useState<EditImage>({ file: [], add: inti.images || [], del: [] })
+  const [images, setImages] = useState<EditImage>({ file: [], imgs: inti.images || [] })
   const [decos, setDecos] = useState<EditDeco>({ ...kindData, ...inti.decos })
   const [content, setContent] = useState(inti.content || '')
   const [message, setMessage] = useState('')
@@ -31,12 +31,11 @@ export default function MemoForm(inti: MemoFormData) {
     if (!content) return setMessage('내용을 입력하세요.')
     const editImage: EditImage = {
       file: [],
-      add: images.add.filter((img) => img.id).map((img) => ({ url: img.url, alt: img.alt })),
-      del: images.del,
+      imgs: images.imgs.filter((img) => img.id).map((img) => ({ url: img.url, alt: img.alt })),
     }
     const renamedFiles = images.file.map((f) => {
       const renamedFile = setRenameFile(f)
-      editImage.add.push({ url: renamedFile.name, alt: '' })
+      editImage.imgs.push({ url: renamedFile.name, alt: '' })
       return renamedFile
     })
 
@@ -52,7 +51,7 @@ export default function MemoForm(inti: MemoFormData) {
     })
 
     setContent('')
-    setImages({ file: [], add: [], del: [] })
+    setImages({ file: [], imgs: [] })
   }, [content, images, decos, inti])
 
   const handleChange = (value: string) => {

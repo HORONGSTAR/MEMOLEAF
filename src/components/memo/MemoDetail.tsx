@@ -3,7 +3,7 @@ import { BackButton, MemoBox, ImgModal, MemoForm, Card, MemoHeader, MemoFooter, 
 import { useCallback, useEffect, useState } from 'react'
 import { CardContent, ImageList, ImageListItem, ListItem } from '@mui/material'
 import { Memo, MemoParams } from '@/lib/types'
-import { editImageUrl } from '@/lib/utills'
+import { addImagePath } from '@/lib/utills'
 import { useSession } from 'next-auth/react'
 import { createMemo, getMemos } from '@/lib/api/memoApi'
 import { AutoStoriesOutlined } from '@mui/icons-material'
@@ -35,7 +35,7 @@ export default function MemoDetail(props: Props) {
 
   if (!memo) return null
 
-  const images = editImageUrl(memo.images)
+  const images = addImagePath(memo.images)
   const count = memo.images.length
   const cols: { [key: number]: number } = { 1: 2, 2: 4, 3: 3, 4: 2 }
 
@@ -76,7 +76,7 @@ export default function MemoDetail(props: Props) {
             header={<MemoHeader {...leaf} variant="list" />}
             footer={
               <MemoFooter id={leaf.id} _count={leaf._count}>
-                <ExpandButton LinkComponent={Link} href={`/page/memo/${leaf.id}`}>
+                <ExpandButton component={Link} href={`/memo/${leaf.id}`}>
                   <AutoStoriesOutlined fontSize="small" />
                   <span className="label">페이지</span>
                 </ExpandButton>
@@ -84,7 +84,7 @@ export default function MemoDetail(props: Props) {
             }
           >
             <ListItem>{leaf.content}</ListItem>
-            <ImgGrid images={editImageUrl(leaf.images)} />
+            <ImgGrid images={addImagePath(leaf.images)} />
           </MemoBox>
         </Card>
       ))}

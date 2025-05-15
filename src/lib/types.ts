@@ -4,7 +4,7 @@ export type Active = 'on' | 'off' | string
 export type ActiveNode = { [key: Active]: ReactNode }
 
 export type Image = { id?: number; url: string; alt?: string }
-export type EditImage = { file: File[]; add: Image[]; del: Image[] }
+export type EditImage = { file: File[]; imgs: Image[] }
 export type Deco = { kind: string; extra: string }
 export type EditDeco = { [key: string]: { active: Active; extra: string } }
 
@@ -69,6 +69,7 @@ export interface MemoParams {
   images: EditImage
   decos: Deco[]
   parentId?: number
+  user?: User
 }
 
 export interface Comment {

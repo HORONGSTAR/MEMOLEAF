@@ -23,12 +23,12 @@ interface Props {
 export default function CommentBox(props: Props) {
   const [removeId, setRemove] = useState<null | number>(null)
   const [editId, setEdit] = useState<null | number>(null)
-  const { profile } = useAppSelector((state) => state.user)
+  const { user } = useAppSelector((state) => state.auth)
   const [comments, setComments] = useState<Comment[]>([])
   const [mounted, setMounted] = useState(false)
   const { id, active, setCount } = props
   const { data: session } = useSession()
-  const user = session?.user
+  const auth = session?.user
 
   useEffect(() => {
     if (!swapOnOff[active].bool || mounted) return
@@ -40,17 +40,17 @@ export default function CommentBox(props: Props) {
 
   const onSubmit = useCallback(
     (text: string, commentId?: number) => {
-      if (!profile) return
+      if (!user) return
       if (commentId !== editId) {
-        createComment({ text, id, userId: profile.id })
+        createComment({ text, id, userId: user.id })
           .then((result) => {
-            const newComment = { ...result, user: profile }
+            const newComment = { ...result, user }
             setComments((prev) => [newComment, ...prev])
             setCount((prev) => ({ ...prev, comments: prev.comments + 1 }))
           })
           .catch((err) => console.error(err))
       } else {
-        updateComment({ text, id: editId, userId: profile.id })
+        updateComment({ text, id: editId, userId: user.id })
           .then((result) => {
             setComments((prev) => prev.map((p) => (p.id !== editId ? p : { ...p, result })))
           })
@@ -58,7 +58,7 @@ export default function CommentBox(props: Props) {
         setEdit(null)
       }
     },
-    [profile, editId, id, setCount]
+    [user, editId, id, setCount]
   )
 
   const handleDelete = useCallback(() => {
@@ -108,7 +108,7 @@ export default function CommentBox(props: Props) {
           <Box key={comment.id} whiteSpace="pre-line">
             <Stack direction="row" justifyContent="space-between">
               <MemoHeader {...comment} variant="list" />
-              {user?.id === comment.user.id && <Action id={comment.id} />}
+              {auth?.id === comment.user.id && <Action id={comment.id} />}
             </Stack>
             <ListItem divider disablePadding>
               {editId !== comment.id ? (

@@ -5,14 +5,12 @@ import { Error } from '@mui/icons-material'
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const memo = await getMemoById(id)
+  const { memo } = await getMemoById(id)
 
   return (
     <Wrap>
-      {memo.id ? (
-        <>
-          <MemoDetail {...memo} />
-        </>
+      {memo ? (
+        <MemoDetail memo={memo} />
       ) : (
         <Stack alignItems="center" spacing={2} pt={3}>
           <Stack alignItems="center" sx={{ bgcolor: '#eee', p: 2, borderRadius: 3 }}>

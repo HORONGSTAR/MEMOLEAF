@@ -14,6 +14,7 @@ export { default as MemoTool } from '@/components/memo/sub/MemoTool'
 export { default as MemoToolItem } from '@/components/memo/sub/MemoToolItem'
 export { default as MemoDetail } from '@/components/memo/MemoDetail'
 export { default as MemoThread } from '@/components/memo/MemoThread'
+export { default as MemoLink } from '@/components/memo/sub/MemoLink'
 
 //feedback
 export { default as CommentForm } from '@/components/feedback/CommentForm'

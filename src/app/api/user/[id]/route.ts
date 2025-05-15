@@ -4,7 +4,10 @@ import { NextRequest, NextResponse as NRes } from 'next/server'
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const user = await prisma.user.findUnique({ where: { id: parseInt(id) } })
+    const user = await prisma.user.findUnique({
+      where: { id: parseInt(id) },
+      select: { id: true, name: true, image: true, info: true, toUsers: true },
+    })
     if (user) {
       return NRes.json(user)
     } else {

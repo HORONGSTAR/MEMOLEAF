@@ -13,7 +13,7 @@ export default function Navbar() {
             <Image src={'/memoleaf.svg'} alt="MEMOLEAF" aria-label="메모리프 홈" width={120} height={20} priority />
           </Link>
           <Blank />
-          <IconButton size="small" LinkComponent={Link} href="/page/search">
+          <IconButton size="small" component={Link} href="/search">
             <Search fontSize="small" />
           </IconButton>
           <Account />

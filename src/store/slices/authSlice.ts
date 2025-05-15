@@ -11,16 +11,16 @@ export const getUserThunk = createAsyncThunk<User, number>('user/getUser', async
 })
 
 interface State {
-  profile?: User
+  user?: User
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
 }
 
 const initialState: State = {
-  profile: undefined,
+  user: undefined,
   status: 'idle',
 }
 
-export const userSlice = createSlice({
+export const authSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {},
@@ -31,7 +31,7 @@ export const userSlice = createSlice({
       })
       .addCase(getUserThunk.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        state.profile = action.payload
+        state.user = action.payload
       })
       .addCase(getUserThunk.rejected, (state) => {
         state.status = 'failed'
@@ -39,4 +39,4 @@ export const userSlice = createSlice({
   },
 })
 
-export default userSlice.reducer
+export default authSlice.reducer

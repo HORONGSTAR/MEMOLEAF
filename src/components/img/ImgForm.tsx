@@ -19,7 +19,7 @@ export default function ImgForm(props: Props) {
     setLoading(true)
     const files = e.target.files
     if (!files) return
-    if (images.add.length > 4) return alert('이미지는 최대 4장까지 첨부할 수 있어요.')
+    if (images.imgs.length > 4) return alert('이미지는 최대 4장까지 첨부할 수 있어요.')
 
     const newImgFiles: File[] = []
     const newImgUrls: string[] = []
@@ -35,8 +35,7 @@ export default function ImgForm(props: Props) {
     }
     setImages((prev) => ({
       file: [...prev.file, ...newImgFiles],
-      add: [...prev.add, ...newImgUrls.map((img) => ({ url: img, alt: '' }))],
-      del: prev.del,
+      imgs: [...prev.imgs, ...newImgUrls.map((img) => ({ url: img, alt: '' }))],
     }))
     setLoading(false)
   }
@@ -49,7 +48,7 @@ export default function ImgForm(props: Props) {
           loading={loading}
           size="small"
           aria-label="이미지 업로드"
-          disabled={images.add.length > 3}
+          disabled={images.imgs.length > 3}
           onClick={() => fileInputRef.current?.click()}
         >
           <ImageSearch />

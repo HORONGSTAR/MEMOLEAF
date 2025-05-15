@@ -6,7 +6,7 @@ export const changeDate = (date: string, format?: string) => dayjs(date).format(
 
 export const imgPath = process.env.NEXT_PUBLIC_IMG_URL + '/uploads/'
 
-export const editImageUrl = (images: Image[]) => images.map((img) => ({ ...img, url: imgPath + img.url }))
+export const addImagePath = (images: Image[]) => images.map((img) => ({ ...img, url: imgPath + img.url }))
 
 export const copyText = async (text: string, label: string) => {
   try {

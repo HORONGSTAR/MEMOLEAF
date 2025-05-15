@@ -10,24 +10,24 @@ datasource db {
 model User {
   id           Int      @id @default(autoincrement())
   userNum      Int?
-  credits      String   @unique
+  credit       String   @unique
   name         String   @db.VarChar(10)
   image        String
   info         String?
   memos        Memo[]
   comments     Comment[]
   bookmarks    BookMark[]
-  followedBy   Follows[] @relation("followedBy")
-  following    Follows[] @relation("following")
+  fromUsers    Follow[] @relation("fromUser")
+  toUsers      Follow[] @relation("toUser")
   createdAt    DateTime @default(now())
 }
 
-model Follows {
-  followedById Int
-  followingId  Int
-  followedBy   User @relation("followedBy", fields: [followedById], references: [id])
-  following    User @relation("following", fields: [followingId], references: [id])
-  @@id([followingId, followedById])
+model Follow {
+  fromUserId   Int
+  toUserId     Int
+  fromUser     User @relation("fromUser", fields: [fromUserId], references: [id])
+  toUser       User @relation("toUser", fields: [toUserId], references: [id])
+  @@id([toUserId, fromUserId])
 }
 
 
@@ -46,6 +46,8 @@ model Memo {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }
+
+
 
 enum Kind {
   subtext
@@ -93,7 +95,7 @@ model BookMark {
 enum Aria {
   replies
   follow
-  schedule
+  bookmark
 }
 
 model Alarm{

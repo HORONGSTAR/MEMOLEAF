@@ -50,7 +50,7 @@ export default function SearchBar() {
       </Stack>
 
       {memos.map((memo) => (
-        <Box key={memo.id} component={Link} href={`/page/memo/${memo.id}`}>
+        <Box key={memo.id} component={Link} href={`/memo/${memo.id}`}>
           <Card sx={{ p: 2 }}>
             <Stack direction="row" spacing={1} mb={0.5}>
               <Typography variant="body2" color="primary">

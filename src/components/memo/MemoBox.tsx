@@ -1,6 +1,6 @@
 'use client'
 import { Dispatch, ReactNode, SetStateAction, useCallback, useMemo, useState } from 'react'
-import { MemoForm, Menu, MemoDeco, Card, Dialog } from '@/components'
+import { MemoForm, Menu, Card, Dialog, MemoDeco } from '@/components'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
 import { updateMemoThunk, deleteMemoThunk } from '@/store/slices/memoSlice'
 import { Snackbar, Typography, Box, Button, Stack } from '@mui/material'
@@ -23,7 +23,7 @@ export default function MemoBox(inti: Props) {
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
   const { data: session } = useSession()
-  const { children, user, id, images, header, footer, setMemo, setLeafs } = inti
+  const { header, children, footer, user, id, setMemo, setLeafs } = inti
   const auth = session?.user
 
   const onSubmit = useCallback(
@@ -40,16 +40,15 @@ export default function MemoBox(inti: Props) {
   )
 
   const handleDelete = useCallback(
-    (params: Pick<Memo, 'id' | 'images'>) => {
-      const images = { file: [], add: [], del: params.images }
-      dispatch(deleteMemoThunk({ ...params, images }))
+    (id: number) => {
+      dispatch(deleteMemoThunk(id))
       setAction('remove')
     },
     [dispatch]
   )
 
   const handleCopy = useCallback(async () => {
-    const url = `${window.location.origin}/page/memo/${id}`
+    const url = `${window.location.origin}/memo/${id}`
     const reuslt = copyText(url, '링크를')
     setMessage(await reuslt)
   }, [id])
@@ -59,7 +58,7 @@ export default function MemoBox(inti: Props) {
   const removeAction = (
     <>
       <Button onClick={() => setOpen(false)}>취소</Button>
-      <Button color="error" onClick={() => handleDelete({ id, images })}>
+      <Button color="error" onClick={() => handleDelete(id)}>
         삭제
       </Button>
     </>

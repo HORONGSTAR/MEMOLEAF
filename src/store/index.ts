@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import memoSlice from './slices/memoSlice'
-import userSlice from './slices/userSlice'
+import authSlice from './slices/authSlice'
 
 export const store = configureStore({
   reducer: {
     memo: memoSlice,
-    user: userSlice,
+    auth: authSlice,
   },
 })
 

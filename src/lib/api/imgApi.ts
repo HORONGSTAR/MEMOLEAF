@@ -1,4 +1,4 @@
-import { imgUrl, metaData } from '@/lib/api/fetchApi'
+import { imgUrl } from '@/lib/api/fetchApi'
 
 export async function uploadImages(files: File[]) {
   const formData = new FormData()
@@ -11,10 +11,4 @@ export async function uploadImages(files: File[]) {
   })
   if (!res.ok) throw new Error('이미지 업로드 실패')
   return res.json()
-}
-
-export async function deleteImages(files: { url: string }[]) {
-  const data = metaData('DELETE', { files })
-  await fetch(imgUrl, data)
-  return
 }

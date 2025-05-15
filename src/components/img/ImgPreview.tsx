@@ -13,21 +13,20 @@ interface Props {
 export default function ImgForm(props: Props) {
   const { images, setImages } = props
 
-  const removeFile = (img: Image, index: number) => {
+  const removeFile = (index: number) => {
     const file = images.file.filter((_, i) => i !== index)
-    const add = images.add.filter((_, i) => i !== index)
-    const del = img.id ? [...images.del, img] : images.del
+    const imgs = images.imgs.filter((_, i) => i !== index)
 
-    setImages({ file, add, del })
+    setImages({ file, imgs })
   }
 
-  const remove = (img: Image, index: number) => (
-    <IconButton sx={{ position: 'absolute', top: -4, right: -4 }} onClick={() => removeFile(img, index)}>
+  const remove = (_: Image, index: number) => (
+    <IconButton sx={{ position: 'absolute', top: -4, right: -4 }} onClick={() => removeFile(index)}>
       <Cancel />
     </IconButton>
   )
 
-  const list = images.add.map((img, index) => ({ id: img.id, url: img.id ? imgPath + img.url : img.url, remove: remove(img, index) }))
+  const list = images.imgs.map((img, index) => ({ id: img.id, url: img.id ? imgPath + img.url : img.url, remove: remove(img, index) }))
 
   return <ImgGrid images={list} />
 }

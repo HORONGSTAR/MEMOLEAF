@@ -19,10 +19,10 @@ export async function PATCH(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { followedById, followingId } = await req.json()
-    const user = await prisma.user.findUnique({ where: { id: followingId } })
+    const { fromUserId, toUserId } = await req.json()
+    const user = await prisma.user.findUnique({ where: { id: toUserId } })
     if (!user) return NRes.json({ error: '유저 정보를 찾을 수 없습니다.' }, { status: 404 })
-    const followId = await prisma.follows.create({ data: { followedById, followingId } })
+    const followId = await prisma.follow.create({ data: { fromUserId, toUserId } })
     return NRes.json(followId)
   } catch (err) {
     console.error(err)

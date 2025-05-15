@@ -5,7 +5,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { LoginBox, Dialog, Menu, Avatar } from '@/components'
 import { useRouter } from 'next/navigation'
 import { Logout, PersonOutlineOutlined, SettingsOutlined } from '@mui/icons-material'
-import { getUserThunk } from '@/store/slices/userSlice'
+import { getUserThunk } from '@/store/slices/authSlice'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 
 export default function Account() {
@@ -14,7 +14,7 @@ export default function Account() {
   const [open, setOpen] = useState(false)
   const { data: session } = useSession()
   const auth = session?.user
-  const { profile } = useAppSelector((state) => state.user)
+  const { user } = useAppSelector((state) => state.auth)
 
   useEffect(() => {
     if (auth) dispatch(getUserThunk(auth.id))
@@ -40,7 +40,7 @@ export default function Account() {
     {
       label: '내 계정',
       icon: <PersonOutlineOutlined fontSize="small" />,
-      onClick: () => router.push('/page/my/' + profile?.id),
+      onClick: () => router.push('/page/my/' + user?.id),
     },
     {
       label: '설정',
@@ -54,5 +54,5 @@ export default function Account() {
     },
   ]
 
-  return <Menu icon={<Avatar user={profile} />} label={`${profile?.name}님의 계정`} items={meunItems} />
+  return <Menu icon={<Avatar user={user} />} label={`${user?.name}님의 계정`} items={meunItems} />
 }
