@@ -1,26 +1,22 @@
 'use client'
-import { Divider, Tab, Tabs, Box } from '@mui/material'
-import { AsyncBox, MyPostItem } from '@/components'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { useState, useEffect } from 'react'
-import { getMemosThunk } from '@/store/slices/memoSlice'
+import { Divider, Tab, Tabs, Box, BoxProps } from '@mui/material'
+import { MemoIndex } from '@/components'
+import { useState } from 'react'
+import { Memo } from '@/lib/types'
 
-export default function MyPost({ id }: { id: string }) {
-  const { memos, status } = useAppSelector((state) => state.memo)
-  const dispatch = useAppDispatch()
+interface Props {
+  id: string
+  posts: Memo[]
+  total: number
+}
+
+export default function MyPost(props: Props) {
   const [value, setValue] = useState(0)
-
-  useEffect(() => {
-    dispatch(getMemosThunk({ page: 1, userId: id }))
-  }, [dispatch, id])
+  const { id, posts, total } = props
 
   const labels = ['내 메모']
-
-  const panels = labels.map((_, i) => (
-    <Box key={`panel${i}`} role={`panel${i}`} id={`panel${i}`} aria-labelledby={`tab${i}`} hidden={value !== i}>
-      <MyPostItem posts={memos} />
-    </Box>
-  ))
+  const Panels = (props: BoxProps) =>
+    labels.map((_, i) => <Box key={`panel${i}`} role={`panel${i}`} id={`panel${i}`} aria-labelledby={`tab${i}`} hidden={value !== i} {...props} />)
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -32,7 +28,9 @@ export default function MyPost({ id }: { id: string }) {
         </Tabs>
       </Box>
       <Divider />
-      <AsyncBox state={status}>{panels}</AsyncBox>
+      <Panels mt={2}>
+        <MemoIndex memos={posts} total={total} queryString={{ userId: id }} />
+      </Panels>
     </Box>
   )
 }

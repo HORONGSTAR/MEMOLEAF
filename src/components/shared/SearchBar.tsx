@@ -1,10 +1,10 @@
 'use client'
 import { TextField, IconButton, Stack, Box, Typography, Button, Divider } from '@mui/material'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { Search } from '@mui/icons-material'
 import { getMemos } from '@/lib/api/memoApi'
 import { Memo } from '@/lib/types'
-import { Card } from '@/components'
+import { Paper } from '@/components'
 import Link from 'next/link'
 import { changeDate } from '@/lib/utills'
 
@@ -15,16 +15,25 @@ export default function SearchBar() {
   const [memos, setMemos] = useState<Memo[]>([])
 
   const handleSearch = useCallback(() => {
-    if (page - 1 === total) return
+    if (page === total) return
     const keyword = encodeURIComponent(text)
     getMemos({ page, keyword, limit: 10 }).then((result) => {
       setTotal(result.total)
       setMemos(result.memos)
     })
-    setPage((prev) => prev + 1)
+    if (page < total) setPage((prev) => prev + 1)
   }, [page, text, total])
-  console.log(memos)
 
+  const active = useMemo(() => (page !== total && total ? 'on' : 'off'), [page, total])
+
+  const nextButton = {
+    on: <Button onClick={handleSearch}>{`더 보기 (${page}/${total})`}</Button>,
+    off: (
+      <Typography variant="caption" color="textDisabled">
+        더 이상 표시할 콘텐츠가 없습니다
+      </Typography>
+    ),
+  }
   return (
     <>
       <Stack direction="row" component="form" justifyContent="center" py={1}>
@@ -48,10 +57,9 @@ export default function SearchBar() {
           <Search />
         </IconButton>
       </Stack>
-
       {memos.map((memo) => (
         <Box key={memo.id} component={Link} href={`/memo/${memo.id}`}>
-          <Card sx={{ p: 2 }}>
+          <Paper sx={{ p: 2 }}>
             <Stack direction="row" spacing={1} mb={0.5}>
               <Typography variant="body2" color="primary">
                 {memo.user.name}
@@ -61,18 +69,12 @@ export default function SearchBar() {
               </Typography>
             </Stack>
             <Typography>{memo.content}</Typography>
-          </Card>
+          </Paper>
         </Box>
       ))}
 
       <Divider sx={{ my: 4 }} variant="middle">
-        {page - 1 !== total ? (
-          <Button onClick={handleSearch}>{`더 보기 (${page}/${total})`}</Button>
-        ) : (
-          <Typography variant="caption" color="textDisabled">
-            표시할 콘텐츠가 없습니다
-          </Typography>
-        )}
+        {nextButton[active]}
       </Divider>
     </>
   )

@@ -21,8 +21,8 @@ export const getMemoById = async (id: string) => {
 
 export const createMemo = async (params: MemoParams) => {
   const { id, content, images, decos, parentId } = params
-  const data = metaData('POST', { id, content, images, decos, parentId })
   if (images.file.length > 0) await uploadImages(images.file)
+  const data = metaData('POST', { id, content, images: images.imgs, decos, parentId })
 
   const res = await fetch(memoUrl, data)
   if (!res.ok) throw new Error('메모 작성 중 에러')
@@ -33,8 +33,7 @@ export const updateMemo = async (params: MemoParams) => {
   const { id, content, images, decos } = params
 
   if (images.file.length > 0) await uploadImages(images.file)
-  const data = metaData('PATCH', { id, content, images, decos })
-
+  const data = metaData('PATCH', { id, content, images: images.imgs, decos })
   const res = await fetch(memoUrl, data)
   if (!res.ok) throw new Error('메모 수정 중 에러')
   return res.json()

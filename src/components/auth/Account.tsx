@@ -22,8 +22,8 @@ export default function Account() {
 
   const dialogProps = {
     open,
-    actions: <Button onClick={() => setOpen(false)}>닫기</Button>,
-    label: '소셜 로그인',
+    title: '소셜 로그인',
+    onClose: () => setOpen(false),
   }
 
   if (!auth)
@@ -40,12 +40,12 @@ export default function Account() {
     {
       label: '내 계정',
       icon: <PersonOutlineOutlined fontSize="small" />,
-      onClick: () => router.push('/page/my/' + user?.id),
+      onClick: () => router.push('/my/' + user?.id),
     },
     {
       label: '설정',
       icon: <SettingsOutlined fontSize="small" />,
-      onClick: () => router.push('/page/setting'),
+      onClick: () => router.push('/setting'),
     },
     {
       label: '로그아웃',

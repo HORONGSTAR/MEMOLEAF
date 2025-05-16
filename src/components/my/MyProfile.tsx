@@ -1,5 +1,5 @@
 'use client'
-import { Typography, List, ListItem, Stack, IconButton, Box, TextField, Button } from '@mui/material'
+import { Typography, List, ListItem, Stack, IconButton, Box, TextField } from '@mui/material'
 import { DriveFileRenameOutline } from '@mui/icons-material'
 import { Avatar, Dialog, ImgUploader } from '@/components'
 import { useState, useMemo, useCallback } from 'react'
@@ -8,8 +8,8 @@ import { useSession } from 'next-auth/react'
 import { imgPath, setRenameFile } from '@/lib/utills'
 import { updateUser } from '@/lib/api/userApi'
 
-export default function MyProfile(user: User) {
-  const [profile, setProfile] = useState(user)
+export default function MyProfile(inti: User) {
+  const [user, setProfile] = useState(inti)
   const [image, setImage] = useState<{ file?: File; url: string }>({ url: imgPath + user.image })
   const [name, setName] = useState(user.name)
   const [info, setInfo] = useState(user.info || '')
@@ -46,13 +46,20 @@ export default function MyProfile(user: User) {
     setProfile((prev) => ({ ...prev, ...userData }))
   }, [user, name, info, image])
 
+  const dialogProps = {
+    open,
+    title: '프로필 수정하기',
+    closeLabel: '확인',
+    onClose: handleSubmit,
+  }
+
   return (
     <Stack spacing={2}>
       <Stack direction={{ sm: 'row', xs: 'column' }}>
-        <Avatar size={120} user={profile} />
+        <Avatar size={120} user={user} />
         <List dense sx={{ flexGrow: 1 }}>
           <ListItem>
-            <Typography variant="h6">{profile.name}</Typography>
+            <Typography variant="h6">{user.name}</Typography>
             {isMyPage && (
               <IconButton size="small" aria-label="프로필 수정하기" onClick={() => setOpen(true)}>
                 <DriveFileRenameOutline fontSize="small" />
@@ -64,11 +71,12 @@ export default function MyProfile(user: User) {
               ID {user.userNum}
             </Typography>
           </ListItem>
-          <ListItem>{profile.info || '자기소개가 없습니다.'}</ListItem>
+          <ListItem>{user.info || '자기소개가 없습니다.'}</ListItem>
         </List>
       </Stack>
       <Box sx={{ width: '100%' }}></Box>
-      <Dialog label="프로필 수정하기" open={open} actions={<Button onClick={handleSubmit}>확인</Button>}>
+
+      <Dialog {...dialogProps}>
         <Stack spacing={3} mt={2}>
           <ImgUploader image={image} setImage={setImage} />
           <TextField label="이름" size="small" value={name} onChange={(e) => handleChangeName(e.target.value)} />

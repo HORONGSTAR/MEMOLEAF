@@ -94,13 +94,20 @@ export default function MemoToolItem(props: Props) {
     off: null,
   }
 
+  const dialogProps = {
+    open: swapOnOff[open].bool,
+    title: '비밀번호 변경하기',
+    closeLabel: '저장',
+    onClose: handleClose,
+  }
+
   const secretBox: Component = {
     on: (
       <Box>
         <Button startIcon={<Key />} size="small" onClick={() => setOpen('on')}>
           감추기 비밀번호 설정
         </Button>
-        <Dialog open={swapOnOff[open].bool} label="비밀번호 변경하기" actions={<Button onClick={handleClose}>확인</Button>}>
+        <Dialog {...dialogProps}>
           <InputText
             id="secret"
             autoFocus

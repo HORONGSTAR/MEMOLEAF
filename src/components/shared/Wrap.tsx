@@ -1,6 +1,6 @@
 'use client'
 import { Toolbar, Container, Stack, Box } from '@mui/material'
-import { Navbar } from '@/components'
+import { Navbar, Footer } from '@/components'
 import { BasicProps } from '@/lib/types'
 
 export default function Wrap(props: BasicProps) {
@@ -8,7 +8,7 @@ export default function Wrap(props: BasicProps) {
 
   return (
     <Stack minHeight="100vh" justifyContent={'space-between'}>
-      <Box>
+      <Box mb={4}>
         <Navbar />
         <Toolbar />
         <Container>
@@ -17,7 +17,7 @@ export default function Wrap(props: BasicProps) {
           </Stack>
         </Container>
       </Box>
-      <footer>내용</footer>
+      <Footer />
     </Stack>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 import { IconButton, Menu as MuiMenu, MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material'
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { BasicProps, Active } from '@/lib/types'
 
 interface ItmeProps extends BasicProps {
@@ -8,8 +8,10 @@ interface ItmeProps extends BasicProps {
   onClick: () => void
 }
 
-interface Props extends BasicProps {
+interface Props {
   items: ItmeProps[]
+  label: string
+  icon: ReactNode
 }
 
 export default function Menu(props: Props) {

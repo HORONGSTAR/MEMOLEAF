@@ -19,7 +19,11 @@ export default function ImgForm(props: Props) {
     setLoading(true)
     const files = e.target.files
     if (!files) return
-    if (images.imgs.length > 4) return alert('이미지는 최대 4장까지 첨부할 수 있어요.')
+    if (images.imgs.length + files.length > 4) {
+      alert('이미지는 최대 4장까지 첨부할 수 있어요.')
+      setLoading(false)
+      return
+    }
 
     const newImgFiles: File[] = []
     const newImgUrls: string[] = []

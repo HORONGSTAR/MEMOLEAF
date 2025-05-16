@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 
 export type Active = 'on' | 'off' | string
 export type ActiveNode = { [key: Active]: ReactNode }
-
+export type Action = { id: null | number; state: null | string }
 export type Image = { id?: number; url: string; alt?: string }
 export type EditImage = { file: File[]; imgs: Image[] }
 export type Deco = { kind: string; extra: string }
@@ -57,6 +57,7 @@ export interface Memo {
   images: Image[]
   decos: Deco[]
   user: User
+  userId: number
   createdAt: string
   leafs: Memo[]
   parentId: number
@@ -83,5 +84,5 @@ export interface Comment {
 export interface CommentParams {
   id: number
   text: string
-  userId: number
+  userId?: number
 }

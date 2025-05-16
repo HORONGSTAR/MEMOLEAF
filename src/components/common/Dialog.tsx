@@ -1,21 +1,32 @@
-import { Dialog as MuiDialog, DialogTitle, DialogContent, DialogActions } from '@mui/material'
+import { Dialog as MuiDialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material'
 import { ReactNode } from 'react'
-import { BasicProps } from '@/lib/types'
 
-interface Props extends BasicProps {
+interface Props {
   open: boolean
-  actions?: ReactNode
+  title: string
+  closeLabel?: string
+  actionLabel?: string
+  onClose?: () => void
+  onAction?: () => void
+  children?: ReactNode
 }
 
 export default function Dialog(props: Props) {
-  const { open, actions, children, label } = props
+  const { open, closeLabel, actionLabel, onClose, onAction, children, title } = props
 
   return (
     <>
-      <MuiDialog open={open} keepMounted={false}>
-        <DialogTitle>{label}</DialogTitle>
+      <MuiDialog open={open} onClose={onClose}>
+        <DialogTitle>{title}</DialogTitle>
         <DialogContent>{children}</DialogContent>
-        <DialogActions>{actions}</DialogActions>
+        <DialogActions>
+          {closeLabel && <Button onClick={onClose}>{closeLabel}</Button>}
+          {actionLabel && (
+            <Button color="error" onClick={onAction}>
+              {actionLabel}
+            </Button>
+          )}
+        </DialogActions>
       </MuiDialog>
     </>
   )

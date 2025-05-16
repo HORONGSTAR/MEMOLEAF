@@ -28,7 +28,7 @@ export default function CommentPopover({ children, icon, label, addEvent }: Prop
   }
 
   const open = Boolean(anchorEl)
-  const itemId = open ? label : undefined
+  const itemId = open ? label + '열기' : undefined
 
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
@@ -43,7 +43,7 @@ export default function CommentPopover({ children, icon, label, addEvent }: Prop
           <AppBar position="static" color="secondary">
             <Toolbar>
               <Typography variant="h6" color="primary">
-                댓글
+                {label}
               </Typography>
               <Blank />
               <IconButton edge="end" color="primary" onClick={handleClose}>

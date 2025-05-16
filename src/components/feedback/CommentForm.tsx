@@ -1,6 +1,6 @@
 'use client'
 import { Box, Chip, Stack } from '@mui/material'
-import { Card, InputText } from '@/components'
+import { InputText, Paper } from '@/components'
 import { useCallback, useState } from 'react'
 
 interface CommentFormData {
@@ -21,7 +21,7 @@ export default function CommentForm(inti: CommentFormData) {
 
   return (
     <Stack spacing={1} alignItems="end">
-      <Card sx={{ p: 1, width: '100%' }}>
+      <Paper sx={{ p: 1, width: '100%' }}>
         <InputText
           fullWidth
           fontSize="body2"
@@ -30,7 +30,7 @@ export default function CommentForm(inti: CommentFormData) {
           value={text}
           onChange={(e) => setText(e.target.value)}
         />
-      </Card>
+      </Paper>
       <Box>
         <Chip
           sx={{ bgcolor: '#ccc', fontWeight: 500 }}

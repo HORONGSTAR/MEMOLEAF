@@ -83,7 +83,7 @@ export default function MemoForm(inti: MemoFormData) {
         <MemoTool {...decoProps} />
         <Blank />
         {children}
-        <Button disabled={content === inti.content} size="large" variant={isEdit ? 'text' : 'contained'} onClick={handleSubmit}>
+        <Button size="large" variant={isEdit ? 'text' : 'contained'} onClick={handleSubmit}>
           {isEdit ? '수정' : '메모'}
         </Button>
       </Stack>

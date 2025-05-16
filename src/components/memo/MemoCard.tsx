@@ -1,9 +1,9 @@
 'use client'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
-import { MemoForm, Menu, Dialog, MemoDeco, ImgGrid, LinkBox, Paper } from '@/components'
+import { MemoForm, Menu, Paper, Dialog, MemoDeco, LinkBox, Avatar, MemoLink, ImgGrid, CommentButton } from '@/components'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
 import { Snackbar, Typography, Button } from '@mui/material'
-import { ListItem, ListItemText, List } from '@mui/material'
+import { CardContent, CardHeader, CardActions } from '@mui/material'
 import { Memo, MemoParams, EditDeco, ActiveNode } from '@/lib/types'
 import { addImagePath, changeDate, copyText } from '@/lib/utills'
 import { useSession } from 'next-auth/react'
@@ -11,11 +11,12 @@ import { deleteMemo, updateMemo } from '@/lib/api/memoApi'
 
 interface Props {
   memo: Memo
-  header?: ReactNode
-  footer?: ReactNode
+  isDetail?: boolean
+  children?: ReactNode
 }
 
-export default function MemoList(props: Props) {
+export default function MemoCard(props: Props) {
+  const { isDetail } = props
   const [memo, setMemo] = useState(props.memo)
   const [action, setAction] = useState('view')
   const [open, setOpen] = useState(false)
@@ -46,17 +47,7 @@ export default function MemoList(props: Props) {
   }, [memo])
 
   const active = useMemo(() => (auth?.id === memo.userId ? 'on' : 'off'), [auth, memo])
-  const memoMenu = (
-    <Menu
-      icon={<MoreHoriz fontSize="small" />}
-      label="메모 메뉴 열기"
-      items={[
-        { active, label: '글 수정', icon: <EditOutlined />, onClick: () => setAction('edit') },
-        { active, label: '삭제', icon: <DeleteOutline />, onClick: () => setOpen(true) },
-        { active: 'on', label: '공유하기', icon: <LinkOutlined />, onClick: () => handleCopy() },
-      ]}
-    />
-  )
+
   const decos: EditDeco = {}
   memo.decos.forEach((deco) => (decos[deco.kind] = { active: 'on', extra: deco.extra }))
   const editProps = { ...memo, onSubmit, decos, placeholder: '메모 내용 수정하기' }
@@ -72,30 +63,41 @@ export default function MemoList(props: Props) {
 
   const components: ActiveNode = {
     view: (
-      <>
-        <ListItem secondaryAction={memoMenu} dense>
-          <ListItemText
-            primary={
-              <LinkBox mr={1} link={`/my/${memo.user.id}`}>
-                {memo.user.name}
-              </LinkBox>
-            }
-            secondary={changeDate(memo.createdAt)}
-          />
-        </ListItem>
-        <ListItem dense>
-          <MemoDeco decos={memo.decos}>
-            <ListItemText>
-              {memo.content}
-              <ImgGrid images={addImagePath(memo.images)} />
-            </ListItemText>
-          </MemoDeco>
-        </ListItem>
-        <ListItem divider></ListItem>
-      </>
+      <Paper kind="card" sx={{ border: isDetail ? 'none' : null }}>
+        <CardHeader
+          avatar={
+            <LinkBox link={`/my/${memo.user.id}`}>
+              <Avatar user={memo.user} size={36} />
+            </LinkBox>
+          }
+          title={<LinkBox link={`/my/${memo.user.id}`}>{memo.user.name}</LinkBox>}
+          subheader={changeDate(memo.createdAt)}
+          action={
+            <Menu
+              icon={<MoreHoriz fontSize="small" />}
+              label="메모 메뉴 열기"
+              items={[
+                { active, label: '글 수정', icon: <EditOutlined />, onClick: () => setAction('edit') },
+                { active, label: '삭제', icon: <DeleteOutline />, onClick: () => setOpen(true) },
+                { active: 'on', label: '공유하기', icon: <LinkOutlined />, onClick: () => handleCopy() },
+              ]}
+            />
+          }
+        />
+        <MemoDeco decos={memo.decos}>
+          <CardContent>
+            {memo.content}
+            <ImgGrid images={addImagePath(memo.images)} isDetail={isDetail} />
+          </CardContent>
+        </MemoDeco>
+        <CardActions>
+          <CommentButton id={memo.id} count={memo._count.comments} user={memo.user} />
+          {isDetail || <MemoLink id={memo.id} />}
+        </CardActions>
+      </Paper>
     ),
     edit: (
-      <Paper use="edit" kind="list">
+      <Paper use="edit" kind="card">
         <MemoForm {...editProps}>
           <Button color="error" onClick={() => setAction('view')}>
             취소
@@ -104,14 +106,14 @@ export default function MemoList(props: Props) {
       </Paper>
     ),
     remove: (
-      <ListItem sx={{ bgcolor: '#eee', p: 2 }}>
+      <Paper sx={{ bgcolor: '#eee', p: 2 }} kind="card">
         <Typography color="textDisabled">삭제된 메모입니다.</Typography>
-      </ListItem>
+      </Paper>
     ),
   }
 
   return (
-    <List>
+    <>
       {components[action]}
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
@@ -123,6 +125,6 @@ export default function MemoList(props: Props) {
       <Dialog {...dialogProps}>
         <Typography>삭제한 메모는 복구할 수 없습니다.</Typography>
       </Dialog>
-    </List>
+    </>
   )
 }
