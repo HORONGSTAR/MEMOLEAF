@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -11,7 +11,7 @@ model User {
   id           Int      @id @default(autoincrement())
   userNum      Int?
   credit       String   @unique
-  name         String   @db.VarChar(10)
+  name         String   
   image        String
   info         String?
   memos        Memo[]
@@ -58,7 +58,7 @@ enum Kind {
 model Deco {
   id           Int        @id @default(autoincrement())
   kind         Kind
-  extra        String     @db.VarChar(60)
+  extra        String     
   memoId       Int
   memo         Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
 }

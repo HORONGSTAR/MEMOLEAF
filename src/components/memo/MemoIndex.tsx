@@ -4,6 +4,7 @@ import { createMemo, getMemos } from '@/lib/api/memoApi'
 import { ActiveNode, Memo, MemoParams, QueryString } from '@/lib/types'
 import { useAppSelector } from '@/store/hooks'
 import { Box, Button, Divider, Typography } from '@mui/material'
+import { useSession } from 'next-auth/react'
 import { useCallback, useMemo, useState } from 'react'
 
 interface Props {
@@ -18,6 +19,8 @@ export default function MemoIndex(props: Props) {
   const { user } = useAppSelector((state) => state.auth)
   const [page, setPage] = useState(2)
   const { queryString } = props
+  const { data: session } = useSession()
+  const auth = session?.user
 
   const handleGetMemos = useCallback(() => {
     getMemos({ page, limit: 10, ...queryString }).then((result) => {
@@ -37,17 +40,6 @@ export default function MemoIndex(props: Props) {
     [user]
   )
 
-  if (!user)
-    <Box sx={{ px: 10 }}>
-      <Typography color="primary" variant="h6">
-        로그인 후 기록을 남겨보세요!
-      </Typography>
-      <Typography color="primary" variant="body2">
-        소셜로그인으로 간편하게 사용할 수 있어요.
-      </Typography>
-      <LoginBox />
-    </Box>
-
   const active = useMemo(() => (page - 1 !== total ? 'on' : 'off'), [page, total])
 
   const pageButton: ActiveNode = {
@@ -61,6 +53,20 @@ export default function MemoIndex(props: Props) {
         더 이상 표시할 콘텐츠가 없습니다
       </Typography>
     ),
+  }
+
+  if (!auth) {
+    return (
+      <Box sx={{ px: 10 }}>
+        <Typography align="center" color="primary" variant="h6">
+          로그인 후 기록을 남겨보세요!
+        </Typography>
+        <Typography align="center" color="primary" variant="body2" gutterBottom>
+          소셜로그인으로 간편하게 사용할 수 있어요.
+        </Typography>
+        <LoginBox />
+      </Box>
+    )
   }
 
   return (
