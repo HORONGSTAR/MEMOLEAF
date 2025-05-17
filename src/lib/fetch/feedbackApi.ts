@@ -1,4 +1,4 @@
-import { feedbackApi, metaData } from '@/lib/api/fetchApi'
+import { feedbackApi, metaData } from '@/lib/fetch/fetchApi'
 import { CommentParams, QueryString } from '@/lib/types'
 
 export const getComments = async (params: QueryString, id: number) => {

@@ -1,6 +1,6 @@
 'use client'
 import { Paper, MemoBox, MemoForm, LoginBox } from '@/components'
-import { createMemo, getMemos } from '@/lib/api/memoApi'
+import { createMemo, getMemos } from '@/lib/fetch/memoApi'
 import { Active, ActiveNode, Memo, MemoParams, QueryString } from '@/lib/types'
 import { useAppSelector } from '@/store/hooks'
 import { Box, Button, CircularProgress, Divider, Stack, Typography } from '@mui/material'

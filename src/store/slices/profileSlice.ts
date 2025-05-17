@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getProfile, updateProfile } from '@/lib/api/userApi'
+import { getProfile, updateProfile } from '@/lib/fetch/userApi'
 import { User, UserParams } from '@/lib/types'
 
 export const getProfileThunk = createAsyncThunk<User, number>('user/getProfile', async (id) => {

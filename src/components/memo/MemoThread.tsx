@@ -1,6 +1,6 @@
 'use client'
 import { Paper, MemoForm, MemoBox } from '@/components'
-import { createMemo, getMemos } from '@/lib/api/memoApi'
+import { createMemo, getMemos } from '@/lib/fetch/memoApi'
 import { Active, ActiveNode, Memo, MemoParams } from '@/lib/types'
 import { checkAuthority, swapOnOff } from '@/lib/utills'
 import { useAppSelector } from '@/store/hooks'

@@ -1,6 +1,6 @@
 import { Wrap, MyProfile, MyPost } from '@/components'
 import { Typography, Stack } from '@mui/material'
-import { getProfile } from '@/lib/api/userApi'
+import { getProfile } from '@/lib/fetch/userApi'
 import { Error } from '@mui/icons-material'
 
 export default async function MyPage({ params }: { params: Promise<{ id: string }> }) {

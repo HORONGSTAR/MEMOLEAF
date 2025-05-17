@@ -1,4 +1,4 @@
-import { memoUrl, metaData } from '@/lib/api/fetchApi'
+import { memoUrl, metaData } from '@/lib/fetch/fetchApi'
 import { uploadImages } from './imgApi'
 import { MemoParams, QueryString } from '@/lib/types'
 

@@ -1,6 +1,6 @@
-import { userUrl, metaData } from '@/lib/api/fetchApi'
+import { userUrl, metaData } from '@/lib/fetch/fetchApi'
 import { FollowParams, UserParams } from '@/lib/types'
-import { uploadImages } from '@/lib/api/imgApi'
+import { uploadImages } from '@/lib/fetch/imgApi'
 
 export const getProfile = async (id: number | string) => {
   const res = await fetch(userUrl + `/${id}`)

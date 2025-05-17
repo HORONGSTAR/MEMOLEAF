@@ -1,5 +1,5 @@
 'use client'
-import { followUser } from '@/lib/api/userApi'
+import { followUser } from '@/lib/fetch/userApi'
 import { ActiveNode, FollowParams } from '@/lib/types'
 import { Button } from '@mui/material'
 import { useState } from 'react'

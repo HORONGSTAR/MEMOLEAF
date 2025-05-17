@@ -1,5 +1,5 @@
 'use client'
-import { getMemoById } from '@/lib/api/memoApi'
+import { getMemoById } from '@/lib/fetch/memoApi'
 import { BackButton, MemoBox } from '@/components'
 import { useEffect, useState } from 'react'
 import { Memo } from '@/lib/types'

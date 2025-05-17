@@ -4,7 +4,7 @@ import { Box, Typography } from '@mui/material'
 import { CommentBox, Bubble, CommentForm } from '@/components'
 import { ReactNode, useCallback, useEffect, useState } from 'react'
 import { Active, User, Comment } from '@/lib/types'
-import { createComment, deleteComment, getComments } from '@/lib/api/feedbackApi'
+import { createComment, deleteComment, getComments } from '@/lib/fetch/feedbackApi'
 import { swapOnOff } from '@/lib/utills'
 
 interface Props {

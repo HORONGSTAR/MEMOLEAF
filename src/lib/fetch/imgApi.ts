@@ -1,4 +1,4 @@
-import { imgUrl } from '@/lib/api/fetchApi'
+import { imgUrl } from '@/lib/fetch/fetchApi'
 
 export async function uploadImages(files: File[]) {
   const formData = new FormData()
