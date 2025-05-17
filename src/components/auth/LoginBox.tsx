@@ -1,4 +1,3 @@
-'use client'
 import { Button, Stack, SvgIcon } from '@mui/material'
 import { signIn } from 'next-auth/react'
 import { googleIcon, kakaoIcon, naverIcon } from '@/styles/Icons'

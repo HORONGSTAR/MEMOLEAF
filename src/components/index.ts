@@ -4,6 +4,7 @@ export { default as Account } from '@/components/auth/Account'
 
 //memo
 export { default as MemoIndex } from '@/components/memo/MemoIndex'
+export { default as MemoDetail } from '@/components/memo/MemoDetail'
 export { default as MemoForm } from '@/components/memo/MemoForm'
 export { default as MemoBox } from '@/components/memo/MemoBox'
 export { default as MemoContent } from '@/components/memo/MemoContent'

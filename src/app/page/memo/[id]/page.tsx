@@ -1,21 +1,14 @@
-import { getMemoById } from '@/lib/api/memoApi'
-import { Wrap, BackButton, MemoBox } from '@/components'
+import { Wrap, MemoDetail } from '@/components'
 import { Stack, Typography } from '@mui/material'
 import { Error } from '@mui/icons-material'
 
 export default async function MemoPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { memo } = await getMemoById(id)
 
   return (
     <Wrap>
-      {memo ? (
-        <>
-          <div>
-            <BackButton />
-          </div>
-          <MemoBox memo={memo} layout="detail" />
-        </>
+      {id ? (
+        <MemoDetail id={id} />
       ) : (
         <Stack alignItems="center" spacing={2} pt={3}>
           <Stack alignItems="center" sx={{ bgcolor: '#eee', p: 2, borderRadius: 3 }}>
