@@ -2,7 +2,7 @@
 import { TextField, IconButton, Stack, Box, Typography, Button, Divider } from '@mui/material'
 import { useCallback, useMemo, useState } from 'react'
 import { Search } from '@mui/icons-material'
-import { getMemos } from '@/lib/api/memoApi'
+import { getMemos } from '@/lib/fetch/memoApi'
 import { Memo } from '@/lib/types'
 import { Paper } from '@/components'
 import Link from 'next/link'
