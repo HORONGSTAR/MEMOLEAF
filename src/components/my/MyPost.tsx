@@ -1,22 +1,28 @@
 'use client'
-import { Divider, Tab, Tabs, Box, BoxProps } from '@mui/material'
-import { MemoIndex } from '@/components'
+import { Divider, Tab, Tabs, Box, Stack } from '@mui/material'
+import { MemoIndex, InfoNote } from '@/components'
 import { useState } from 'react'
-import { Memo } from '@/lib/types'
 
 interface Props {
   id: string
-  posts: Memo[]
-  total: number
 }
 
 export default function MyPost(props: Props) {
   const [value, setValue] = useState(0)
-  const { id, posts, total } = props
+  const { id } = props
 
-  const labels = ['내 메모']
-  const Panels = (props: BoxProps) =>
-    labels.map((_, i) => <Box key={`panel${i}`} role={`panel${i}`} id={`panel${i}`} aria-labelledby={`tab${i}`} hidden={value !== i} {...props} />)
+  const labels = ['게시글', '팔로우', '북마크']
+
+  const myMemos = <MemoIndex queryString={{ userId: id }} formActive="off" />
+
+  const follower = <InfoNote />
+  const following = <InfoNote />
+
+  const panels = labels.map((_, i) => (
+    <Box key={`panel${i}`} role={`panel${i}`} id={`panel${i}`} aria-labelledby={`tab${i}`} hidden={value !== i}>
+      <Stack spacing={2}>{[myMemos, follower, following][i]}</Stack>
+    </Box>
+  ))
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -28,9 +34,7 @@ export default function MyPost(props: Props) {
         </Tabs>
       </Box>
       <Divider />
-      <Panels mt={2}>
-        <MemoIndex memos={posts} total={total} queryString={{ userId: id }} />
-      </Panels>
+      {panels}
     </Box>
   )
 }

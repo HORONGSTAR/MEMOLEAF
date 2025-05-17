@@ -1,24 +1,18 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '@mui/material'
 import { useSession, signOut } from 'next-auth/react'
 import { LoginBox, Dialog, Menu, Avatar } from '@/components'
 import { useRouter } from 'next/navigation'
 import { Logout, PersonOutlineOutlined, SettingsOutlined } from '@mui/icons-material'
-import { getUserThunk } from '@/store/slices/authSlice'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { useAppSelector } from '@/store/hooks'
 
 export default function Account() {
-  const dispatch = useAppDispatch()
   const router = useRouter()
   const [open, setOpen] = useState(false)
+  const { profile } = useAppSelector((state) => state.profile)
   const { data: session } = useSession()
-  const auth = session?.user
-  const { user } = useAppSelector((state) => state.auth)
-
-  useEffect(() => {
-    if (auth) dispatch(getUserThunk(auth.id))
-  }, [dispatch, auth])
+  const myId = session?.user.id
 
   const dialogProps = {
     open,
@@ -26,7 +20,7 @@ export default function Account() {
     onClose: () => setOpen(false),
   }
 
-  if (!auth)
+  if (!myId)
     return (
       <>
         <Button onClick={() => setOpen(true)}>로그인</Button>
@@ -40,7 +34,7 @@ export default function Account() {
     {
       label: '내 계정',
       icon: <PersonOutlineOutlined fontSize="small" />,
-      onClick: () => router.push('/my/' + user?.id),
+      onClick: () => router.push(`/page/my/${myId}`),
     },
     {
       label: '설정',
@@ -54,5 +48,5 @@ export default function Account() {
     },
   ]
 
-  return <Menu icon={<Avatar user={user} />} label={`${user?.name}님의 계정`} items={meunItems} />
+  return <Menu icon={<Avatar user={profile} />} label={`${profile?.name}님의 계정`} items={meunItems} />
 }

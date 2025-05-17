@@ -3,13 +3,13 @@ import { useTheme } from '@mui/material/styles'
 
 interface Props extends PaperProps {
   use?: 'create' | 'edit'
-  kind?: 'card' | 'list'
+  noBorder?: boolean
 }
 
 export default function Paper(props: Props) {
-  const { use, kind, children } = props
+  const { use, noBorder, children } = props
   const theme = useTheme()
-  const kindSx = { card: '1px solid', list: 'none' }[kind || 'card']
+  const borderSx = noBorder ? '1px solid' : 'none'
 
   const box = {
     basic: (
@@ -20,13 +20,13 @@ export default function Paper(props: Props) {
     create: (
       <MuiPaper
         variant="outlined"
-        sx={{ backgroundColor: theme.palette.secondary.light, border: kindSx, borderColor: theme.palette.secondary.main, p: 1 }}
+        sx={{ backgroundColor: theme.palette.secondary.light, border: borderSx, borderColor: theme.palette.secondary.main, p: 1 }}
       >
         {children}
       </MuiPaper>
     ),
     edit: (
-      <MuiPaper variant="outlined" sx={{ backgroundColor: theme.palette.grey[100], border: kindSx, borderColor: theme.palette.grey[300], p: 1 }}>
+      <MuiPaper variant="outlined" sx={{ backgroundColor: theme.palette.grey[100], border: borderSx, borderColor: theme.palette.grey[300], p: 1 }}>
         {children}
       </MuiPaper>
     ),

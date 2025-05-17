@@ -3,17 +3,28 @@ import { useEffect, useState } from 'react'
 import { Box } from '@mui/material'
 import Image from 'next/image'
 import { BasicProps } from '@/lib/types'
+import { useAppDispatch } from '@/store/hooks'
+import { getProfileThunk } from '@/store/slices/profileSlice'
+import { useSession } from 'next-auth/react'
 
 export default function SplashScreen(props: BasicProps) {
   const { children } = props
   const [ready, setReady] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const dispatch = useAppDispatch()
+  const { data: session } = useSession()
+  const myId = session?.user.id
 
   useEffect(() => {
     setMounted(true)
     const timer = setTimeout(() => setReady(true), 500)
     return () => clearTimeout(timer)
   }, [])
+
+  useEffect(() => {
+    setMounted(true)
+    if (myId) dispatch(getProfileThunk(myId))
+  }, [dispatch, myId])
 
   if (!mounted) return null
 

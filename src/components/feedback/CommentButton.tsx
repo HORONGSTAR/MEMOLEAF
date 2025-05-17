@@ -28,7 +28,7 @@ export default function MemoFooter(props: Props) {
 
   const onSubmit = useCallback(
     (text: string) => {
-      createComment({ text, id, userId: user.id })
+      createComment({ text, id })
         .then((result) => {
           const newComment = { ...result, user }
           setComments((prev) => [newComment, ...prev])

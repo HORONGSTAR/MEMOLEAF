@@ -52,6 +52,7 @@ export default function MemoForm(inti: MemoFormData) {
 
     setContent('')
     setImages({ file: [], imgs: [] })
+    setDecos({ ...kindData })
   }, [content, images, decos, inti])
 
   const handleChange = (value: string) => {

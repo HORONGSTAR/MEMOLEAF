@@ -5,9 +5,9 @@ export { default as Account } from '@/components/auth/Account'
 //memo
 export { default as MemoIndex } from '@/components/memo/MemoIndex'
 export { default as MemoForm } from '@/components/memo/MemoForm'
-export { default as MemoCard } from '@/components/memo/MemoCard'
+export { default as MemoBox } from '@/components/memo/MemoBox'
+export { default as MemoContent } from '@/components/memo/MemoContent'
 export { default as MemoThread } from '@/components/memo/MemoThread'
-export { default as MemoList } from '@/components/memo/MemoList'
 export { default as MemoLink } from '@/components/memo/sub/MemoLink'
 export { default as MemoDeco } from '@/components/memo/sub/MemoDeco'
 export { default as MemoDecoItem } from '@/components/memo/sub/MemoDecoItem'
@@ -29,6 +29,7 @@ export { default as ImgUploader } from '@/components/img/ImgUploader'
 //my
 export { default as MyProfile } from '@/components/my/MyProfile'
 export { default as MyPost } from '@/components/my/MyPost'
+export { default as FollowButton } from '@/components/my/FollowButton'
 
 //shared
 export { default as Navbar } from '@/components/shared/Navbar'
@@ -38,6 +39,7 @@ export { default as LinkBox } from '@/components/shared/LinkBox'
 export { default as SplashScreen } from '@/components/shared/SplashScreen'
 export { default as BackButton } from '@/components/shared/BackButton'
 export { default as SearchBar } from '@/components/shared/SearchBar'
+export { default as InfoNote } from '@/components/shared/InfoNote'
 
 //common
 export { default as Avatar } from '@/components/common/Avatar'

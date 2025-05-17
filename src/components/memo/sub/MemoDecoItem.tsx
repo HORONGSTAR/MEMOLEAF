@@ -47,16 +47,17 @@ export default function MemoDecoItem(props: Props) {
 
   const component: ActiveNode = {
     subtext: (
-      <Box>
+      <Box sx={{ mx: 2 }}>
         <Typography variant="body2" color="textSecondary">
           {extra}
         </Typography>
-        <Divider sx={{ my: 2 }} />
+        <Divider sx={{ my: 1 }} />
       </Box>
     ),
     folder: (
       <Box>
         <Chip
+          sx={{ mx: 2, my: 1 }}
           onClick={() => setChecked(swapOnOff[checked].next)}
           label={chipLabel[checked]}
           size="small"

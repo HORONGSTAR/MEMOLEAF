@@ -1,5 +1,5 @@
 'use client'
-import { Image } from '@/lib/types'
+import { Image, Layout } from '@/lib/types'
 import { ImgModal } from '@/components'
 import { Box, ImageList, ImageListItem } from '@mui/material'
 import { ReactNode } from 'react'
@@ -10,14 +10,14 @@ interface Images extends Image {
 
 interface Props {
   images: Images[]
-  isDetail?: boolean
+  layout: Layout
 }
 
-export default function ImageGrid({ images, isDetail }: Props) {
+export default function ImgGrid({ images, layout }: Props) {
   const count = images.length
   if (count === 0) return null
 
-  if (isDetail) {
+  const detail = () => {
     const cols: { [key: number]: number } = { 1: 2, 2: 4, 3: 3, 4: 2 }
     const imgListRow1 = images.slice(0, 4 - count).map((img) => (
       <ImageListItem key={img.id} cols={2} rows={2}>
@@ -38,7 +38,7 @@ export default function ImageGrid({ images, isDetail }: Props) {
     )
   }
 
-  return (
+  const basic = (
     <ImageList cols={4} sx={{ mt: 2 }}>
       {images.map((img) => (
         <ImageListItem key={img.url}>
@@ -50,4 +50,6 @@ export default function ImageGrid({ images, isDetail }: Props) {
       ))}
     </ImageList>
   )
+
+  return <>{{ card: basic, list: basic, detail }[layout]}</>
 }

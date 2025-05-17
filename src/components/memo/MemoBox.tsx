@@ -1,28 +1,28 @@
 'use client'
-import { ReactNode, useCallback, useMemo, useState } from 'react'
-import { MemoForm, Menu, Paper, Dialog, MemoDeco, LinkBox, Avatar, MemoLink, ImgGrid, CommentButton } from '@/components'
+import { useCallback, useState } from 'react'
+import { Menu, Paper, Dialog, ImgGrid } from '@/components'
+import { MemoForm, MemoContent } from '@/components'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
 import { Snackbar, Typography, Button } from '@mui/material'
-import { CardContent, CardHeader, CardActions } from '@mui/material'
-import { Memo, MemoParams, EditDeco, ActiveNode } from '@/lib/types'
-import { addImagePath, changeDate, copyText } from '@/lib/utills'
+import { Memo, Layout, MemoParams, EditDeco, ActiveNode } from '@/lib/types'
+import { addImagePath, copyText, checkAuthority } from '@/lib/utills'
 import { useSession } from 'next-auth/react'
 import { deleteMemo, updateMemo } from '@/lib/api/memoApi'
 
 interface Props {
   memo: Memo
-  isDetail?: boolean
-  children?: ReactNode
+  layout: Layout
 }
 
-export default function MemoCard(props: Props) {
-  const { isDetail } = props
+export default function MemoBox(props: Props) {
+  const { layout } = props
   const [memo, setMemo] = useState(props.memo)
   const [action, setAction] = useState('view')
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
   const { data: session } = useSession()
-  const auth = session?.user
+
+  const isMine = checkAuthority(memo.id, session?.user.id || 0)
 
   const onSubmit = useCallback(
     (params: Omit<MemoParams, 'id'>) => {
@@ -46,8 +46,6 @@ export default function MemoCard(props: Props) {
     setMessage(await reuslt)
   }, [memo])
 
-  const active = useMemo(() => (auth?.id === memo.userId ? 'on' : 'off'), [auth, memo])
-
   const decos: EditDeco = {}
   memo.decos.forEach((deco) => (decos[deco.kind] = { active: 'on', extra: deco.extra }))
   const editProps = { ...memo, onSubmit, decos, placeholder: '메모 내용 수정하기' }
@@ -61,43 +59,26 @@ export default function MemoCard(props: Props) {
     onAction: handleDelete,
   }
 
-  const components: ActiveNode = {
+  const memu = (
+    <Menu
+      icon={<MoreHoriz fontSize="small" />}
+      label="메모 메뉴 열기"
+      items={[
+        { active: isMine, label: '글 수정', icon: <EditOutlined />, onClick: () => setAction('edit') },
+        { active: isMine, label: '삭제', icon: <DeleteOutline />, onClick: () => setOpen(true) },
+        { active: 'on', label: '공유하기', icon: <LinkOutlined />, onClick: () => handleCopy() },
+      ]}
+    />
+  )
+
+  const activeBox: ActiveNode = {
     view: (
-      <Paper kind="card" sx={{ border: isDetail ? 'none' : null }}>
-        <CardHeader
-          avatar={
-            <LinkBox link={`/my/${memo.user.id}`}>
-              <Avatar user={memo.user} size={36} />
-            </LinkBox>
-          }
-          title={<LinkBox link={`/my/${memo.user.id}`}>{memo.user.name}</LinkBox>}
-          subheader={changeDate(memo.createdAt)}
-          action={
-            <Menu
-              icon={<MoreHoriz fontSize="small" />}
-              label="메모 메뉴 열기"
-              items={[
-                { active, label: '글 수정', icon: <EditOutlined />, onClick: () => setAction('edit') },
-                { active, label: '삭제', icon: <DeleteOutline />, onClick: () => setOpen(true) },
-                { active: 'on', label: '공유하기', icon: <LinkOutlined />, onClick: () => handleCopy() },
-              ]}
-            />
-          }
-        />
-        <MemoDeco decos={memo.decos}>
-          <CardContent>
-            {memo.content}
-            <ImgGrid images={addImagePath(memo.images)} isDetail={isDetail} />
-          </CardContent>
-        </MemoDeco>
-        <CardActions>
-          <CommentButton id={memo.id} count={memo._count.comments} user={memo.user} />
-          {isDetail || <MemoLink id={memo.id} />}
-        </CardActions>
-      </Paper>
+      <MemoContent memo={memo} memu={memu} layout={layout}>
+        <ImgGrid layout={layout} images={addImagePath(memo.images)} />
+      </MemoContent>
     ),
     edit: (
-      <Paper use="edit" kind="card">
+      <Paper use="edit">
         <MemoForm {...editProps}>
           <Button color="error" onClick={() => setAction('view')}>
             취소
@@ -106,7 +87,7 @@ export default function MemoCard(props: Props) {
       </Paper>
     ),
     remove: (
-      <Paper sx={{ bgcolor: '#eee', p: 2 }} kind="card">
+      <Paper sx={{ bgcolor: '#eee', p: 2 }}>
         <Typography color="textDisabled">삭제된 메모입니다.</Typography>
       </Paper>
     ),
@@ -114,7 +95,7 @@ export default function MemoCard(props: Props) {
 
   return (
     <>
-      {components[action]}
+      {activeBox[action]}
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={message ? true : false}

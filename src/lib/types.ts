@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 
+export type Layout = 'list' | 'detail' | 'card' | string
 export type Active = 'on' | 'off' | string
 export type ActiveNode = { [key: Active]: ReactNode }
 export type Action = { id: null | number; state: null | string }
@@ -36,10 +37,11 @@ export interface User {
   name: string
   image: string
   info: string
+  toUsers?: User[]
+  fromUsers?: User[]
 }
 
 export interface UserParams {
-  id: number
   name?: string
   image?: string
   info?: string
@@ -47,8 +49,9 @@ export interface UserParams {
 }
 
 export interface FollowParams {
-  followedById: number
-  followingId: number
+  fromUserId: number
+  toUserId: number
+  action: 'follow' | 'unfollow' | string
 }
 
 export interface Memo {
@@ -57,7 +60,6 @@ export interface Memo {
   images: Image[]
   decos: Deco[]
   user: User
-  userId: number
   createdAt: string
   leafs: Memo[]
   parentId: number
@@ -65,12 +67,11 @@ export interface Memo {
 }
 
 export interface MemoParams {
-  id: number
+  id?: number
   content: string
   images: EditImage
   decos: Deco[]
   parentId?: number
-  user?: User
 }
 
 export interface Comment {
@@ -84,5 +85,4 @@ export interface Comment {
 export interface CommentParams {
   id: number
   text: string
-  userId?: number
 }

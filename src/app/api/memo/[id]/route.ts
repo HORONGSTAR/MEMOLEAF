@@ -14,14 +14,3 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
   })
   return NRes.json({ memo })
 }
-
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const { parentId } = await req.json()
-
-  await prisma.memo.update({
-    where: { id: parseInt(id) },
-    data: { parentId },
-  })
-  return NRes.json({ id })
-}

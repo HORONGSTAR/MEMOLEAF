@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
-import { Noto_Sans_KR, Nanum_Gothic, Nanum_Myeongjo, Nanum_Pen_Script, Do_Hyeon, Jua } from 'next/font/google'
+import { Noto_Sans_KR } from 'next/font/google'
 import { ThemeProvider } from '@mui/material'
 import { theme } from '@/styles/MuiTheme'
-import Providers from './Providers'
+import Providers from '@/lib/Providers'
 
 import './globals.css'
 import { SplashScreen } from '@/components'
@@ -12,36 +12,6 @@ export const notoSans = Noto_Sans_KR({
   subsets: ['latin'],
   weight: ['400'],
   display: 'swap',
-})
-
-export const nanumGothic = Nanum_Gothic({
-  variable: '--font-nanum-gothic',
-  subsets: ['latin'],
-  weight: ['400'],
-})
-
-export const nanumMyeongjo = Nanum_Myeongjo({
-  variable: '--font-nanum-myeongjo',
-  subsets: ['latin'],
-  weight: ['400'],
-})
-
-export const nanumPenScript = Nanum_Pen_Script({
-  variable: '--font-nanum-pen-script',
-  subsets: ['latin'],
-  weight: ['400'],
-})
-
-export const doHyeon = Do_Hyeon({
-  variable: '--font-do-hyeon',
-  subsets: ['latin'],
-  weight: ['400'],
-})
-
-export const jua = Jua({
-  variable: '--font-jua',
-  subsets: ['latin'],
-  weight: ['400'],
 })
 
 export const metadata: Metadata = {

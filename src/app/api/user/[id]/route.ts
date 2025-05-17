@@ -6,7 +6,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
     const { id } = await params
     const user = await prisma.user.findUnique({
       where: { id: parseInt(id) },
-      select: { id: true, name: true, image: true, info: true, toUsers: true, userNum: true },
+      select: { id: true, name: true, image: true, info: true, userNum: true },
     })
     if (user) {
       return NRes.json(user)

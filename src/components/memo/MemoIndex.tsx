@@ -1,26 +1,31 @@
 'use client'
-import { Paper, LoginBox, MemoCard, MemoForm } from '@/components'
+import { Paper, MemoBox, MemoForm, LoginBox } from '@/components'
 import { createMemo, getMemos } from '@/lib/api/memoApi'
-import { ActiveNode, Memo, MemoParams, QueryString } from '@/lib/types'
+import { Active, ActiveNode, Memo, MemoParams, QueryString } from '@/lib/types'
 import { useAppSelector } from '@/store/hooks'
-import { Box, Button, Divider, Typography } from '@mui/material'
+import { Box, Button, CircularProgress, Divider, Stack, Typography } from '@mui/material'
 import { useSession } from 'next-auth/react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 interface Props {
-  memos: Memo[]
-  total: number
-  queryString: QueryString
+  queryString?: QueryString
+  formActive: Active
 }
 
 export default function MemoIndex(props: Props) {
-  const [memos, setMemos] = useState<Memo[]>(props.memos.length > 0 ? props.memos : [])
-  const [total, setTotal] = useState(props.total || 1)
-  const { user } = useAppSelector((state) => state.auth)
+  const [memos, setMemos] = useState<Memo[]>([])
+  const [total, setTotal] = useState(1)
+  const { profile } = useAppSelector((state) => state.profile)
   const [page, setPage] = useState(2)
-  const { queryString } = props
-  const { data: session } = useSession()
-  const auth = session?.user
+  const { queryString, formActive } = props
+  const { status } = useSession()
+
+  useEffect(() => {
+    getMemos({ page: 1, limit: 10 }).then((result) => {
+      setMemos(result.memos)
+      setTotal(result.total)
+    })
+  }, [])
 
   const handleGetMemos = useCallback(() => {
     getMemos({ page, limit: 10, ...queryString }).then((result) => {
@@ -32,12 +37,12 @@ export default function MemoIndex(props: Props) {
 
   const handleCreateMemo = useCallback(
     (params: Omit<MemoParams, 'id'>) => {
-      if (!user) return
-      createMemo({ ...params, id: user.id })
-        .then((memo) => setMemos((prev) => [{ ...memo, user }, ...prev]))
+      if (!profile) return
+      createMemo({ ...params })
+        .then((memo) => setMemos((prev) => [{ ...memo, user: profile }, ...prev]))
         .catch((err) => console.error(err))
     },
-    [user]
+    [profile]
   )
 
   const active = useMemo(() => (page - 1 !== total ? 'on' : 'off'), [page, total])
@@ -55,9 +60,24 @@ export default function MemoIndex(props: Props) {
     ),
   }
 
-  if (!auth) {
-    return (
-      <Box sx={{ px: 10 }}>
+  const form: ActiveNode = {
+    on: (
+      <Paper use="create">
+        <MemoForm onSubmit={handleCreateMemo} />
+      </Paper>
+    ),
+    off: null,
+  }
+
+  const components = {
+    authenticated: form[formActive],
+    loading: (
+      <Stack alignItems="center" justifyContent="center" minHeight={100}>
+        <CircularProgress sx={{ m: 'auto' }} />
+      </Stack>
+    ),
+    unauthenticated: (
+      <Box sx={{ width: '100%', py: 4 }}>
         <Typography align="center" color="primary" variant="h6">
           로그인 후 기록을 남겨보세요!
         </Typography>
@@ -66,18 +86,14 @@ export default function MemoIndex(props: Props) {
         </Typography>
         <LoginBox />
       </Box>
-    )
+    ),
   }
 
   return (
     <>
-      {!queryString && (
-        <Paper use="create" kind="card">
-          <MemoForm onSubmit={handleCreateMemo} />
-        </Paper>
-      )}
+      {components[status]}
       {memos.map((memo: Memo) => (
-        <MemoCard key={'memocard' + memo.id} memo={memo} />
+        <MemoBox key={'memoindex' + memo.id} memo={memo} layout="card" />
       ))}
       <Divider sx={{ my: 4 }} variant="middle">
         {pageButton[active]}

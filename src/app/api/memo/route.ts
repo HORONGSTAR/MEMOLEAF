@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse as NRes } from 'next/server'
 import prisma from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
@@ -34,14 +36,14 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const { id, content, images, decos, parentId } = await req.json()
+    const session = await getServerSession(authOptions)
+    if (!session) return NRes.json({ error: '로그인이 필요합니다.' }, { status: 401 })
 
-    const user = await prisma.user.findUnique({ where: { id } })
-    if (!user) return NRes.json({ error: '유저 정보를 찾을 수 없습니다.' }, { status: 404 })
-
+    const id = session.user.id
+    const { content, images, decos, parentId } = await req.json()
     const newMemo = await prisma.memo.create({
       data: {
-        userId: user.id,
+        userId: id,
         content,
         parentId,
 
@@ -49,7 +51,7 @@ export async function POST(req: NextRequest) {
         ...(decos?.length > 0 && { decos: { create: decos } }),
       },
     })
-    const res = { ...newMemo, user, images, decos, _count: { leafs: 0, comments: 0, bookmarks: 0 } }
+    const res = { ...newMemo, images, decos, _count: { leafs: 0, comments: 0, bookmarks: 0 } }
 
     res.images = await prisma.image.findMany({ where: { memoId: newMemo.id } })
     res.decos = await prisma.deco.findMany({ where: { memoId: newMemo.id } })
@@ -63,6 +65,9 @@ export async function POST(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions)
+    if (!session) return NRes.json({ error: '로그인이 필요합니다.' }, { status: 401 })
+
     const { id, content, images, decos } = await req.json()
     const search = await prisma.memo.findUnique({ where: { id } })
     if (!search) return NRes.json({ error: '메모를 찾을 수 없습니다.' }, { status: 404 })
@@ -89,14 +94,15 @@ export async function PATCH(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   try {
+    const session = await getServerSession(authOptions)
+    if (!session) return NRes.json({ error: '로그인이 필요합니다.' }, { status: 401 })
+
     const { id } = await req.json()
     const search = await prisma.memo.findUnique({ where: { id } })
-    if (search) {
-      await prisma.memo.delete({ where: { id } })
-      return NRes.json({ id })
-    } else {
-      return NRes.json({ error: '메모를 찾을 수 없습니다.' }, { status: 404 })
-    }
+    if (!search) return NRes.json({ error: '메모를 찾을 수 없습니다.' }, { status: 404 })
+
+    await prisma.memo.delete({ where: { id } })
+    return NRes.json({ id })
   } catch (err) {
     console.error(err)
     return NRes.json({ success: false, message: '메모 삭제 중 문제가 발생했습니다.' }, { status: 500 })

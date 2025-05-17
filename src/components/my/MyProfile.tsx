@@ -1,23 +1,25 @@
 'use client'
 import { Typography, List, ListItem, Stack, IconButton, Box, TextField } from '@mui/material'
 import { DriveFileRenameOutline } from '@mui/icons-material'
-import { Avatar, Dialog, ImgUploader } from '@/components'
-import { useState, useMemo, useCallback } from 'react'
+import { Avatar, Dialog, FollowButton, ImgUploader } from '@/components'
+import { useState, useCallback, useMemo } from 'react'
 import { User, UserParams } from '@/lib/types'
 import { useSession } from 'next-auth/react'
-import { imgPath, setRenameFile } from '@/lib/utills'
-import { updateUser } from '@/lib/api/userApi'
+import { checkAuthority, imgPath, setRenameFile, swapOnOff } from '@/lib/utills'
+import { useAppDispatch } from '@/store/hooks'
+import { updateProfileThunk } from '@/store/slices/profileSlice'
 
 export default function MyProfile(inti: User) {
-  const [user, setProfile] = useState(inti)
-  const [image, setImage] = useState<{ file?: File; url: string }>({ url: imgPath + user.image })
-  const [name, setName] = useState(user.name)
-  const [info, setInfo] = useState(user.info || '')
+  const [profile, setProfile] = useState(inti)
+  const [image, setImage] = useState<{ file?: File; url: string }>({ url: imgPath + inti.image })
+  const [name, setName] = useState(profile.name)
+  const [info, setInfo] = useState(profile.info || '')
   const [open, setOpen] = useState(false)
   const { data: session } = useSession()
-  const auth = session?.user
+  const dispatch = useAppDispatch()
 
-  const isMyPage = useMemo(() => auth && auth.id === user.id, [auth, user])
+  const myId = session?.user.id
+  const isMine = checkAuthority(profile.id, myId || 0)
 
   const handleChangeName = useCallback((value: string) => {
     if (value.length > 12) return
@@ -32,7 +34,6 @@ export default function MyProfile(inti: User) {
   const handleSubmit = useCallback(async () => {
     setOpen(false)
     const userData: UserParams = {
-      id: user.id,
       name: name,
       info: info,
     }
@@ -42,9 +43,10 @@ export default function MyProfile(inti: User) {
       userData.file = renamedFile
       userData.image = renamedFile.name
     }
-    await updateUser(userData)
+    dispatch(updateProfileThunk(userData))
+
     setProfile((prev) => ({ ...prev, ...userData }))
-  }, [user, name, info, image])
+  }, [name, info, image.file, dispatch])
 
   const dialogProps = {
     open,
@@ -53,25 +55,35 @@ export default function MyProfile(inti: User) {
     onClose: handleSubmit,
   }
 
+  const followAction = useMemo(() => {
+    if (swapOnOff[isMine].bool) return 'none'
+    return profile.toUsers?.some((user) => user.id !== myId) ? 'follow' : 'unfollow'
+  }, [isMine, myId, profile.toUsers])
+
+  const myButton = {
+    on: (
+      <IconButton size="small" aria-label="프로필 수정하기" onClick={() => setOpen(true)}>
+        <DriveFileRenameOutline fontSize="small" />
+      </IconButton>
+    ),
+    off: myId && <FollowButton fromUserId={myId} toUserId={profile.id} action={followAction} />,
+  }[isMine]
+
   return (
     <Stack spacing={2}>
       <Stack direction={{ sm: 'row', xs: 'column' }}>
-        <Avatar size={120} user={user} />
+        <Avatar size={120} user={profile} />
         <List dense sx={{ flexGrow: 1 }}>
           <ListItem>
-            <Typography variant="h6">{user.name}</Typography>
-            {isMyPage && (
-              <IconButton size="small" aria-label="프로필 수정하기" onClick={() => setOpen(true)}>
-                <DriveFileRenameOutline fontSize="small" />
-              </IconButton>
-            )}
+            <Typography variant="h6">{profile.name}</Typography>
+            {myButton}
           </ListItem>
           <ListItem>
             <Typography variant="body2" color="textSecondary">
-              ID {user.userNum}
+              ID {profile.userNum}
             </Typography>
           </ListItem>
-          <ListItem>{user.info || '자기소개가 없습니다.'}</ListItem>
+          <ListItem>{profile.info || '자기소개가 없습니다.'}</ListItem>
         </List>
       </Stack>
       <Box sx={{ width: '100%' }}></Box>

@@ -19,9 +19,9 @@ export default function CommentBox(props: Props) {
   const [open, setOpen] = useState(false)
   const { onDelete } = props
   const { data: session } = useSession()
-  const auth = session?.user
+  const myId = session?.user.id
 
-  const active = useMemo(() => (auth?.id === comment.user.id ? 'on' : 'off'), [auth?.id, comment.user.id])
+  const active = useMemo(() => (myId === comment.user.id ? 'on' : 'off'), [myId, comment.user.id])
 
   const onSubmit = useCallback(
     (text: string) => {
@@ -86,13 +86,13 @@ export default function CommentBox(props: Props) {
         <Box whiteSpace="pre-line">
           <ListItem secondaryAction={menu[active]}>
             <ListItemAvatar>
-              <LinkBox link={`/my/${comment.user.id}`}>
+              <LinkBox link={`/page/my/${comment.user.id}`}>
                 <Avatar user={comment.user} size={36} />
               </LinkBox>
             </ListItemAvatar>
             <ListItemText
               primary={
-                <LinkBox mr={1} link={`/my/${comment.user.id}`}>
+                <LinkBox mr={1} link={`/page/my/${comment.user.id}`}>
                   {comment.user.name}
                 </LinkBox>
               }

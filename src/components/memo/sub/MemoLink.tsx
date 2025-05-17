@@ -1,19 +1,21 @@
 'use client'
-import { ExpandButton } from '@/components'
 import { AutoStoriesOutlined } from '@mui/icons-material'
+import { Button } from '@mui/material'
 import Link from 'next/link'
 
 interface Props {
   id: number
+  count: number
 }
 
 export default function MemoLink(props: Props) {
-  const { id } = props
+  const { id, count } = props
 
-  return (
-    <ExpandButton component={Link} href={`/memo/${id}`}>
-      <AutoStoriesOutlined fontSize="small" />
-      <span className="label">페이지</span>
-    </ExpandButton>
-  )
+  if (count > 0)
+    return (
+      <Button component={Link} startIcon={<AutoStoriesOutlined />} href={`/page/memo/${id}`}>
+        {count}개의 타래
+      </Button>
+    )
+  else return null
 }

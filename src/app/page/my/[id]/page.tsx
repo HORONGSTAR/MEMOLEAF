@@ -1,20 +1,18 @@
-import { getMemoById } from '@/lib/api/memoApi'
-import { Wrap, BackButton, MemoThread, MemoCard } from '@/components'
-import { Stack, Typography } from '@mui/material'
+import { Wrap, MyProfile, MyPost } from '@/components'
+import { Typography, Stack } from '@mui/material'
+import { getProfile } from '@/lib/api/userApi'
 import { Error } from '@mui/icons-material'
 
-export default async function MemoPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function MyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const { memo } = await getMemoById(id)
+  const profile = await getProfile(id)
 
   return (
     <Wrap>
-      {memo ? (
+      {profile ? (
         <>
-          <div>
-            <BackButton />
-          </div>
-          <MemoCard memo={memo} isDetail />
+          <MyProfile {...profile} />
+          <MyPost id={id} />
         </>
       ) : (
         <Stack alignItems="center" spacing={2} pt={3}>
@@ -24,7 +22,6 @@ export default async function MemoPage({ params }: { params: Promise<{ id: strin
           </Stack>
         </Stack>
       )}
-      <MemoThread id={parseInt(id)} total={memo._count.leafs} userId={memo.userId} />
     </Wrap>
   )
 }

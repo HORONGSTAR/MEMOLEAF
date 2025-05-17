@@ -28,5 +28,5 @@ export default function ImgForm(props: Props) {
 
   const list = images.imgs.map((img, index) => ({ id: img.id, url: img.id ? imgPath + img.url : img.url, remove: remove(img, index) }))
 
-  return <ImgGrid images={list} />
+  return <ImgGrid images={list} layout="list" />
 }
