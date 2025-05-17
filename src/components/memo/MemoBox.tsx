@@ -7,7 +7,7 @@ import { Snackbar, Typography, Button } from '@mui/material'
 import { Memo, Layout, MemoParams, EditDeco, ActiveNode } from '@/lib/types'
 import { addImagePath, copyText, checkAuthority } from '@/lib/utills'
 import { useSession } from 'next-auth/react'
-import { deleteMemo, updateMemo } from '@/lib/api/memoApi'
+import { deleteMemo, updateMemo } from '@/lib/fetch/memoApi'
 
 interface Props {
   memo: Memo

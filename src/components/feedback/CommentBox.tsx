@@ -2,7 +2,7 @@
 import { CommentForm, Dialog, LinkBox, Avatar } from '@/components'
 import { useCallback, useMemo, useState } from 'react'
 import { ActiveNode, Comment } from '@/lib/types'
-import { updateComment } from '@/lib/api/feedbackApi'
+import { updateComment } from '@/lib/fetch/feedbackApi'
 import { changeDate } from '@/lib/utills'
 import { List, ListItem, Box, Typography, IconButton, ListItemText, ListItemAvatar } from '@mui/material'
 import { DriveFileRenameOutline, DeleteForever, ExitToApp } from '@mui/icons-material'
