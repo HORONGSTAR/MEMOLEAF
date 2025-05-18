@@ -1,27 +1,27 @@
 'use client'
+
 import { CommentForm, Dialog, LinkBox, Avatar } from '@/components'
-import { useCallback, useMemo, useState } from 'react'
-import { ActiveNode, Comment } from '@/lib/types'
+import { useCallback, useState } from 'react'
+import { OnOffItem, CommentData } from '@/lib/types'
 import { updateComment } from '@/lib/fetch/feedbackApi'
-import { changeDate } from '@/lib/utills'
+import { changeDate, checkCurrentOnOff } from '@/lib/utills'
 import { List, ListItem, Box, Typography, IconButton, ListItemText, ListItemAvatar } from '@mui/material'
 import { DriveFileRenameOutline, DeleteForever, ExitToApp } from '@mui/icons-material'
 import { useSession } from 'next-auth/react'
 
 interface Props {
-  comment: Comment
+  comment: CommentData
   onDelete: (id: number) => void
 }
 
 export default function CommentBox(props: Props) {
-  const [comment, setComment] = useState<Comment>(props.comment)
+  const [comment, setComment] = useState<CommentData>(props.comment)
   const [action, setAction] = useState('view')
   const [open, setOpen] = useState(false)
   const { onDelete } = props
   const { data: session } = useSession()
   const myId = session?.user.id
-
-  const active = useMemo(() => (myId === comment.user.id ? 'on' : 'off'), [myId, comment.user.id])
+  const isMine = checkCurrentOnOff(comment.user.id, myId || 0)
 
   const onSubmit = useCallback(
     (text: string) => {
@@ -39,7 +39,7 @@ export default function CommentBox(props: Props) {
     setOpen(false)
   }, [comment, onDelete])
 
-  const menu = {
+  const menu: OnOffItem = {
     on: (
       <Box my={0.2}>
         <IconButton size="small" aria-label="댓글 수정폼 열기" onClick={() => setAction('edit')}>
@@ -62,7 +62,7 @@ export default function CommentBox(props: Props) {
     onAction: handleDelete,
   }
 
-  const components: ActiveNode = {
+  const components: OnOffItem = {
     view: (
       <Typography px={2} pb={2} variant="body2">
         {comment.text}
@@ -84,7 +84,7 @@ export default function CommentBox(props: Props) {
     <>
       <List disablePadding>
         <Box whiteSpace="pre-line">
-          <ListItem secondaryAction={menu[active]}>
+          <ListItem secondaryAction={menu[isMine]}>
             <ListItemAvatar>
               <LinkBox link={`/page/my/${comment.user.id}`}>
                 <Avatar user={comment.user} size={36} />

@@ -1,20 +1,31 @@
 import { memoUrl, metaData } from '@/lib/fetch/fetchApi'
 import { uploadImages } from './imgApi'
-import { MemoParams, QueryString } from '@/lib/types'
+import { MemoParams, GetMemoParams } from '@/lib/types'
 
-export const getMemos = async (params: QueryString) => {
-  const keys = Object.keys(params)
-  let query = ''
-  for (const key of keys) {
-    query += `${key}=${params[key]}&`
+export const getMemos = async (params: GetMemoParams) => {
+  const { category, pagination } = params
+  let endpoint = ''
+  let queryString = ''
+
+  if (category) {
+    const key = Object.keys(category)[0]
+    endpoint += `/${category[key]}/${key}`
   }
-  const res = await fetch(memoUrl + `?${query}`)
+
+  if (pagination) {
+    const keys = Object.keys(pagination)
+    for (const key of keys) {
+      queryString += `${key}=${pagination[key]}&`
+    }
+  }
+
+  const res = await fetch(memoUrl + `${endpoint}?${queryString}`)
   if (!res.ok) throw new Error('메모 조회 중 에러')
   return res.json()
 }
 
 export const getMemoById = async (id: string) => {
-  const res = await fetch(memoUrl + `/${id}`)
+  const res = await fetch(memoUrl + `/${id}/detail`)
   if (!res.ok) throw new Error('메모 조회 중 에러')
   return res.json()
 }

@@ -1,31 +1,31 @@
 'use client'
 import { Paper, MemoForm, MemoBox } from '@/components'
 import { createMemo, getMemos } from '@/lib/fetch/memoApi'
-import { Active, ActiveNode, Memo, MemoParams } from '@/lib/types'
-import { checkAuthority, swapOnOff } from '@/lib/utills'
+import { OnOff, OnOffItem, MemoData, MemoParams } from '@/lib/types'
+import { checkCurrentOnOff, swapOnOff } from '@/lib/utills'
 import { useAppSelector } from '@/store/hooks'
-import { Box, Button, Collapse, Divider, List } from '@mui/material'
+import { Box, Button, Collapse, List } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import { useSession } from 'next-auth/react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 interface Props {
   id: number
-  total: number
+  count: number
   userId: number
-  formActive: Active
+  formActive: OnOff
 }
 
 export default function MemoThread(props: Props) {
-  const [memos, setMemos] = useState<Memo[]>([])
-  const [newMemos, setNewMemos] = useState<Memo[]>([])
+  const [memos, setMemos] = useState<MemoData[]>([])
+  const [newMemos, setNewMemos] = useState<MemoData[]>([])
   const [page, setPage] = useState(1)
   const [open, setOpen] = useState('off')
-  const [total, setTotal] = useState(Math.ceil(props.total / 10) || 0)
+  const [total, setTotal] = useState(props.count || 0)
   const formRef = useRef<Element>(null)
   const { profile } = useAppSelector((state) => state.profile)
   const { data: session } = useSession()
-  const isMine = checkAuthority(props.userId, session?.user.id || 0)
+  const isMine = checkCurrentOnOff(props.userId, session?.user.id || 0)
   const { formActive } = props
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export default function MemoThread(props: Props) {
   }, [newMemos.length])
 
   const handleGetMemos = useCallback(() => {
-    getMemos({ page, limit: 10, parentId: props.id }).then((result) => {
+    getMemos({ category: { thread: props.id }, pagination: { page, limit: 10 } }).then((result) => {
       setMemos((prev) => [...prev, ...result.memos])
       setTotal(result.total)
       setPage((prev) => prev + 1)
@@ -52,26 +52,23 @@ export default function MemoThread(props: Props) {
     [profile, props.id]
   )
 
-  const firstPage = useMemo(() => page === 1 && total > 0, [total, page])
-  const pageButtonActive = useMemo(() => (page - 1 !== total ? 'on' : 'off'), [page, total])
+  const isLast = checkCurrentOnOff(Math.ceil(total / 10), page)
 
   const handleOpen = useCallback(() => {
-    if (firstPage) handleGetMemos()
+    if (page === 1) handleGetMemos()
     setOpen((prev) => swapOnOff[prev].next)
-  }, [firstPage, handleGetMemos])
+  }, [page, handleGetMemos])
 
-  const pageButton: ActiveNode = {
+  const pageButton: OnOffItem = {
     on: (
-      <Divider>
-        <Button onClick={handleGetMemos}>
-          더 보기{page}/{total}
-        </Button>
-      </Divider>
+      <Button fullWidth sx={{ my: 1 }} onClick={handleGetMemos}>
+        더 보기{page - 1}/{Math.ceil(total / 10)}
+      </Button>
     ),
     off: null,
   }
 
-  const addForm: ActiveNode = {
+  const addForm: OnOffItem = {
     on: (
       <Box ref={formRef}>
         <Paper use="create" noBorder>
@@ -86,20 +83,22 @@ export default function MemoThread(props: Props) {
 
   return (
     <>
-      <Button fullWidth sx={{ color: grey[600], bgcolor: grey[100] }} onClick={handleOpen}>
-        {{ off: `${props.total}개의 스레드 보기`, on: '스레드 접기' }[open]}
-      </Button>
-      <Collapse in={swapOnOff[open].bool}>
-        <List>
-          {memos.map((memo: Memo) => (
+      {total ? (
+        <Button fullWidth sx={{ color: grey[600], bgcolor: grey[100] }} onClick={handleOpen}>
+          {{ off: `${total}개의 스레드 보기`, on: '스레드 접기' }[open]}
+        </Button>
+      ) : null}
+      <List>
+        <Collapse in={swapOnOff[open].bool}>
+          {memos.map((memo: MemoData) => (
             <MemoBox layout={layout} key={'first-memothread' + memo.id} memo={memo} />
           ))}
-          {pageButton[pageButtonActive]}
-          {newMemos.map((memo: Memo) => (
-            <MemoBox layout={layout} key={'last-memothread-l' + memo.id} memo={memo} />
-          ))}
-        </List>
-      </Collapse>
+          {pageButton[isLast]}
+        </Collapse>
+        {newMemos.map((memo: MemoData) => (
+          <MemoBox layout={layout} key={'last-memothread-l' + memo.id} memo={memo} />
+        ))}
+      </List>
       {{ on: addForm[isMine], off: null }[formActive]}
     </>
   )

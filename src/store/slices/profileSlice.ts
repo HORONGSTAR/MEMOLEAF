@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getProfile, updateProfile } from '@/lib/fetch/userApi'
-import { User, UserParams } from '@/lib/types'
+import { UserData, UserParams } from '@/lib/types'
 
-export const getProfileThunk = createAsyncThunk<User, number>('user/getProfile', async (id) => {
+export const getProfileThunk = createAsyncThunk<UserData, number>('user/getProfile', async (id) => {
   try {
     return await getProfile(id)
   } catch (error) {
@@ -10,7 +10,7 @@ export const getProfileThunk = createAsyncThunk<User, number>('user/getProfile',
   }
 })
 
-export const updateProfileThunk = createAsyncThunk<User, UserParams>('user/updateProfile', async (params) => {
+export const updateProfileThunk = createAsyncThunk<UserData, UserParams>('user/updateProfile', async (params) => {
   try {
     return await updateProfile(params)
   } catch (error) {
@@ -19,7 +19,7 @@ export const updateProfileThunk = createAsyncThunk<User, UserParams>('user/updat
 })
 
 interface State {
-  profile?: User
+  profile?: UserData
   status: 'idle' | 'loading' | 'succeeded' | 'failed'
 }
 

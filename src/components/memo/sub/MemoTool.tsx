@@ -2,7 +2,7 @@
 import { Stack as MuiStack, IconButton, Collapse, StackProps, Checkbox, Tooltip } from '@mui/material'
 import { AddCircle, AddCircleOutline, Lock, LockOutlined, SubtitlesOutlined, Subtitles, DevicesFoldOutlined, DevicesFold } from '@mui/icons-material'
 import { ReactNode, useState, Dispatch, SetStateAction, useCallback } from 'react'
-import { Active, EditDeco } from '@/lib/types'
+import { OnOff, EditDeco } from '@/lib/types'
 import { swapOnOff } from '@/lib/utills'
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 }
 
 type Tool = {
-  [key: Active]: {
+  [key: OnOff]: {
     bgcolor: string
     rotate: string
     bool: boolean

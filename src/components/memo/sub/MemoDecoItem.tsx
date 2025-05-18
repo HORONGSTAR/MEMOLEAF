@@ -3,7 +3,7 @@ import { ReactNode, useState } from 'react'
 import { Collapse, Typography, Chip, Box, Paper, Stack, Divider, Button } from '@mui/material'
 import { ExpandMore } from '@mui/icons-material'
 import { InputText } from '@/components'
-import { Deco, ActiveNode } from '@/lib/types'
+import { Deco, OnOffItem } from '@/lib/types'
 import { swapOnOff } from '@/lib/utills'
 
 interface Props extends Deco {
@@ -17,14 +17,14 @@ export default function MemoDecoItem(props: Props) {
   const [checked, setChecked] = useState('off')
   const [unLock, setUnLock] = useState('off')
 
-  const transform: ActiveNode = { on: '-180deg', off: '0deg' }
-  const chipLabel: ActiveNode = { on: '접기', off: extra || '더 보기' }
+  const transform: OnOffItem = { on: '-180deg', off: '0deg' }
+  const chipLabel: OnOffItem = { on: '접기', off: extra || '더 보기' }
 
   const handleChange = (value: string) => {
     setPassword(value)
   }
 
-  const secretBox: ActiveNode = {
+  const secretBox: OnOffItem = {
     on: <Box>{children}</Box>,
     off: (
       <Stack alignItems="center" spacing={1}>
@@ -45,7 +45,7 @@ export default function MemoDecoItem(props: Props) {
     ),
   }
 
-  const component: ActiveNode = {
+  const component: OnOffItem = {
     subtext: (
       <Box sx={{ mx: 2 }}>
         <Typography variant="body2" color="textSecondary">

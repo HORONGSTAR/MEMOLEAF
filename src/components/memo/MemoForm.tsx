@@ -3,9 +3,9 @@ import { Button, Snackbar, Stack } from '@mui/material'
 import { ImgForm, ImgPreview, Blank, InputText, MemoTool, MemoToolItem } from '@/components'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { setRenameFile, swapOnOff } from '@/lib/utills'
-import { Memo, MemoParams, EditImage, EditDeco } from '@/lib/types'
+import { MemoData, MemoParams, EditImage, EditDeco } from '@/lib/types'
 
-interface MemoFormData extends Partial<Omit<Memo, 'decos'>> {
+interface MemoFormData extends Partial<Omit<MemoData, 'decos'>> {
   decos?: EditDeco
   placeholder?: string
   children?: ReactNode

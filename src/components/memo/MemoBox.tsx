@@ -4,13 +4,13 @@ import { Menu, Paper, Dialog, ImgGrid } from '@/components'
 import { MemoForm, MemoContent } from '@/components'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
 import { Snackbar, Typography, Button } from '@mui/material'
-import { Memo, Layout, MemoParams, EditDeco, ActiveNode } from '@/lib/types'
-import { addImagePath, copyText, checkAuthority } from '@/lib/utills'
+import { MemoData, Layout, MemoParams, EditDeco, OnOffItem } from '@/lib/types'
+import { addImagePath, copyText, checkCurrentOnOff } from '@/lib/utills'
 import { useSession } from 'next-auth/react'
 import { deleteMemo, updateMemo } from '@/lib/fetch/memoApi'
 
 interface Props {
-  memo: Memo
+  memo: MemoData
   layout: Layout
 }
 
@@ -21,8 +21,8 @@ export default function MemoBox(props: Props) {
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
   const { data: session } = useSession()
-
-  const isMine = checkAuthority(memo.id, session?.user.id || 0)
+  const myId = session?.user.id
+  const isMine = checkCurrentOnOff(memo.user.id, myId || 0)
 
   const onSubmit = useCallback(
     (params: Omit<MemoParams, 'id'>) => {
@@ -71,7 +71,7 @@ export default function MemoBox(props: Props) {
     />
   )
 
-  const activeBox: ActiveNode = {
+  const memoStateBox: OnOffItem = {
     view: (
       <MemoContent memo={memo} memu={memu} layout={layout}>
         <ImgGrid layout={layout} images={addImagePath(memo.images)} />
@@ -95,7 +95,7 @@ export default function MemoBox(props: Props) {
 
   return (
     <>
-      {activeBox[action]}
+      {memoStateBox[action]}
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={message ? true : false}

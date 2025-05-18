@@ -5,13 +5,13 @@ import { MemoDeco, Avatar } from '@/components'
 
 import { Box, ListItem, ListItemText } from '@mui/material'
 import { CardContent, CardHeader, CardActions } from '@mui/material'
-import { Layout, ActiveNode, Memo } from '@/lib/types'
+import { Layout, OnOffItem, MemoData } from '@/lib/types'
 import { changeDate } from '@/lib/utills'
 import { AutoStoriesOutlined } from '@mui/icons-material'
 import Link from 'next/link'
 
 interface Props {
-  memo: Memo
+  memo: MemoData
   memu: ReactNode
   children: ReactNode
   layout: Layout
@@ -21,26 +21,26 @@ export default function MemoContent(props: Props) {
   const { memo, memu, children, layout } = props
 
   const avatar = (
-    <LinkBox link={`/my/${memo.user.id}`}>
+    <LinkBox link={`/page/my/${memo.user.id}`}>
       <Avatar user={memo.user} size={36} />
     </LinkBox>
   )
 
-  const name = <LinkBox link={`/my/${memo.user.id}`}>{memo.user.name}</LinkBox>
+  const name = <LinkBox link={`/page/my/${memo.user.id}`}>{memo.user.name}</LinkBox>
 
   const date = changeDate(memo.createdAt)
 
   const comment = <CommentButton id={memo.id} count={memo._count.comments} user={memo.user} />
 
   const detailLink = (
-    <ExpandButton component={Link} href={`/page/memo/${memo.id}`}>
+    <ExpandButton component={Link} href={`/page/detail/${memo.id}`}>
       <AutoStoriesOutlined fontSize="small" />
       <span className="label">페이지</span>
     </ExpandButton>
   )
 
   const leafCount = memo._count.leafs
-  const thread = { [leafCount]: <MemoThread formActive="off" id={memo.id} total={memo._count.leafs} userId={memo.user.id} />, 0: null }[leafCount]
+
   const cardContent = (
     <>
       <CardHeader avatar={avatar} title={name} subheader={date} action={memu} />
@@ -53,7 +53,7 @@ export default function MemoContent(props: Props) {
     </>
   )
 
-  const layoutBox: ActiveNode = {
+  const layoutBox: OnOffItem = {
     list: (
       <>
         <ListItem secondaryAction={memu} dense>
@@ -80,14 +80,14 @@ export default function MemoContent(props: Props) {
           {comment}
           {detailLink}
         </CardActions>
-        {thread}
+        {{ [leafCount]: <MemoThread formActive="off" id={memo.id} count={memo._count.leafs} userId={memo.user.id} />, 0: null }[leafCount]}
       </Paper>
     ),
     detail: (
       <Box>
         {cardContent}
         <CardActions>{comment}</CardActions>
-        {thread}
+        <MemoThread formActive="on" id={memo.id} count={memo._count.leafs} userId={memo.user.id} />
       </Box>
     ),
   }

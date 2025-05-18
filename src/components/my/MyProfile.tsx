@@ -3,13 +3,13 @@ import { Typography, List, ListItem, Stack, IconButton, Box, TextField } from '@
 import { DriveFileRenameOutline } from '@mui/icons-material'
 import { Avatar, Dialog, FollowButton, ImgUploader } from '@/components'
 import { useState, useCallback, useMemo } from 'react'
-import { User, UserParams } from '@/lib/types'
+import { UserData, UserParams } from '@/lib/types'
 import { useSession } from 'next-auth/react'
-import { checkAuthority, imgPath, setRenameFile, swapOnOff } from '@/lib/utills'
+import { checkCurrentOnOff, imgPath, setRenameFile, swapOnOff } from '@/lib/utills'
 import { useAppDispatch } from '@/store/hooks'
 import { updateProfileThunk } from '@/store/slices/profileSlice'
 
-export default function MyProfile(inti: User) {
+export default function MyProfile(inti: UserData) {
   const [profile, setProfile] = useState(inti)
   const [image, setImage] = useState<{ file?: File; url: string }>({ url: imgPath + inti.image })
   const [name, setName] = useState(profile.name)
@@ -19,7 +19,7 @@ export default function MyProfile(inti: User) {
   const dispatch = useAppDispatch()
 
   const myId = session?.user.id
-  const isMine = checkAuthority(profile.id, myId || 0)
+  const isMine = checkCurrentOnOff(profile.id, myId || 0)
 
   const handleChangeName = useCallback((value: string) => {
     if (value.length > 12) return

@@ -1,7 +1,7 @@
 'use client'
 import { Dialog, InputText } from '@/components'
-import { Dispatch, SetStateAction, useState, useCallback, ReactNode } from 'react'
-import { EditDeco } from '@/lib/types'
+import { Dispatch, SetStateAction, useState, useCallback } from 'react'
+import { EditDeco, OnOffItem } from '@/lib/types'
 import { Box, Chip, ChipProps, IconButton, Button, Divider, Stack, Typography } from '@mui/material'
 import { ExpandMore, DriveFileRenameOutline, Key } from '@mui/icons-material'
 import { swapOnOff } from '@/lib/utills'
@@ -10,8 +10,6 @@ interface Props {
   decos: EditDeco
   setDecos: Dispatch<SetStateAction<EditDeco>>
 }
-
-type Component = { [key: string]: ReactNode }
 
 export default function MemoToolItem(props: Props) {
   const { decos, setDecos } = props
@@ -66,7 +64,7 @@ export default function MemoToolItem(props: Props) {
     off: { variant: 'filled', label: decos.folder.extra || '더 보기' },
   }
 
-  const subtextBox: Component = {
+  const subtextBox: OnOffItem = {
     on: (
       <Box>
         <InputText
@@ -82,7 +80,7 @@ export default function MemoToolItem(props: Props) {
     off: null,
   }
 
-  const folderBox: Component = {
+  const folderBox: OnOffItem = {
     on: (
       <Box>
         <Chip {...chipProps[edit]} icon={<ExpandMore />} size="small" />
@@ -101,7 +99,7 @@ export default function MemoToolItem(props: Props) {
     onClose: handleClose,
   }
 
-  const secretBox: Component = {
+  const secretBox: OnOffItem = {
     on: (
       <Box>
         <Button startIcon={<Key />} size="small" onClick={() => setOpen('on')}>

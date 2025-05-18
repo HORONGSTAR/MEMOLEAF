@@ -3,7 +3,7 @@ import { ForumOutlined } from '@mui/icons-material'
 import { Box, Typography } from '@mui/material'
 import { CommentBox, Bubble, CommentForm } from '@/components'
 import { ReactNode, useCallback, useEffect, useState } from 'react'
-import { Active, User, Comment } from '@/lib/types'
+import { OnOff, UserData, CommentData } from '@/lib/types'
 import { createComment, deleteComment, getComments } from '@/lib/fetch/feedbackApi'
 import { swapOnOff } from '@/lib/utills'
 
@@ -11,12 +11,12 @@ interface Props {
   count: number
   children?: ReactNode
   id: number
-  user: User
+  user: UserData
 }
-export default function MemoFooter(props: Props) {
-  const [comments, setComments] = useState<Comment[]>([])
+export default function CommentButton(props: Props) {
+  const [comments, setComments] = useState<CommentData[]>([])
   const [count, setCount] = useState(props.count || 0)
-  const [active, setActive] = useState<Active>('off')
+  const [active, setActive] = useState<OnOff>('off')
   const { id, user } = props
 
   useEffect(() => {

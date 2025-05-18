@@ -1,9 +1,7 @@
-import { Wrap, SearchBar } from '@/components'
+import { SearchBar } from '@/components'
+import { disconnectPrisma } from '@/lib/prisma'
 
 export default async function SearchPage() {
-  return (
-    <Wrap>
-      <SearchBar />
-    </Wrap>
-  )
+  disconnectPrisma()
+  return <SearchBar />
 }

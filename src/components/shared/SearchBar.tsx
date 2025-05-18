@@ -1,52 +1,45 @@
 'use client'
 import { TextField, IconButton, Stack, Box, Typography, Button, Divider } from '@mui/material'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Search } from '@mui/icons-material'
 import { getMemos } from '@/lib/fetch/memoApi'
-import { Memo } from '@/lib/types'
+import { OnOffItem, MemoData } from '@/lib/types'
 import { Paper } from '@/components'
 import Link from 'next/link'
 import { changeDate } from '@/lib/utills'
 
 export default function SearchBar() {
-  const [text, setText] = useState('')
+  const [keyword, setKeyword] = useState('')
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
-  const [memos, setMemos] = useState<Memo[]>([])
+  const [memos, setMemos] = useState<MemoData[]>([])
+  const beforeKeyword = useRef('')
 
   const handleSearch = useCallback(() => {
-    if (page === total) return
-    const keyword = encodeURIComponent(text)
-    getMemos({ page, keyword, limit: 10 }).then((result) => {
-      setTotal(result.total)
-      setMemos(result.memos)
-    })
-    if (page < total) setPage((prev) => prev + 1)
-  }, [page, text, total])
+    const search = encodeURIComponent(keyword)
+    const data = { page, search }
+    if (beforeKeyword.current !== keyword) {
+      data.page = 1
+    }
+    getMemos({ pagination: data })
+      .then((result) => {
+        setTotal(result.total)
+        setMemos(result.memos)
+        setPage((prev) => prev + 1)
+      })
+      .catch((error) => console.log(error))
+  }, [keyword, page])
 
-  const active = useMemo(() => (page !== total && total ? 'on' : 'off'), [page, total])
+  const active = { [page]: 'on', [total]: 'off' }[page]
 
-  const nextButton = {
+  const nextButton: OnOffItem = {
     on: <Button onClick={handleSearch}>{`더 보기 (${page}/${total})`}</Button>,
-    off: (
-      <Typography variant="caption" color="textDisabled">
-        더 이상 표시할 콘텐츠가 없습니다
-      </Typography>
-    ),
+    off: null,
   }
   return (
     <>
       <Stack direction="row" component="form" justifyContent="center" py={1}>
-        <TextField
-          size="small"
-          label="검색"
-          value={text}
-          onChange={(e) => {
-            setText(e.target.value)
-            setPage(1)
-            setTotal(0)
-          }}
-        />
+        <TextField size="small" label="검색" value={keyword} onChange={(e) => setKeyword(e.target.value)} />
         <IconButton
           type="submit"
           onClick={(e) => {

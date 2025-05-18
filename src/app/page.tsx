@@ -1,9 +1,9 @@
-import { MemoIndex, Wrap } from '@/components'
+import { MemoList } from '@/components'
+import { disconnectPrisma } from '@/lib/prisma'
+export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
-  return (
-    <Wrap>
-      <MemoIndex formActive="on" />
-    </Wrap>
-  )
+  disconnectPrisma()
+
+  return <MemoList formActive="on" />
 }

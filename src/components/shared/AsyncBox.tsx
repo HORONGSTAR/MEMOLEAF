@@ -1,4 +1,4 @@
-import { CircularProgress } from '@mui/material'
+import { CircularProgress, Stack } from '@mui/material'
 import { ReactNode } from 'react'
 
 interface Props {
@@ -10,7 +10,11 @@ export default function AsyncBox(props: Props) {
 
   const components = {
     idle: null,
-    loading: <CircularProgress />,
+    loading: (
+      <Stack alignItems="center" justifyContent="center" minHeight={200}>
+        <CircularProgress />
+      </Stack>
+    ),
     succeeded: children,
     failed: null,
   }
