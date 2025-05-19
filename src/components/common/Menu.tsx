@@ -1,10 +1,10 @@
 'use client'
 import { IconButton, Menu as MuiMenu, MenuItem, ListItemIcon, ListItemText, Tooltip } from '@mui/material'
 import { ReactNode, useState } from 'react'
-import { BasicProps, Active } from '@/lib/types'
+import { BasicProps, OnOff } from '@/lib/types'
 
 interface ItmeProps extends BasicProps {
-  active?: Active
+  active?: OnOff
   onClick: () => void
 }
 
