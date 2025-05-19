@@ -13,11 +13,19 @@ export async function POST(req: NextRequest) {
     const fromUserId = session.user.id
     const { toUserId } = await req.json()
     const search = await prisma.user.count({ where: { id: toUserId } })
+
     if (!search) {
       const message = '유저를 찾을 수 없습니다.'
       return NRes.json({ success: false, message }, { status: 404 })
     }
     const followId = await prisma.follow.create({ data: { fromUserId, toUserId } })
+
+    const readerId = session.user.id
+
+    await prisma.alarm.create({
+      data: { linkId: toUserId, readerId, authorId: toUserId, aria: 'follow' },
+    })
+
     return NRes.json(followId)
   } catch (error) {
     console.error(error)

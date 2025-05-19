@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { getMemos, createMemo, updateMemo, deleteMemo } from '@/lib/fetch/memoApi'
-import { MemoParams, MemoData, GetMemoParams, UserData } from '@/lib/types'
+import { MemoParams, MemoData, GetDataParams, UserData, Status } from '@/lib/types'
 
 interface Memos {
   memos: MemoData[]
@@ -13,7 +13,7 @@ interface CreateMemoParams {
   user: UserData
 }
 
-export const getMemosThunk = createAsyncThunk<Memos, GetMemoParams>('memo/getMemos', async (params) => {
+export const getMemosThunk = createAsyncThunk<Memos, GetDataParams>('memo/getMemos', async (params) => {
   try {
     return await getMemos(params)
   } catch (error) {
@@ -25,7 +25,7 @@ export const createMemoThunk = createAsyncThunk<MemoData, CreateMemoParams>('mem
   try {
     const { memo, user } = params
     const newMemo = await createMemo(memo)
-    return { ...newMemo, user }
+    return { ...newMemo, user, bookmarks: [] }
   } catch (error) {
     console.error(error || '메모 작성 실패')
   }
@@ -51,7 +51,7 @@ interface State {
   memos: MemoData[] | []
   page: number
   total: number
-  status: 'idle' | 'loading' | 'succeeded' | 'failed'
+  status: Status
 }
 
 const initialState: State = {
@@ -84,7 +84,7 @@ export const memoSlice = createSlice({
       })
       .addCase(createMemoThunk.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        state.memos = [action.payload, ...state.memos.slice(0, 9)]
+        state.memos = [action.payload, ...state.memos]
       })
       .addCase(createMemoThunk.rejected, (state) => {
         state.status = 'failed'

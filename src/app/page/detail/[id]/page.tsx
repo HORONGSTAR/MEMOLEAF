@@ -13,6 +13,7 @@ export default async function DetailPage({ params }: { params: Promise<{ id: str
       user: true,
       decos: true,
       images: true,
+      bookmarks: { where: { userId: parseInt(id) } },
       _count: { select: { comments: true, bookmarks: true, leafs: true } },
     },
   })

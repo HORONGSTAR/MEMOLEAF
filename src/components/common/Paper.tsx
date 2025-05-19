@@ -9,7 +9,7 @@ interface Props extends PaperProps {
 export default function Paper(props: Props) {
   const { use, noBorder, children } = props
   const theme = useTheme()
-  const borderSx = noBorder ? '1px solid' : 'none'
+  const borderSx = noBorder ? 'none' : '1px solid'
 
   const box = {
     basic: (

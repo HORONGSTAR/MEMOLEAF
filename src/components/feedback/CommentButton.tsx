@@ -1,6 +1,6 @@
 'use client'
 import { ForumOutlined } from '@mui/icons-material'
-import { Box, Typography } from '@mui/material'
+import { Box, Pagination, Stack, Typography } from '@mui/material'
 import { CommentBox, Bubble, CommentForm } from '@/components'
 import { ReactNode, useCallback, useEffect, useState } from 'react'
 import { OnOff, UserData, CommentData } from '@/lib/types'
@@ -18,13 +18,16 @@ export default function CommentButton(props: Props) {
   const [count, setCount] = useState(props.count || 0)
   const [active, setActive] = useState<OnOff>('off')
   const { id, user } = props
+  const [page, setPage] = useState(1)
+  const limit = 5
+  const totalPage = Math.ceil(count / limit)
 
   useEffect(() => {
     if (!swapOnOff[active].bool) return
-    getComments({ page: 1 }, id)
+    getComments({ page, limit }, id)
       .then((result) => setComments(result.comments))
       .catch((err) => console.error(err))
-  }, [active, id])
+  }, [active, page, id])
 
   const onSubmit = useCallback(
     (text: string) => {
@@ -38,6 +41,10 @@ export default function CommentButton(props: Props) {
     },
     [user, id, setCount]
   )
+
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value)
+  }
 
   const handleDelete = useCallback((id: number) => {
     deleteComment(id)
@@ -61,9 +68,13 @@ export default function CommentButton(props: Props) {
       <Box sx={{ bgcolor: '#eee', p: 1 }}>
         <CommentForm onSubmit={onSubmit} />
       </Box>
+
       {comments.map((comment) => (
         <CommentBox key={'comment' + comment.id} onDelete={handleDelete} comment={comment} />
       ))}
+      <Stack spacing={2} alignItems="center" py={2}>
+        <Pagination size="small" count={totalPage} page={page} onChange={handleChange} />
+      </Stack>
     </Bubble>
   )
 }

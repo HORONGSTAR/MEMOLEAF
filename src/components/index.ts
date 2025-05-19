@@ -18,6 +18,8 @@ export { default as MemoToolItem } from '@/components/memo/sub/MemoToolItem'
 export { default as CommentForm } from '@/components/feedback/CommentForm'
 export { default as CommentBox } from '@/components/feedback/CommentBox'
 export { default as CommentButton } from '@/components/feedback/CommentButton'
+export { default as BookmarkButton } from '@/components/feedback/BookmarkButton'
+export { default as AlarmBox } from '@/components/feedback/AlarmBox'
 
 //img
 export { default as ImgForm } from '@/components/img/ImgForm'
@@ -27,9 +29,11 @@ export { default as ImgModal } from '@/components/img/ImgModal'
 export { default as ImgUploader } from '@/components/img/ImgUploader'
 
 //my
-export { default as MyProfile } from '@/components/my/MyProfile'
-export { default as MyPost } from '@/components/my/MyPost'
-export { default as FollowButton } from '@/components/my/FollowButton'
+export { default as MyProfile } from '@/components/user/MyProfile'
+export { default as MyPost } from '@/components/user/MyPost'
+export { default as MyPostItem } from '@/components/user/MyPostItem'
+export { default as FollowButton } from '@/components/user/FollowButton'
+export { default as UserList } from '@/components/user/UserList'
 
 //shared
 export { default as Navbar } from '@/components/shared/Navbar'
@@ -37,7 +41,7 @@ export { default as Footer } from '@/components/shared/Footer'
 export { default as LinkBox } from '@/components/shared/LinkBox'
 export { default as SplashScreen } from '@/components/shared/SplashScreen'
 export { default as BackButton } from '@/components/shared/BackButton'
-export { default as SearchBar } from '@/components/shared/SearchBar'
+export { default as SearchBox } from '@/components/shared/SearchBox'
 export { default as InfoNote } from '@/components/shared/InfoNote'
 export { default as AsyncBox } from '@/components/shared/AsyncBox'
 

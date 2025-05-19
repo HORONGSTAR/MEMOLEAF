@@ -13,7 +13,7 @@ interface Props {
   id: number
   count: number
   userId: number
-  formActive: OnOff
+  formActive?: OnOff
 }
 
 export default function MemoThread(props: Props) {
@@ -27,6 +27,8 @@ export default function MemoThread(props: Props) {
   const { data: session } = useSession()
   const isMine = checkCurrentOnOff(props.userId, session?.user.id || 0)
   const { formActive } = props
+  const limit = 10
+  const totalPage = Math.ceil(total / limit)
 
   useEffect(() => {
     if (newMemos.length > 0 && formRef.current) {
@@ -35,7 +37,7 @@ export default function MemoThread(props: Props) {
   }, [newMemos.length])
 
   const handleGetMemos = useCallback(() => {
-    getMemos({ category: { thread: props.id }, pagination: { page, limit: 10 } }).then((result) => {
+    getMemos({ category: { thread: props.id }, pagination: { page, limit } }).then((result) => {
       setMemos((prev) => [...prev, ...result.memos])
       setTotal(result.total)
       setPage((prev) => prev + 1)
@@ -52,7 +54,7 @@ export default function MemoThread(props: Props) {
     [profile, props.id]
   )
 
-  const isLast = checkCurrentOnOff(Math.ceil(total / 10), page)
+  const isLast = checkCurrentOnOff(totalPage, page)
 
   const handleOpen = useCallback(() => {
     if (page === 1) handleGetMemos()
@@ -62,7 +64,7 @@ export default function MemoThread(props: Props) {
   const pageButton: OnOffItem = {
     on: (
       <Button fullWidth sx={{ my: 1 }} onClick={handleGetMemos}>
-        더 보기{page - 1}/{Math.ceil(total / 10)}
+        더 보기{page - 1}/{totalPage}
       </Button>
     ),
     off: null,
@@ -88,7 +90,7 @@ export default function MemoThread(props: Props) {
           {{ off: `${total}개의 스레드 보기`, on: '스레드 접기' }[open]}
         </Button>
       ) : null}
-      <List>
+      <List dense>
         <Collapse in={swapOnOff[open].bool}>
           {memos.map((memo: MemoData) => (
             <MemoBox layout={layout} key={'first-memothread' + memo.id} memo={memo} />
@@ -96,10 +98,10 @@ export default function MemoThread(props: Props) {
           {pageButton[isLast]}
         </Collapse>
         {newMemos.map((memo: MemoData) => (
-          <MemoBox layout={layout} key={'last-memothread-l' + memo.id} memo={memo} />
+          <MemoBox layout={layout} key={'last-memothread' + memo.id} memo={memo} />
         ))}
       </List>
-      {{ on: addForm[isMine], off: null }[formActive]}
+      {{ on: addForm[isMine], off: null }[formActive || 'off']}
     </>
   )
 }

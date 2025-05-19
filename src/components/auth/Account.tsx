@@ -39,7 +39,7 @@ export default function Account() {
     {
       label: '설정',
       icon: <SettingsOutlined fontSize="small" />,
-      onClick: () => router.push('/setting'),
+      onClick: () => router.push('/page/setting'),
     },
     {
       label: '로그아웃',

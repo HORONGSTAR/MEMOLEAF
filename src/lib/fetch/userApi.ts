@@ -1,5 +1,5 @@
 import { userUrl, metaData } from '@/lib/fetch/fetchApi'
-import { FollowParams, QueryString, UserParams } from '@/lib/types'
+import { FollowParams, GetDataParams, UserParams } from '@/lib/types'
 import { uploadImages } from '@/lib/fetch/imgApi'
 
 export const getProfile = async (id: number | string) => {
@@ -19,17 +19,31 @@ export const updateProfile = async (params: UserParams) => {
 }
 
 export const followUser = async (params: FollowParams) => {
-  const { fromUserId, toUserId, action } = params
+  const { toUserId, action } = params
   const method = { follow: 'POST', unfollow: 'DELETE' }[action]
-  const data = metaData(method || 'POST', { fromUserId, toUserId })
+  const data = metaData(method || 'POST', { toUserId })
   const res = await fetch(userUrl + '/follow', data)
   if (!res.ok) throw new Error('팔로우 중 에러')
   return res.json()
 }
 
-export const getFollows = async (query: QueryString) => {
-  const { id, ListAria } = query
-  const res = await fetch(userUrl + `/follow/${id}/${ListAria}`)
+export const getUsers = async (params: GetDataParams) => {
+  const { category, pagination } = params
+  let endpoint = ''
+  let queryString = ''
+
+  if (category) {
+    const key = Object.keys(category)[0]
+    endpoint += `/${category[key]}/${key}`
+  }
+
+  if (pagination) {
+    const keys = Object.keys(pagination)
+    for (const key of keys) {
+      queryString += `${key}=${pagination[key]}&`
+    }
+  }
+  const res = await fetch(userUrl + `${endpoint}?${queryString}`)
   if (!res.ok) return null
   return res.json()
 }

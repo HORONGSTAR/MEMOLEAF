@@ -1,11 +1,11 @@
-import { imgUrl } from '@/lib/fetch/fetchApi'
-
 export async function uploadImages(files: File[]) {
   const formData = new FormData()
   files.forEach((file) => {
-    formData.append('images', file)
+    formData.append(`${process.env.CLOUDINARY_UPLOAD_PRESET}`, 'memoleaf')
+    formData.append(`${process.env.CLOUDINARY_API_KEY}`, '763328519649627')
+    formData.append('file', file)
   })
-  const res = await fetch(imgUrl, {
+  const res = await fetch(`${process.env.CLOUDINARY_URL}`, {
     method: 'POST',
     body: formData,
   })

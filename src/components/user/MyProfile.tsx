@@ -57,7 +57,7 @@ export default function MyProfile(inti: UserData) {
 
   const followAction = useMemo(() => {
     if (swapOnOff[isMine].bool) return 'none'
-    return profile.toUsers?.some((user) => user.id !== myId) ? 'follow' : 'unfollow'
+    return profile.toUsers?.some((user) => user.fromUserId === myId) ? 'follow' : 'unfollow'
   }, [isMine, myId, profile.toUsers])
 
   const myButton = {
@@ -66,7 +66,7 @@ export default function MyProfile(inti: UserData) {
         <DriveFileRenameOutline fontSize="small" />
       </IconButton>
     ),
-    off: myId && <FollowButton fromUserId={myId} toUserId={profile.id} action={followAction} />,
+    off: myId && <FollowButton toUserId={profile.id} state={followAction} />,
   }[isMine]
 
   return (

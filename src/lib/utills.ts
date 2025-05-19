@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import { v4 as uuid } from 'uuid'
 import { OnOff, Image } from '@/lib/types'
 
-export const imgPath = process.env.NEXT_PUBLIC_IMG_URL + '/uploads/'
+export const imgPath = process.env.NEXT_PUBLIC_IMG_URL + '/'
 
 //data mapping
 export const swapOnOff: {

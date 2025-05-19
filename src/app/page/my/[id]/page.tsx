@@ -1,4 +1,4 @@
-import { MyProfile, MyPost, MemoList } from '@/components'
+import { MyProfile, MyPost, UserList } from '@/components'
 import { Typography, Stack } from '@mui/material'
 import { Error } from '@mui/icons-material'
 import prisma, { disconnectPrisma } from '@/lib/prisma'
@@ -9,14 +9,14 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
   const { id } = await params
   const profile = await prisma.user.findUnique({
     where: { id: parseInt(id) },
-    select: { id: true, name: true, image: true, info: true, userNum: true, _count: { select: { fromUsers: true, toUsers: true } } },
-  })
-
-  const memos = await prisma.memo.findMany({
-    take: 10,
-    where: { parentId: null, userId: parseInt(id) },
-    orderBy: { createdAt: 'desc' },
-    include: { user: true, images: true, decos: true, _count: { select: { comments: true, bookmarks: true, leafs: true } } },
+    select: {
+      id: true,
+      name: true,
+      image: true,
+      info: true,
+      userNum: true,
+      toUsers: true,
+    },
   })
 
   return (
@@ -24,8 +24,8 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
       {profile ? (
         <>
           <MyProfile {...profile} />
-          <MyPost>
-            <MemoList />
+          <MyPost id={parseInt(id)}>
+            <UserList id={parseInt(id)} name={profile.name} />
           </MyPost>
         </>
       ) : (

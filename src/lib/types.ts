@@ -1,4 +1,4 @@
-import { Comment, Memo, User } from '@prisma/client'
+import { BookMark, Comment, Memo, User } from '@prisma/client'
 import { ReactNode } from 'react'
 
 export type Layout = 'list' | 'detail' | 'card' | string
@@ -9,8 +9,9 @@ export type Image = { id?: number; url: string; alt?: string }
 export type EditImage = { file: File[]; imgs: Image[] }
 export type Deco = { kind: string; extra: string }
 export type EditDeco = { [key: string]: { active: OnOff; extra: string } }
+export type Status = 'idle' | 'loading' | 'succeeded' | 'failed'
 
-export interface GetMemoParams {
+export interface GetDataParams {
   category?: EndPoint
   pagination?: QueryString
 }
@@ -21,12 +22,15 @@ export interface EndPoint {
   detail?: number
   mypost?: number
   thread?: number
+  listAria?: number
 }
 
 export interface QueryString {
   [key: string]: unknown
-  page?: number | string
+  cursor?: number
+  limit?: number
   search?: string
+  keyword?: string
 }
 
 export interface BasicProps {
@@ -37,8 +41,7 @@ export interface BasicProps {
   component?: ReactNode
 }
 export interface UserData extends Omit<User, 'credit' | 'createdAt'> {
-  toUsers?: User[]
-  fromUsers?: User[]
+  toUsers?: { fromUserId: number; toUserId: number }[]
 }
 
 export interface UserParams {
@@ -49,14 +52,20 @@ export interface UserParams {
 }
 
 export interface FollowParams {
-  fromUserId: number
+  fromUserId?: number
   toUserId: number
   action: 'follow' | 'unfollow' | string
+}
+
+export interface BookmarkParams {
+  id: number
+  action: 'add' | 'remove' | string
 }
 
 export interface MemoData extends Memo {
   images: Image[]
   decos: Deco[]
+  bookmarks: BookMark[]
   user: User
   createdAt: Date
   _count: { comments: number; bookmarks: number; leafs: number }

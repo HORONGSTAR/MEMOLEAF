@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
       return NRes.json({ success: false, message }, { status: 401 })
     }
     const { id, text } = await req.json()
-    const memo = await prisma.memo.count({ where: { id } })
+    const memo = await prisma.memo.findUnique({ where: { id }, select: { userId: true } })
     if (!memo) {
       const message = '메모를 찾을 수 없습니다.'
       return NRes.json({ success: false, message }, { status: 404 })
@@ -19,6 +19,10 @@ export async function POST(req: NextRequest) {
     const userId = session.user.id
     const newComment = await prisma.comment.create({
       data: { memoId: id, userId, text },
+    })
+
+    await prisma.alarm.create({
+      data: { linkId: id, readerId: userId, authorId: memo.userId, aria: 'comment' },
     })
 
     return NRes.json(newComment)

@@ -30,7 +30,7 @@ export default function CommentPopover({ children, icon, label, addEvent }: Prop
   const open = Boolean(anchorEl)
   const itemId = open ? label + '열기' : undefined
 
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
+  const isMobile = useMediaQuery(theme.breakpoints.down('xs'))
 
   return (
     <>
@@ -66,8 +66,9 @@ export default function CommentPopover({ children, icon, label, addEvent }: Prop
             '& .MuiPaper-root': {
               p: 1,
               borderRadius: 2,
-              minWidth: 300,
-              maxHeight: 300,
+              minWidth: 320,
+              maxWidth: 380,
+              maxHeight: 480,
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',

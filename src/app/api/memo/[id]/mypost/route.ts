@@ -7,16 +7,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const { searchParams } = new URL(req.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
-    const keyword = searchParams.get('keyword')
 
     const whereData = {
-      ...(keyword && {
-        where: {
-          parentId: null,
-          userId: parseInt(id),
-          content: { contains: keyword },
-        },
-      }),
+      where: {
+        parentId: null,
+        userId: parseInt(id),
+      },
     }
 
     const memos = await prisma.memo.findMany({
@@ -28,6 +24,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         user: true,
         images: true,
         decos: true,
+        bookmarks: true,
         _count: { select: { comments: true, bookmarks: true, leafs: true } },
       },
     })
@@ -36,7 +33,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     return NRes.json({
       memos,
-      total: Math.ceil(totalCount / limit),
+      total: totalCount,
     })
   } catch (error) {
     console.error(error)

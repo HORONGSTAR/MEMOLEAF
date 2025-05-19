@@ -8,22 +8,21 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
 
-    const whereData = { where: { id: parseInt(id) } }
-    const selectData = { select: { name: true, image: true, info: true, userNum: true } }
+    const whereData = { where: { toUserId: parseInt(id) } }
+    const selectData = { select: { id: true, name: true, image: true, info: true, userNum: true } }
 
-    const users = await prisma.user.findMany({
+    const follows = await prisma.follow.findMany({
       ...whereData,
       skip: (page - 1) * limit,
       take: limit,
-      include: {
-        toUsers: { include: { toUser: selectData } },
-      },
+      include: { fromUser: selectData },
     })
 
-    const totalCount = await prisma.user.count({ ...whereData })
+    const users = follows.map((follow) => follow.fromUser)
+    const totalCount = await prisma.follow.count({ ...whereData })
     return NRes.json({
       users,
-      total: Math.ceil(totalCount / limit),
+      total: totalCount,
     })
   } catch (error) {
     console.error(error)

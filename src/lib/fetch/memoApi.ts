@@ -1,8 +1,8 @@
 import { memoUrl, metaData } from '@/lib/fetch/fetchApi'
 import { uploadImages } from './imgApi'
-import { MemoParams, GetMemoParams } from '@/lib/types'
+import { MemoParams, GetDataParams } from '@/lib/types'
 
-export const getMemos = async (params: GetMemoParams) => {
+export const getMemos = async (params: GetDataParams) => {
   const { category, pagination } = params
   let endpoint = ''
   let queryString = ''

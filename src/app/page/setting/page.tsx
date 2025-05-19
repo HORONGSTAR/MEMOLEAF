@@ -1,11 +1,7 @@
-import { InfoNote, Wrap } from '@/components'
+import { InfoNote } from '@/components'
 
 function SettingPage() {
-  return (
-    <Wrap>
-      <InfoNote />
-    </Wrap>
-  )
+  return <InfoNote />
 }
 
 export default SettingPage

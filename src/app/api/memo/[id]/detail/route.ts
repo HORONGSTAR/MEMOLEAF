@@ -10,6 +10,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
         user: true,
         images: true,
         decos: true,
+        bookmarks: true,
         _count: { select: { comments: true, bookmarks: true, leafs: true } },
       },
     })

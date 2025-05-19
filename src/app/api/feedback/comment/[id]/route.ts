@@ -11,7 +11,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const comments = await prisma.comment.findMany({
       where: { memoId: parseInt(id) },
       skip: (page - 1) * limit,
-      take: 10,
+      take: limit,
       include: { user: true },
       orderBy: { createdAt: 'desc' },
     })

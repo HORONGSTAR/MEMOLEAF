@@ -1,15 +1,20 @@
 'use client'
 import { followUser } from '@/lib/fetch/userApi'
-import { OnOffItem, FollowParams } from '@/lib/types'
+import { OnOffItem } from '@/lib/types'
 import { Button } from '@mui/material'
 import { useState } from 'react'
 
-export default function FollowButton(props: FollowParams) {
-  const [state, setState] = useState(props.action || 'follow')
-  const { fromUserId, toUserId } = props
+interface Props {
+  toUserId: number
+  state: string
+}
+
+export default function FollowButton(props: Props) {
+  const [state, setState] = useState(props.state || 'follow')
+  const { toUserId } = props
 
   const handleFollow = (action: string) => {
-    followUser({ fromUserId, toUserId, action })
+    followUser({ toUserId, action })
     setState(action)
   }
 

@@ -1,26 +1,22 @@
 'use client'
 import { Divider, Tab, Tabs, Box, Stack } from '@mui/material'
-import { InfoNote } from '@/components'
 import { ReactNode, useState } from 'react'
+import { MyPostItem } from '@/components'
 
 interface Props {
+  id: number
   children: ReactNode
 }
 
-export default function MyPost(props: Props) {
+export default function MyPost({ id, children }: Props) {
   const [value, setValue] = useState(0)
-  const { children } = props
+  const labels = ['게시글', '북마크', '팔로우']
 
-  const labels = ['게시글', '팔로우', '북마크']
-
-  const follower = <InfoNote />
-  const following = <InfoNote />
-
-  const panels = labels.map((_, i) => (
-    <Box key={`panel${i}`} role={`panel${i}`} id={`panel${i}`} aria-labelledby={`tab${i}`} hidden={value !== i}>
-      <Stack spacing={2}>{[follower, following][i]}</Stack>
-    </Box>
-  ))
+  const items: { [key: number]: ReactNode } = {
+    0: <MyPostItem endpoint={{ mypost: id }} />,
+    1: <MyPostItem endpoint={{ bookmark: id }} />,
+    2: children,
+  }
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -32,8 +28,9 @@ export default function MyPost(props: Props) {
         </Tabs>
       </Box>
       <Divider />
-      {panels}
-      {children}
+      <Box key={`panel${value}`} role={`panel${value}`} id={`panel${value}`} aria-labelledby={`tab${value}`} hidden={value !== value} pt={2}>
+        <Stack spacing={2}>{items[value]}</Stack>
+      </Box>
     </Box>
   )
 }

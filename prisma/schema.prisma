@@ -17,6 +17,7 @@ model User {
   memos        Memo[]
   comments     Comment[]
   bookmarks    BookMark[]
+  alarms       Alarm[]
   fromUsers    Follow[] @relation("fromUser")
   toUsers      Follow[] @relation("toUser")
   createdAt    DateTime @default(now())
@@ -90,10 +91,11 @@ model BookMark {
   user         User       @relation(fields: [userId],references: [id],onDelete: Cascade)
   memo         Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
   createdAt    DateTime   @default(now())
+  @@unique([userId, memoId])
 }
 
 enum Aria {
-  replies
+  comment
   follow
   bookmark
 }
@@ -101,6 +103,9 @@ enum Aria {
 model Alarm{
   id           Int        @id @default(autoincrement())
   aria         Aria
-  link         Int
+  authorId     Int
+  linkId       Int
+  readerId     Int
+  reader       User       @relation(fields: [readerId],references: [id],onDelete: Cascade)
 }
 
