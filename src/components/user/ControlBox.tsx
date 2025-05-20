@@ -14,7 +14,6 @@ export default function ControlBox() {
   const [message, setMessage] = useState('')
 
   const router = useRouter()
-
   const myId = session?.user.id
 
   const handleDelete = useCallback(() => {
@@ -44,7 +43,10 @@ export default function ControlBox() {
     }
   }, [aria, myId, router])
 
-  if (!myId) return router.push('/')
+  if (!myId) {
+    router.push('/')
+    return null
+  }
 
   return (
     <>
