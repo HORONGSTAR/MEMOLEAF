@@ -1,7 +1,11 @@
 import { PrismaClient, Prisma } from '@prisma/client'
 
+// 연결 관리를 위한 추가 라이브러리 (가상 임포트 - 실제 설치 필요)
+// import { Pool } from 'generic-pool' (필요시 설치)
+
 interface CustomNodeJsGlobal {
   prisma: PrismaClient
+  prismaConnections: { [key: string]: number }
 }
 
 declare const global: CustomNodeJsGlobal
@@ -24,29 +28,65 @@ const getPrismaOptions = (): Prisma.PrismaClientOptions => {
   }
 }
 
-// 연결 풀 관리를 위한 설정 (필요시 사용)
+// 연결 풀 관리를 위한 설정
 export const prismaPoolConfig = {
-  max: 5, // 최대 연결 수
-  min: 1, // 최소 연결 수
-  idle: 10000, // 유휴 타임아웃(ms)
+  max: 20, // 최대 연결 수 증가 (부하에 따라 조정)
+  min: 3, // 최소 유지 연결 수 (빠른 초기 응답을 위해)
+  idle: 60000, // 유휴 타임아웃을 60초로 증가
+  acquire: 30000, // 연결 획득 타임아웃
+  retries: 3, // 연결 실패 시 재시도 횟수
+}
+
+// 글로벌 연결 수 추적 초기화
+if (!global.prismaConnections) {
+  global.prismaConnections = {
+    active: 0,
+    idle: 0,
+    max: prismaPoolConfig.max,
+  }
 }
 
 // Prisma 인스턴스 생성 또는 재사용
 const prismaClientSingleton = () => {
   const prisma = new PrismaClient(getPrismaOptions())
 
-  // 이벤트 핸들러 설정 (로그 기록)
-  // 타입 안전한 이벤트 핸들러 설정
+  // 미들웨어를 통한 연결 추적 및 관리
   prisma.$use(async (params, next) => {
-    const startTime = Date.now()
-    const result = await next(params)
-    const timing = Date.now() - startTime
+    // 연결이 최대치에 도달했는지 확인
+    if (global.prismaConnections.active >= prismaPoolConfig.max) {
+      console.warn(`[DB Pool] Maximum connections reached: ${global.prismaConnections.active}/${prismaPoolConfig.max}`)
 
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`Query: ${params.model}.${params.action} took ${timing}ms`)
+      // 대기열 처리 로직 (필요시 구현)
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      // 연결이 여전히 최대치라면 오류 발생
+      if (global.prismaConnections.active >= prismaPoolConfig.max) {
+        throw new Error('Database connection pool exhausted')
+      }
     }
 
-    return result
+    // 활성 연결 수 증가
+    global.prismaConnections.active++
+
+    const startTime = Date.now()
+    try {
+      // 쿼리 실행
+      const result = await next(params)
+      const timing = Date.now() - startTime
+
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`Query: ${params.model}.${params.action} took ${timing}ms`)
+      }
+
+      return result
+    } catch (error) {
+      const timing = Date.now() - startTime
+      console.error(`Query failed: ${params.model}.${params.action} after ${timing}ms`, error)
+      throw error
+    } finally {
+      // 활성 연결 수 감소
+      global.prismaConnections.active--
+    }
   })
 
   // 글로벌 에러 처리
@@ -71,16 +111,87 @@ if (process.env.NODE_ENV !== 'production') {
   global.prisma = prisma
 }
 
+// 연결 상태 모니터링 함수
+export const getConnectionStatus = () => {
+  return {
+    active: global.prismaConnections.active,
+    idle: global.prismaConnections.idle,
+    max: global.prismaConnections.max,
+    available: global.prismaConnections.max - global.prismaConnections.active,
+  }
+}
+
 export default prisma
 
 // Prisma 연결 해제 함수
 export const disconnectPrisma = async () => {
   try {
     await prisma.$disconnect()
+
+    // 연결 카운터 초기화
+    if (global.prismaConnections) {
+      global.prismaConnections.active = 0
+      global.prismaConnections.idle = 0
+    }
+
     console.log('Database connection closed successfully')
   } catch (error) {
     console.error('Error disconnecting from database:', error)
     process.exit(1)
+  }
+}
+
+// 비상 연결 해제 함수 (연결 풀 문제 발생 시)
+export const emergencyResetConnections = async () => {
+  try {
+    console.warn('[DB Pool] Emergency connection reset initiated')
+
+    // 기존 연결 종료
+    await prisma.$disconnect()
+
+    // 연결 카운터 초기화
+    if (global.prismaConnections) {
+      global.prismaConnections.active = 0
+      global.prismaConnections.idle = 0
+    }
+
+    // 잠시 대기 후 새 연결 생성
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+
+    // 새 연결 테스트 (간단한 쿼리 실행)
+    await prisma.$queryRaw`SELECT 1 as test`
+
+    console.log('[DB Pool] Connection pool successfully reset')
+    return true
+  } catch (error) {
+    console.error('[DB Pool] Failed to reset connection pool:', error)
+    return false
+  }
+}
+
+// 연결 타임아웃 처리 함수
+export const withConnectionTimeout = async <T>(dbOperation: () => Promise<T>, timeoutMs: number = 5000): Promise<T> => {
+  // 타임아웃 Promise 생성
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    setTimeout(() => {
+      reject(new Error(`Database operation timed out after ${timeoutMs}ms`))
+    }, timeoutMs)
+  })
+
+  try {
+    // 데이터베이스 작업과 타임아웃 중 먼저 완료되는 것 반환
+    return await Promise.race([dbOperation(), timeoutPromise])
+  } catch (error) {
+    // 타임아웃 에러인 경우 연결 풀 상태 로깅
+    if ((error as Error).message.includes('timed out')) {
+      console.error('[DB Pool] Connection timeout. Current pool status:', getConnectionStatus())
+
+      // 연결 풀이 거의 찼다면 비상 재설정 고려
+      if (global.prismaConnections.active > prismaPoolConfig.max * 0.9) {
+        console.warn('[DB Pool] High connection usage detected, considering pool reset')
+      }
+    }
+    throw error
   }
 }
 
