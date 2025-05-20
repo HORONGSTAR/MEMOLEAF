@@ -26,13 +26,17 @@ export default function AlarmBox() {
       .catch((err) => console.error(err))
   }, [userId])
 
-  const handleDelete = useCallback(() => removeAlarm(), [])
+  const handleDelete = useCallback(() => {
+    removeAlarm()
+    setAlarms([])
+    setCount(0)
+  }, [])
 
   return (
     <Bubble
       label="알림창"
       icon={
-        <Badge badgeContent={count} color="primary" max={10}>
+        <Badge aria-controls="" badgeContent={count} color="primary" max={10}>
           <Notifications />
         </Badge>
       }
@@ -69,7 +73,7 @@ export default function AlarmBox() {
           ))}
           <ListItem>
             <Blank />
-            <Button onClick={handleDelete}>확인</Button>
+            <Button onClick={handleDelete}>알림 지우기</Button>
           </ListItem>
         </List>
       ) : (

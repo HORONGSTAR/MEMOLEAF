@@ -1,11 +1,12 @@
 'use client'
-import { ForumOutlined } from '@mui/icons-material'
-import { Box, Pagination, Stack, Typography } from '@mui/material'
-import { CommentBox, Bubble, CommentForm } from '@/components'
+import { Close, ForumOutlined } from '@mui/icons-material'
+import { Box, IconButton, Dialog, Pagination, Stack, Typography, DialogContent, DialogTitle, DialogActions, useMediaQuery } from '@mui/material'
+import { Blank, CommentBox, CommentForm } from '@/components'
 import { ReactNode, useCallback, useEffect, useState } from 'react'
 import { OnOff, UserData, CommentData } from '@/lib/types'
 import { createComment, deleteComment, getComments } from '@/lib/fetch/feedbackApi'
 import { swapOnOff } from '@/lib/utills'
+import { theme } from '@/styles/MuiTheme'
 
 interface Props {
   count: number
@@ -21,6 +22,8 @@ export default function CommentButton(props: Props) {
   const [page, setPage] = useState(1)
   const limit = 5
   const totalPage = Math.ceil(count / limit)
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('xs'))
 
   useEffect(() => {
     if (!swapOnOff[active].bool) return
@@ -53,28 +56,37 @@ export default function CommentButton(props: Props) {
   }, [])
 
   return (
-    <Bubble
-      label="댓글창"
-      icon={
-        <>
-          <ForumOutlined fontSize="small" />
-          <Typography variant="body2" sx={{ position: 'absolute', right: -2, fontWeight: 'bold' }}>
-            {count}
-          </Typography>
-        </>
-      }
-      addEvent={() => setActive('on')}
-    >
-      <Box sx={{ bgcolor: '#eee', p: 1 }}>
-        <CommentForm onSubmit={onSubmit} />
-      </Box>
-
-      {comments.map((comment) => (
-        <CommentBox key={'comment' + comment.id} onDelete={handleDelete} comment={comment} />
-      ))}
-      <Stack spacing={2} alignItems="center" py={2}>
-        <Pagination size="small" count={totalPage} page={page} onChange={handleChange} />
-      </Stack>
-    </Bubble>
+    <>
+      <IconButton aria-label="댓글창 열기" onClick={() => setActive('on')}>
+        <ForumOutlined fontSize="small" />
+        <Typography variant="body2" sx={{ position: 'absolute', right: -2, fontWeight: 'bold' }}>
+          {count}
+        </Typography>
+      </IconButton>
+      <Dialog scroll="paper" open={swapOnOff[active].bool} fullWidth fullScreen={isMobile} onClose={() => setActive('off')}>
+        <DialogTitle>
+          <Stack direction="row" alignItems="center">
+            댓글창
+            <Blank />
+            <IconButton onClick={() => setActive('off')} aria-label="닫기">
+              <Close />
+            </IconButton>
+          </Stack>
+        </DialogTitle>
+        <Box sx={{ bgcolor: '#eee', p: 1, minWidth: { sx: 480, xs: 300 } }}>
+          <CommentForm onSubmit={onSubmit} />
+        </Box>
+        <DialogContent>
+          {comments.map((comment) => (
+            <CommentBox key={'comment' + comment.id} onDelete={handleDelete} comment={comment} />
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Stack spacing={2} alignItems="center" py={2}>
+            <Pagination size="small" count={totalPage} page={page} onChange={handleChange} />
+          </Stack>
+        </DialogActions>
+      </Dialog>
+    </>
   )
 }

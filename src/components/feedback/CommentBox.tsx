@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react'
 import { OnOffItem, CommentData } from '@/lib/types'
 import { updateComment } from '@/lib/fetch/feedbackApi'
 import { changeDate, checkCurrentOnOff } from '@/lib/utills'
-import { List, ListItem, Box, Typography, IconButton, ListItemText, ListItemAvatar } from '@mui/material'
+import { List, ListItem, Box, Typography, IconButton, ListItemText, ListItemAvatar, Snackbar } from '@mui/material'
 import { DriveFileRenameOutline, DeleteForever, ExitToApp } from '@mui/icons-material'
 import { useSession } from 'next-auth/react'
 
@@ -22,12 +22,16 @@ export default function CommentBox(props: Props) {
   const { data: session } = useSession()
   const myId = session?.user.id
   const isMine = checkCurrentOnOff(comment.user.id, myId || 0)
+  const [message, setMessage] = useState('')
 
   const onSubmit = useCallback(
     (text: string) => {
       updateComment({ text, id: comment.id })
-        .then((result) => setComment((prev) => ({ ...prev, ...result })))
-        .catch((err) => console.error(err))
+        .then((result) => {
+          setComment((prev) => ({ ...prev, ...result }))
+          setMessage('댓글을 작성했습니다.')
+        })
+        .catch(() => setMessage('댓글을 작성 중 문제가 생겼습니다.'))
       setAction('view')
     },
     [comment.id]
@@ -107,6 +111,7 @@ export default function CommentBox(props: Props) {
       <Dialog {...dialogProps}>
         <Typography>삭제한 메모는 복구할 수 없습니다.</Typography>
       </Dialog>
+      <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
     </>
   )
 }

@@ -1,7 +1,7 @@
-import { InfoNote } from '@/components'
+import { ControlBox } from '@/components'
 
 function SettingPage() {
-  return <InfoNote />
+  return <ControlBox />
 }
 
 export default SettingPage

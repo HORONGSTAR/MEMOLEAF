@@ -2,38 +2,35 @@
 import { useState } from 'react'
 import { BasicProps } from '@/lib/types'
 import Image from 'next/image'
+import { Dialog } from '@/components'
+import { swapOnOff } from '@/lib/utills'
 
 interface Props extends BasicProps {
   size?: number
+  alt?: string
 }
 
 export default function ImgModalBox(props: Props) {
-  const { image, label, size } = props
-  const [open, setOpen] = useState(false)
+  const { image, alt, size } = props
+  const [open, setOpen] = useState('off')
 
   return (
     <>
       <Image
-        onClick={(e) => {
-          e.stopPropagation()
-          setOpen(true)
-        }}
+        onClick={() => setOpen('on')}
+        tabIndex={0}
         src={`${image}`}
-        alt={`${label}`}
+        alt={`${alt} 이미지`}
         width={size || 150}
         height={size || 150}
-        className="aspect-square object-cover rounded-md cursor-pointer"
+        style={{ aspectRatio: 1 / 1, objectFit: 'cover', borderRadius: 2 }}
       />
+
       {open && (
-        <div
-          className="image-modal"
-          onClick={(e) => {
-            e.stopPropagation()
-            setOpen(false)
-          }}
-        >
-          <Image src={`${image}`} alt={`${label}`} width={600} height={600} />
-        </div>
+        <Dialog title="이미지 상세보기" closeLabel="닫기" open={swapOnOff[open].bool} onClose={() => setOpen('off')}>
+          <Image src={`${image}`} alt={`${alt}`} width={600} height={600} />
+          {alt}
+        </Dialog>
       )}
     </>
   )

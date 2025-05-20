@@ -1,7 +1,7 @@
-import { Dialog as MuiDialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material'
+import { Dialog as MuiDialog, DialogTitle, DialogContent, DialogActions, Button, DialogProps } from '@mui/material'
 import { ReactNode } from 'react'
 
-interface Props {
+interface Props extends DialogProps {
   open: boolean
   title: string
   closeLabel?: string

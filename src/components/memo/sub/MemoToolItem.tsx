@@ -56,12 +56,12 @@ export default function MemoToolItem(props: Props) {
           value={decos.folder.extra}
           onChange={(e) => handleChangeFolder(e.target.value)}
           autoFocus
-          aria-label="접힌글 더 보기 버튼 문구 입력"
-          placeholder="예) 더 보기, 펼치기"
+          aria-label="접힌 글 버튼 문구 입력"
+          placeholder="예) 내용 열기, 펼치기"
         />
       ),
     },
-    off: { variant: 'filled', label: decos.folder.extra || '더 보기' },
+    off: { variant: 'filled', label: decos.folder.extra || '내용 열기' },
   }
 
   const subtextBox: OnOffItem = {
@@ -71,8 +71,9 @@ export default function MemoToolItem(props: Props) {
           id="subtext"
           value={decos.subtext.extra}
           onChange={(e) => handleChangeSubtext(e.target.value)}
-          aria-label="덧붙임 내용 입력"
+          slotProps={{ input: { 'aria-label': '덧붙임 내용 입력' } }}
           placeholder="부연 설명을 덧붙일 수 있어요."
+          autoFocus
         />
         <Divider />
       </Box>
@@ -84,7 +85,7 @@ export default function MemoToolItem(props: Props) {
     on: (
       <Box>
         <Chip {...chipProps[edit]} icon={<ExpandMore />} size="small" />
-        <IconButton size="small" onClick={() => setEdit(swapOnOff[edit].next)}>
+        <IconButton aria-label="접힌글 열기 버튼 문구 편집" autoFocus size="small" onClick={() => setEdit(swapOnOff[edit].next)}>
           <DriveFileRenameOutline fontSize="small" />
         </IconButton>
       </Box>
@@ -102,7 +103,7 @@ export default function MemoToolItem(props: Props) {
   const secretBox: OnOffItem = {
     on: (
       <Box>
-        <Button startIcon={<Key />} size="small" onClick={() => setOpen('on')}>
+        <Button autoFocus startIcon={<Key />} size="small" onClick={() => setOpen('on')}>
           감추기 비밀번호 설정
         </Button>
         <Dialog {...dialogProps}>
@@ -113,9 +114,10 @@ export default function MemoToolItem(props: Props) {
             onChange={(e) => handleChangeSecret(e.target.value)}
             aria-label="감추기 해제용 비밀번호 입력"
             placeholder="입력 없으면 자동 생성됩니다."
+            aria-describedby="secret-info"
           />
           <Divider />
-          <Typography maxWidth={300} mt={2} variant="body2">
+          <Typography id="secret-info" maxWidth={300} mt={2} variant="body2">
             간단한 비밀번호로 메모를 잠글 수 있어요. 하지만 완전한 보안은 아니니 개인정보나 중요한 내용은 적지 말아주세요!
           </Typography>
         </Dialog>

@@ -1,11 +1,11 @@
 'use client'
-import { Typography, List, ListItem, Stack, IconButton, Box, TextField } from '@mui/material'
+import { Typography, List, ListItem, Stack, IconButton, TextField } from '@mui/material'
 import { DriveFileRenameOutline } from '@mui/icons-material'
-import { Avatar, Dialog, FollowButton, ImgUploader } from '@/components'
+import { Avatar, Dialog, FollowButton, ImgUploader, TextCount } from '@/components'
 import { useState, useCallback, useMemo } from 'react'
 import { UserData, UserParams } from '@/lib/types'
 import { useSession } from 'next-auth/react'
-import { checkCurrentOnOff, imgPath, setRenameFile, swapOnOff } from '@/lib/utills'
+import { checkCurrentOnOff, imgPath, swapOnOff } from '@/lib/utills'
 import { useAppDispatch } from '@/store/hooks'
 import { updateProfileThunk } from '@/store/slices/profileSlice'
 
@@ -38,10 +38,8 @@ export default function MyProfile(inti: UserData) {
       info: info,
     }
     if (image.file) {
-      const renamedFile = setRenameFile(image.file)
+      userData.file = image.file
       setImage({ file: undefined, url: '' })
-      userData.file = renamedFile
-      userData.image = renamedFile.name
     }
     dispatch(updateProfileThunk(userData))
 
@@ -66,7 +64,7 @@ export default function MyProfile(inti: UserData) {
         <DriveFileRenameOutline fontSize="small" />
       </IconButton>
     ),
-    off: myId && <FollowButton toUserId={profile.id} state={followAction} />,
+    off: myId && <FollowButton toUserName={profile.name} toUserId={profile.id} state={followAction} />,
   }[isMine]
 
   return (
@@ -86,13 +84,24 @@ export default function MyProfile(inti: UserData) {
           <ListItem>{profile.info || '자기소개가 없습니다.'}</ListItem>
         </List>
       </Stack>
-      <Box sx={{ width: '100%' }}></Box>
 
       <Dialog {...dialogProps}>
-        <Stack spacing={3} mt={2}>
+        <Stack spacing={2} mt={2}>
           <ImgUploader image={image} setImage={setImage} />
-          <TextField label="이름" size="small" value={name} onChange={(e) => handleChangeName(e.target.value)} />
-          <TextField label="자기소개" size="small" multiline rows={3} value={info} onChange={(e) => handleChangeInfo(e.target.value)} />
+          <Stack spacing={1}>
+            <TextField label="이름" size="small" placeholder="최대 글자수 10자" value={name} onChange={(e) => handleChangeName(e.target.value)} />
+            <TextCount text={name} max={10} />
+            <TextField
+              label="자기소개"
+              size="small"
+              placeholder="최대 글자수 191자"
+              multiline
+              rows={3}
+              value={info}
+              onChange={(e) => handleChangeInfo(e.target.value)}
+            />
+            <TextCount text={info} max={191} />
+          </Stack>
         </Stack>
       </Dialog>
     </Stack>

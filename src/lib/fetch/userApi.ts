@@ -9,11 +9,14 @@ export const getProfile = async (id: number | string) => {
 }
 
 export const updateProfile = async (params: UserParams) => {
-  const { name, image, info, file } = params
-  const data = metaData('PATCH', { name, image, info })
+  const { name, info, file } = params
+  let images
+  if (file) {
+    const result = await uploadImages([file])
+    images = result[0]
+  }
+  const data = metaData('PATCH', { name, info, image: images })
   const res = await fetch(userUrl + '/my', data)
-
-  if (file) await uploadImages([file])
   if (!res.ok) throw new Error('유저 정보 수정 중 에러')
   return res.json()
 }

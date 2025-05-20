@@ -11,7 +11,5 @@ interface Props extends AvatarProps {
 
 export default function Avatar(props: Props) {
   const { variant, size, user } = props
-  return (
-    <MuiAvatar variant={variant} sx={{ width: size || 32, height: size || 32 }} src={`${imgPath}${user?.image}`} alt={`${user?.name}프로필 사진`} />
-  )
+  return <MuiAvatar variant={variant} sx={{ width: size || 32, height: size || 32 }} src={imgPath + user?.image} alt={`${user?.name}프로필 사진`} />
 }

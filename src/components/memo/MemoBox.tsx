@@ -62,7 +62,7 @@ export default function MemoBox(props: Props) {
   const memu = (
     <Menu
       icon={<MoreHoriz fontSize="small" />}
-      label="메모 메뉴 열기"
+      label="더 보기"
       items={[
         { active: isMine, label: '글 수정', icon: <EditOutlined />, onClick: () => setAction('edit') },
         { active: isMine, label: '삭제', icon: <DeleteOutline />, onClick: () => setOpen(true) },

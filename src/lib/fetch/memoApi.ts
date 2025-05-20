@@ -24,15 +24,13 @@ export const getMemos = async (params: GetDataParams) => {
   return res.json()
 }
 
-export const getMemoById = async (id: string) => {
-  const res = await fetch(memoUrl + `/${id}/detail`)
-  if (!res.ok) throw new Error('메모 조회 중 에러')
-  return res.json()
-}
-
 export const createMemo = async (params: MemoParams) => {
   const { id, content, images, decos, parentId } = params
-  if (images.file.length > 0) await uploadImages(images.file)
+
+  if (images.file.length > 0) {
+    const uploads = await uploadImages(images.file)
+    images.imgs.map((img, i) => (img.url = uploads[i]))
+  }
   const data = metaData('POST', { id, content, images: images.imgs, decos, parentId })
 
   const res = await fetch(memoUrl, data)

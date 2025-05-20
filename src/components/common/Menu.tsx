@@ -24,6 +24,7 @@ export default function Menu(props: Props) {
       <Tooltip title={label}>
         <IconButton
           size="small"
+          aria-label={label}
           onClick={(e) => setAnchorEl(e.currentTarget)}
           aria-controls={open ? label : undefined}
           aria-haspopup="true"
@@ -32,7 +33,6 @@ export default function Menu(props: Props) {
           {icon}
         </IconButton>
       </Tooltip>
-
       <MuiMenu
         id={label}
         anchorEl={anchorEl}

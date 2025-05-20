@@ -1,6 +1,6 @@
 'use client'
-import { Box, Chip, Stack } from '@mui/material'
-import { InputText, Paper } from '@/components'
+import { Box, Chip, Snackbar, Stack } from '@mui/material'
+import { InputText, Paper, TextCount } from '@/components'
 import { useCallback, useState } from 'react'
 
 interface CommentFormData {
@@ -11,10 +11,12 @@ interface CommentFormData {
 }
 
 export default function CommentForm(inti: CommentFormData) {
+  const [message, setMessage] = useState('')
   const [text, setText] = useState(inti.text || '')
   const { onSubmit, id } = inti
 
   const handleSubmit = useCallback(() => {
+    if (!text) return setMessage('내용을 입력해주세요.')
     onSubmit(text, id)
     setText('')
   }, [onSubmit, text, id])
@@ -24,6 +26,7 @@ export default function CommentForm(inti: CommentFormData) {
       <Paper sx={{ p: 1, width: '100%' }}>
         <InputText
           fullWidth
+          aria-label="댓글 글자수 제한 191자"
           fontSize="body2"
           placeholder="메모에 댓글을 남길 수 있어요."
           multiline
@@ -32,13 +35,16 @@ export default function CommentForm(inti: CommentFormData) {
         />
       </Paper>
       <Box>
-        <Chip
-          sx={{ bgcolor: '#ccc', fontWeight: 500 }}
-          onClick={handleSubmit}
-          label={id ? '수정 완료' : '댓글 쓰기'}
-          disabled={!text || inti.text === text}
-        />
+        <TextCount text={text} max={191} />
+        <Chip sx={{ bgcolor: '#ccc', fontWeight: 500 }} onClick={handleSubmit} label={id ? '수정 완료' : '댓글 쓰기'} />
       </Box>
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={message ? true : false}
+        autoHideDuration={6000}
+        onClose={() => setMessage('')}
+        message={message}
+      />
     </Stack>
   )
 }

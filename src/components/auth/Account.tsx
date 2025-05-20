@@ -18,6 +18,7 @@ export default function Account() {
     open,
     title: '소셜 로그인',
     onClose: () => setOpen(false),
+    closeLabel: '닫기',
   }
 
   if (!myId)
@@ -32,7 +33,7 @@ export default function Account() {
 
   const meunItems = [
     {
-      label: '내 계정',
+      label: '마이 페이지',
       icon: <PersonOutlineOutlined fontSize="small" />,
       onClick: () => router.push(`/page/my/${myId}`),
     },
@@ -48,5 +49,5 @@ export default function Account() {
     },
   ]
 
-  return <Menu icon={<Avatar user={profile} />} label={`${profile?.name}님의 계정`} items={meunItems} />
+  return <Menu icon={<Avatar user={profile} />} label={'내 계정'} items={meunItems} />
 }

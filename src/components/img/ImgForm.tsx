@@ -1,5 +1,5 @@
 'use client'
-import { IconButton, Tooltip } from '@mui/material'
+import { IconButton, Snackbar, Tooltip } from '@mui/material'
 import imageCompression from 'browser-image-compression'
 import { Dispatch, SetStateAction, useRef, useState } from 'react'
 import { ImageSearch } from '@mui/icons-material'
@@ -14,13 +14,14 @@ export default function ImgForm(props: Props) {
   const [loading, setLoading] = useState(false)
   const { images, setImages } = props
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [message, setMessage] = useState('')
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoading(true)
     const files = e.target.files
     if (!files) return
     if (images.imgs.length + files.length > 4) {
-      alert('이미지는 최대 4장까지 첨부할 수 있어요.')
+      setMessage('이미지는 최대 4장까지 첨부할 수 있어요.')
       setLoading(false)
       return
     }
@@ -59,6 +60,13 @@ export default function ImgForm(props: Props) {
         </IconButton>
       </Tooltip>
       <input className="hidden" ref={fileInputRef} id="image" type="file" accept="image/*" multiple onChange={(e) => handleFileChange(e)} />
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={message ? true : false}
+        autoHideDuration={6000}
+        onClose={() => setMessage('')}
+        message={message}
+      />
     </>
   )
 }

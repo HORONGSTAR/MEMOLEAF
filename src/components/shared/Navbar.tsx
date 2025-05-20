@@ -7,13 +7,13 @@ import { Search } from '@mui/icons-material'
 export default function Navbar() {
   return (
     <AppBar sx={{ bgcolor: 'Background', color: 'inherit' }} elevation={1}>
-      <Container>
+      <Container aria-label="헤더">
         <Toolbar sx={{ p: 1 }}>
-          <Link href={'/'}>
-            <Image src={'/memoleaf.svg'} alt="MEMOLEAF" aria-label="메모리프 홈" width={120} height={20} priority />
+          <Link href={'/'} aria-label="MEMOLEAF">
+            <Image src={'/memoleaf.svg'} alt="MEMOLEAF" width={120} height={20} priority />
           </Link>
           <Blank />
-          <IconButton component={Link} href="/page/search">
+          <IconButton aria-label="검색 페이지" component={Link} href="/page/search">
             <Search />
           </IconButton>
           <AlarmBox />

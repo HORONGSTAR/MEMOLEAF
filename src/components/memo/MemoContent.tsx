@@ -65,10 +65,8 @@ export default function MemoContent(props: Props) {
   const CommonContent = (props: ListItemBaseProps) => (
     <>
       <MemoDeco decos={memo.decos} {...props}>
-        <ListItem>
-          {memo.content}
-          {children}
-        </ListItem>
+        <ListItem>{memo.content}</ListItem>
+        <ListItem>{children}</ListItem>
       </MemoDeco>
     </>
   )

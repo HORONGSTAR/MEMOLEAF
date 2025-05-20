@@ -22,9 +22,11 @@ export async function POST(req: NextRequest) {
       data: { memoId: id, userId },
     })
 
-    await prisma.alarm.create({
-      data: { linkId: id, readerId: userId, authorId: memo.userId, aria: 'bookmark' },
-    })
+    if (userId !== memo.userId) {
+      await prisma.alarm.create({
+        data: { linkId: id, readerId: userId, authorId: memo.userId, aria: 'bookmark' },
+      })
+    }
 
     return NRes.json(newBookmark.id)
   } catch (error) {

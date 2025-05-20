@@ -1,10 +1,10 @@
 import dayjs from 'dayjs'
-import { v4 as uuid } from 'uuid'
 import { OnOff, Image } from '@/lib/types'
 
 export const imgPath = process.env.NEXT_PUBLIC_IMG_URL + '/'
 
 //data mapping
+
 export const swapOnOff: {
   [key: string]: { next: string; bool: boolean }
 } = { on: { next: 'off', bool: true }, off: { next: 'on', bool: false } }
@@ -31,12 +31,6 @@ export const copyText = async (text: string, label: string) => {
     console.error('복사 실패:', err)
     return label + ' 복사하는 중 문제가 발생했습니다.'
   }
-}
-
-export const setRenameFile = (file: File) => {
-  const ext = file.type.split('/')[1]
-  const rename = `${uuid()}.${ext}`
-  return new File([file], rename, { type: file.type })
 }
 
 export const randomProfile = () => {

@@ -1,8 +1,8 @@
 'use client'
 import { Button, Snackbar, Stack } from '@mui/material'
-import { ImgForm, ImgPreview, Blank, InputText, MemoTool, MemoToolItem } from '@/components'
+import { ImgForm, ImgPreview, Blank, InputText, MemoTool, MemoToolItem, TextCount } from '@/components'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
-import { setRenameFile, swapOnOff } from '@/lib/utills'
+import { swapOnOff } from '@/lib/utills'
 import { MemoData, MemoParams, EditImage, EditDeco } from '@/lib/types'
 
 interface MemoFormData extends Partial<Omit<MemoData, 'decos'>> {
@@ -29,20 +29,15 @@ export default function MemoForm(inti: MemoFormData) {
 
   const handleSubmit = useCallback(() => {
     if (!content) return setMessage('내용을 입력하세요.')
+
     const editImage: EditImage = {
-      file: [],
+      file: images.file,
       imgs: images.imgs.filter((img) => img.id).map((img) => ({ url: img.url, alt: img.alt })),
     }
-    const renamedFiles = images.file.map((f) => {
-      const renamedFile = setRenameFile(f)
-      editImage.imgs.push({ url: renamedFile.name, alt: '' })
-      return renamedFile
-    })
 
     const editDecos = Object.keys(decos)
       .filter((key) => swapOnOff[decos[key].active].bool)
       .map((key) => ({ kind: key, extra: decos[key].extra }))
-    editImage.file = renamedFiles
 
     inti.onSubmit({
       content,
@@ -69,15 +64,15 @@ export default function MemoForm(inti: MemoFormData) {
         <InputText
           id="content"
           multiline
-          autoFocus
           minRows={3}
-          aria-label="메모 입력"
+          aria-label="메모 작성. 글자수 제한 191자."
           placeholder={placeholder || '기록을 남겨보세요!'}
           value={content}
           fontSize="body1"
           onChange={(e) => handleChange(e.target.value)}
         />
         <ImgPreview {...imageProps} />
+        <TextCount text={content} max={191} />
       </Stack>
       <Stack direction="row" alignItems="center">
         <ImgForm {...imageProps} />

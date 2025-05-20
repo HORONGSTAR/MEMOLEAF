@@ -18,7 +18,7 @@ export default function MemoDecoItem(props: Props) {
   const [unLock, setUnLock] = useState('off')
 
   const transform: OnOffItem = { on: '-180deg', off: '0deg' }
-  const chipLabel: OnOffItem = { on: '접기', off: extra || '더 보기' }
+  const chipLabel: OnOffItem = { on: '내용 접기', off: extra || '내용 열기' }
 
   const handleChange = (value: string) => {
     setPassword(value)

@@ -7,8 +7,7 @@ export async function GET() {
   try {
     const session = await getServerSession(authOptions)
     if (!session) {
-      const message = '로그인이 필요합니다.'
-      return NRes.json({ success: false, message }, { status: 401 })
+      return NRes.json({ status: 204 })
     }
 
     const authorId = session.user.id

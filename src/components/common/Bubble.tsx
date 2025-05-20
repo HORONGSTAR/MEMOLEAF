@@ -34,7 +34,7 @@ export default function CommentPopover({ children, icon, label, addEvent }: Prop
 
   return (
     <>
-      <IconButton onClick={handleClick} aria-describedby={itemId} sx={{ position: 'relative' }}>
+      <IconButton aria-label={label} onClick={handleClick} aria-describedby={itemId} sx={{ position: 'relative' }}>
         {icon}
       </IconButton>
 
