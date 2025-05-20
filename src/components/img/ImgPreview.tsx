@@ -29,7 +29,6 @@ export default function ImgForm(props: Props) {
     setOpen(false)
     setImages((prev) => ({ ...prev, imgs }))
   }
-  console.log(alt, images)
 
   const remove = (_: Image, index: number) => (
     <Box sx={{ position: 'absolute', top: 0, right: 0 }}>

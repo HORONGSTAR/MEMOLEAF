@@ -27,11 +27,16 @@ export const getMemos = async (params: GetDataParams) => {
 export const createMemo = async (params: MemoParams) => {
   const { id, content, images, decos, parentId } = params
 
+  let imageUrl
+
+  console.log(images.file)
+
   if (images.file.length > 0) {
     const uploads = await uploadImages(images.file)
-    images.imgs.map((img, i) => (img.url = uploads[i]))
+    console.log(uploads, 'gma')
+    imageUrl = images.imgs.map((img, i) => (img.url = uploads[i]))
   }
-  const data = metaData('POST', { id, content, images: images.imgs, decos, parentId })
+  const data = metaData('POST', { id, content, images: imageUrl, decos, parentId })
 
   const res = await fetch(memoUrl, data)
   if (!res.ok) throw new Error('메모 작성 중 에러')
@@ -41,8 +46,14 @@ export const createMemo = async (params: MemoParams) => {
 export const updateMemo = async (params: MemoParams) => {
   const { id, content, images, decos } = params
 
-  if (images.file.length > 0) await uploadImages(images.file)
-  const data = metaData('PATCH', { id, content, images: images.imgs, decos })
+  let imageUrl
+
+  if (images.file.length > 0) {
+    const uploads = await uploadImages(images.file)
+    imageUrl = images.imgs.map((img, i) => (img.url = uploads[i]))
+  }
+
+  const data = metaData('PATCH', { id, content, images: imageUrl, decos })
   const res = await fetch(memoUrl, data)
   if (!res.ok) throw new Error('메모 수정 중 에러')
   return res.json()
