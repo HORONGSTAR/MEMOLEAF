@@ -41,7 +41,7 @@ export default function MemoBox(props: Props) {
   }, [memo])
 
   const handleCopy = useCallback(async () => {
-    const url = `${window.location.origin}/memo/${memo.id}`
+    const url = `${window.location.origin}/page/detail/${memo.id}`
     const reuslt = copyText(url, '링크를')
     setMessage(await reuslt)
   }, [memo])

@@ -4,8 +4,8 @@ import { MemoParams, MemoData, GetDataParams, UserData, Status } from '@/lib/typ
 
 interface Memos {
   memos: MemoData[]
-  page: number
-  total: number
+  searchTotal: number
+  nextCursor: number
 }
 
 interface CreateMemoParams {
@@ -49,15 +49,15 @@ export const deleteMemoThunk = createAsyncThunk<MemoData, number>('memo/deleteMe
 
 interface State {
   memos: MemoData[] | []
-  page: number
-  total: number
+  searchTotal: number
+  nextCursor: number
   status: Status
 }
 
 const initialState: State = {
   memos: [],
-  page: 1,
-  total: 1,
+  searchTotal: 10,
+  nextCursor: 0,
   status: 'idle',
 }
 
@@ -73,8 +73,8 @@ export const memoSlice = createSlice({
       .addCase(getMemosThunk.fulfilled, (state, action) => {
         state.status = 'succeeded'
         state.memos = action.payload.memos
-        state.page = action.payload.page
-        state.total = action.payload.total
+        state.searchTotal = action.payload.searchTotal
+        state.nextCursor = action.payload.nextCursor
       })
       .addCase(getMemosThunk.rejected, (state) => {
         state.status = 'failed'
@@ -85,6 +85,7 @@ export const memoSlice = createSlice({
       .addCase(createMemoThunk.fulfilled, (state, action) => {
         state.status = 'succeeded'
         state.memos = [action.payload, ...state.memos]
+        state.searchTotal += 1
       })
       .addCase(createMemoThunk.rejected, (state) => {
         state.status = 'failed'

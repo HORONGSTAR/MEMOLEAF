@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
     if (toUserId !== readerId) {
       await prisma.alarm.create({
-        data: { linkId: toUserId, readerId, authorId: toUserId, aria: 'follow' },
+        data: { linkId: fromUserId, readerId, authorId: toUserId, aria: 'follow' },
       })
     }
 

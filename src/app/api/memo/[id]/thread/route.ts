@@ -1,37 +1,42 @@
 import { NextRequest, NextResponse as NRes } from 'next/server'
 import prisma from '@/lib/prisma'
+import { authOptions } from '@/lib/auth'
+import { getServerSession } from 'next-auth'
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const session = await getServerSession(authOptions)
+    const userId = session?.user.id
     const { id } = await params
     const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1')
+    const cursor = parseInt(searchParams.get('cursor') || '0')
     const limit = parseInt(searchParams.get('limit') || '10')
 
-    const whereData = {
+    const memos = await prisma.memo.findMany({
       where: {
         parentId: parseInt(id),
+        ...(cursor && { id: { gt: cursor } }),
       },
-    }
-
-    const memos = await prisma.memo.findMany({
-      ...whereData,
-      skip: (page - 1) * limit,
       take: limit,
       orderBy: { id: 'asc' },
       include: {
         user: true,
         images: true,
         decos: true,
-        bookmarks: true,
-        _count: { select: { comments: true, bookmarks: true, leafs: true } },
+        bookmarks: { where: { userId } },
+        _count: { select: { comments: true, bookmarks: true } },
       },
     })
 
-    const totalCount = await prisma.memo.count({ ...whereData })
+    const searchTotal = await prisma.memo.count({
+      where: { parentId: parseInt(id) },
+    })
+    const nextCursor = memos.length > 0 ? memos.slice(-1)[0].id : 0
+
     return NRes.json({
       memos,
-      total: totalCount,
+      searchTotal,
+      nextCursor,
     })
   } catch (error) {
     console.error(error)

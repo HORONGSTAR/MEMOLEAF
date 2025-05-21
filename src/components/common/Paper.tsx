@@ -1,3 +1,5 @@
+'use client'
+
 import { Paper as MuiPaper, PaperProps } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 

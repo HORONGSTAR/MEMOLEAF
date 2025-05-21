@@ -8,20 +8,16 @@ export async function GET(req: NextRequest) {
     const session = await getServerSession(authOptions)
     const userId = session?.user.id
     const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1')
+    const cursor = parseInt(searchParams.get('cursor') || '0')
     const limit = parseInt(searchParams.get('limit') || '10')
     const keyword = searchParams.get('keyword')
 
-    const whereData = {
+    const memos = await prisma.memo.findMany({
       where: {
         parentId: null,
-        content: keyword ? { contains: keyword } : undefined,
+        ...(cursor && { id: { lt: cursor } }),
+        ...(keyword && { parentId: undefined, content: { contains: keyword } }),
       },
-    }
-
-    const memos = await prisma.memo.findMany({
-      ...whereData,
-      skip: (page - 1) * limit,
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: {
@@ -32,10 +28,19 @@ export async function GET(req: NextRequest) {
         _count: { select: { comments: true, bookmarks: true, leafs: true } },
       },
     })
-    const totalCount = await prisma.memo.count({ ...whereData })
+
+    const searchTotal = await prisma.memo.count({
+      where: {
+        parentId: null,
+        ...(keyword && { parentId: undefined, content: { contains: keyword } }),
+      },
+    })
+    const nextCursor = memos.length > 0 ? memos.slice(-1)[0].id : 0
+
     return NRes.json({
       memos,
-      total: totalCount,
+      searchTotal,
+      nextCursor,
     })
   } catch (error) {
     console.error(error)
@@ -63,7 +68,7 @@ export async function POST(req: NextRequest) {
         ...(decos?.length > 0 && { decos: { create: decos } }),
       },
     })
-    const res = { ...newMemo, images, decos, _count: { leafs: 0, comments: 0, bookmarks: 0 } }
+    const res = { ...newMemo, images, decos }
     res.images = await prisma.image.findMany({ where: { memoId: newMemo.id } })
     res.decos = await prisma.deco.findMany({ where: { memoId: newMemo.id } })
 

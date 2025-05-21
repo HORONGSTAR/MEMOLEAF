@@ -29,12 +29,10 @@ export const createMemo = async (params: MemoParams) => {
 
   let imageUrl
 
-  console.log(images.file)
-
   if (images.file.length > 0) {
     const uploads = await uploadImages(images.file)
-    console.log(uploads, 'gma')
-    imageUrl = images.imgs.map((img, i) => (img.url = uploads[i]))
+    imageUrl = images.imgs.map((img, i) => ({ url: uploads[i], alt: img.alt }))
+    console.log('uploads:', uploads, 'imageUrl1:', imageUrl)
   }
   const data = metaData('POST', { id, content, images: imageUrl, decos, parentId })
 
@@ -50,9 +48,9 @@ export const updateMemo = async (params: MemoParams) => {
 
   if (images.file.length > 0) {
     const uploads = await uploadImages(images.file)
-    imageUrl = images.imgs.map((img, i) => (img.url = uploads[i]))
+    imageUrl = images.imgs.map((img, i) => ({ url: uploads[i], alt: img.alt }))
+    console.log('uploads:', uploads, 'imageUrl1:', imageUrl)
   }
-
   const data = metaData('PATCH', { id, content, images: imageUrl, decos })
   const res = await fetch(memoUrl, data)
   if (!res.ok) throw new Error('메모 수정 중 에러')

@@ -30,18 +30,13 @@ export default function MemoForm(inti: MemoFormData) {
   const handleSubmit = useCallback(() => {
     if (!content) return setMessage('내용을 입력하세요.')
 
-    const editImage: EditImage = {
-      file: images.file,
-      imgs: images.imgs.filter((img) => img.id).map((img) => ({ url: img.url, alt: img.alt })),
-    }
-
     const editDecos = Object.keys(decos)
       .filter((key) => swapOnOff[decos[key].active].bool)
       .map((key) => ({ kind: key, extra: decos[key].extra }))
 
     inti.onSubmit({
       content,
-      images: editImage,
+      images,
       decos: editDecos,
     })
 

@@ -1,6 +1,6 @@
 'use client'
 import { Paper, MemoBox, MemoForm, AsyncBox } from '@/components'
-import { OnOff, OnOffItem, MemoData, MemoParams, EndPoint } from '@/lib/types'
+import { OnOffItem, MemoData, MemoParams, EndPoint } from '@/lib/types'
 import { checkCurrentOnOff } from '@/lib/utills'
 import { useAppSelector } from '@/store/hooks'
 import { useAppDispatch } from '@/store/hooks'
@@ -11,61 +11,68 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 interface Props {
   search?: { keyword: string }
   endpoint?: EndPoint
-  formActive?: OnOff
+  path: 'home' | 'my' | 'search'
 }
 
-export default function MemoList({ search, endpoint, formActive }: Props) {
-  const dispatch = useAppDispatch()
+export default function MemoList(props: Props) {
+  const { memos, searchTotal, nextCursor, status } = useAppSelector((state) => state.memo)
   const { profile } = useAppSelector((state) => state.profile)
+  const { search, endpoint, path } = props
   const [beforeMemo, setBeforeMemo] = useState<MemoData[]>([])
-  const { memos, total, status } = useAppSelector((state) => state.memo)
   const [addItemStyle, setItemStyle] = useState('')
-  const [page, setPage] = useState(1)
+  const [cursor, setCursor] = useState(0)
   const pageRef = useRef<HTMLDivElement>(null)
+  const isLast = checkCurrentOnOff(searchTotal, memos.length + beforeMemo.length)
   const limit = 10
-  const totalPage = Math.ceil(total / limit)
+
+  const isActiev = {
+    form: { home: 'on', my: 'off', search: 'off' }[path],
+    layout: { home: 'card', my: 'card', search: 'card' }[path],
+  }
+
+  const dispatch = useAppDispatch()
+  useEffect(() => {
+    const params = {
+      category: endpoint,
+      pagination: { ...(cursor && { cursor }), limit, ...search },
+    }
+    dispatch(getMemosThunk(params))
+  }, [dispatch, endpoint, search, cursor, limit])
 
   useEffect(() => {
-    dispatch(getMemosThunk({ category: endpoint, pagination: { page, limit, ...search } }))
-  }, [dispatch, endpoint, search, page])
-
-  useEffect(() => {
-    if (page > 1) {
+    if (cursor) {
       setTimeout(() => {
         if (pageRef.current) {
           pageRef.current.scrollIntoView({ behavior: 'smooth' })
         }
       }, 1000)
     }
-  }, [page])
+  }, [cursor])
 
   const handleNextPage = useCallback(() => {
     setBeforeMemo((prev) => [...memos, ...prev])
-    setPage((prev) => prev + 1)
-  }, [memos])
+    setCursor(nextCursor)
+  }, [memos, nextCursor])
 
   const handleCreateMemo = useCallback(
     (formData: Omit<MemoParams, 'id'>) => {
       if (!profile) return
+      const memo = { ...formData, ...(endpoint?.thread && { parentId: endpoint.thread }) }
       setItemStyle('memo_loading_effect')
-      dispatch(createMemoThunk({ memo: formData, user: profile }))
+      dispatch(createMemoThunk({ memo, user: profile }))
         .unwrap()
         .then(() => setItemStyle('memo_create_effect'))
       setTimeout(() => {
         setItemStyle('')
       }, 1000)
     },
-    [dispatch, profile]
+    [dispatch, profile, endpoint]
   )
-
-  const isLast = checkCurrentOnOff(totalPage || 1, page)
 
   const pageButton: OnOffItem = {
     off: (
       <Divider>
-        <Button onClick={handleNextPage}>
-          더 보기{page}/{totalPage}
-        </Button>
+        <Button onClick={handleNextPage}>더 보기</Button>
       </Divider>
     ),
     on: null,
@@ -84,15 +91,15 @@ export default function MemoList({ search, endpoint, formActive }: Props) {
     <>
       <AsyncBox state={status}>
         <Typography variant="body2" color="textSecondary">
-          {search ? <>{total}건의 검색결과</> : null}
+          {search ? <>{searchTotal}건의 검색결과</> : null}
         </Typography>
-        {form[formActive || 'off']}
+        {form[isActiev.form]}
         <Stack spacing={2} className={addItemStyle}>
           {beforeMemo.map((memo: MemoData) => (
-            <MemoBox key={'before-loading-memo' + memo.id} memo={memo} layout="card" />
+            <MemoBox key={'before-loading-memo' + memo.id} memo={memo} layout={isActiev.layout} />
           ))}
           {memos.map((memo: MemoData) => (
-            <MemoBox key={'after-loading-memo' + memo.id} memo={memo} layout="card" />
+            <MemoBox key={'after-loading-memo' + memo.id} memo={memo} layout={isActiev.layout} />
           ))}
           {pageButton[isLast]}
         </Stack>

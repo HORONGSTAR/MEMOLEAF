@@ -20,8 +20,8 @@ export default function FollowButton(props: Props) {
     setState(action)
     setMessage(
       {
-        follow: toUserName + '님을 팔로우 했습니다.',
-        unfollow: toUserName + '님을 언팔로우 했습니다.',
+        follow: toUserName + '님을 언팔로우 했습니다.',
+        unfollow: toUserName + '님을 팔로우 했습니다.',
       }[state] || ''
     )
   }

@@ -26,7 +26,7 @@ export default function SearchBar() {
   const labels = ['게시글', '사용자']
 
   const items: { [key: number]: ReactNode } = {
-    0: <MemoList search={{ keyword }} />,
+    0: <MemoList search={{ keyword }} path={'search'} />,
     1: <UserList search={{ keyword }} />,
   }
 

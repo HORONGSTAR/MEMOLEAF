@@ -5,15 +5,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     const { id } = await params
     const { searchParams } = new URL(req.url)
-    const page = parseInt(searchParams.get('page') || '1')
+    const cursor = parseInt(searchParams.get('cursor') || '0')
     const limit = parseInt(searchParams.get('limit') || '10')
+    const keyword = searchParams.get('keyword')
 
-    const whereData = {
-      where: { userId: parseInt(id) },
-    }
     const bookmarks = await prisma.bookMark.findMany({
-      ...whereData,
-      skip: (page - 1) * limit,
+      where: {
+        userId: parseInt(id),
+        ...(cursor && { id: { lt: cursor } }),
+        ...(keyword && { parentId: undefined, content: { contains: keyword } }),
+      },
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: {
@@ -22,18 +23,25 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
             user: true,
             images: true,
             decos: true,
-            bookmarks: true,
             _count: { select: { comments: true, bookmarks: true, leafs: true } },
           },
         },
       },
     })
 
-    const memos = bookmarks.map((bookmark) => bookmark.memo)
-    const totalCount = await prisma.bookMark.count({ ...whereData })
+    const memos = bookmarks.map((bookmark) => ({ ...bookmark.memo, bookmarks: [{ id: bookmark.id }] }))
+    const searchTotal = await prisma.memo.count({
+      where: {
+        userId: parseInt(id),
+        ...(keyword && { parentId: undefined, content: { contains: keyword } }),
+      },
+    })
+    const nextCursor = memos.length > 0 ? memos.slice(-1)[0].id : 0
+
     return NRes.json({
       memos,
-      total: totalCount,
+      searchTotal,
+      nextCursor,
     })
   } catch (error) {
     console.error(error)

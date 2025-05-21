@@ -1,4 +1,4 @@
-import { BackButton, MemoBox } from '@/components'
+import { BackButton, MemoBox, MemoThread } from '@/components'
 import { Stack, Typography } from '@mui/material'
 import { Error } from '@mui/icons-material'
 import prisma, { disconnectPrisma } from '@/lib/prisma'
@@ -24,6 +24,7 @@ export default async function DetailPage({ params }: { params: Promise<{ id: str
         <div>
           <BackButton />
           <MemoBox memo={memo} layout="detail" />
+          <MemoThread id={parseInt(id)} count={memo._count.leafs} userId={memo.userId} />
         </div>
       ) : (
         <Stack alignItems="center" spacing={2} pt={3}>

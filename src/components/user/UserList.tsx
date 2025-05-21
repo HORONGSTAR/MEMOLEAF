@@ -99,13 +99,13 @@ export default function UserList({ id, name, search }: Props) {
         )}
       </Stack>
       <List>
-        <ListItem>
+        <ListItem disableGutters>
           <Typography variant="body2" color="textSecondary">
             {followInfo}
           </Typography>
         </ListItem>
         {users.map((user) => (
-          <ListItem key={'followList' + user.id} alignItems="flex-start" divider>
+          <ListItem disableGutters key={'followList' + user.id} alignItems="flex-start" divider>
             <ListItemAvatar>
               <LinkBox link={`/page/my/${user.id}`}>
                 <Avatar user={user} size={40} />

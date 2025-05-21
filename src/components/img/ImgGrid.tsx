@@ -19,7 +19,7 @@ export default function ImgGrid({ images, layout, dense }: Props) {
   const count = images.length
   if (count === 0) return null
 
-  const detail = () => {
+  const Detail = () => {
     const cols: { [key: number]: number } = { 1: 2, 2: 4, 3: 3, 4: 2 }
     const imgListRow1 = images.slice(0, 4 - count).map((img) => (
       <ImageListItem key={img.id} cols={2} rows={2}>
@@ -52,5 +52,5 @@ export default function ImgGrid({ images, layout, dense }: Props) {
     </ImageList>
   )
 
-  return <>{{ card: basic, list: basic, detail }[layout]}</>
+  return <>{{ card: basic, list: basic, detail: <Detail /> }[layout]}</>
 }

@@ -1,8 +1,5 @@
 import { PrismaClient, Prisma } from '@prisma/client'
 
-// 연결 관리를 위한 추가 라이브러리 (가상 임포트 - 실제 설치 필요)
-// import { Pool } from 'generic-pool' (필요시 설치)
-
 interface CustomNodeJsGlobal {
   prisma: PrismaClient
   prismaConnections: { [key: string]: number }
@@ -14,6 +11,7 @@ declare const global: CustomNodeJsGlobal
 const getPrismaOptions = (): Prisma.PrismaClientOptions => {
   // 개발 환경에서는 쿼리 로깅, 배포 환경에서는 에러만 로깅
   const isProduction = process.env.NODE_ENV === 'production'
+  console.log('NODE_ENV :', process.env.NODE_ENV)
 
   // 로그 옵션 설정 - 타입 문제로 인해 기본 설정만 사용
   return {
@@ -54,14 +52,14 @@ const prismaClientSingleton = () => {
   prisma.$use(async (params, next) => {
     // 연결이 최대치에 도달했는지 확인
     if (global.prismaConnections.active >= prismaPoolConfig.max) {
-      console.warn(`[DB Pool] Maximum connections reached: ${global.prismaConnections.active}/${prismaPoolConfig.max}`)
+      console.warn(`[DB Pool] 최대 연결 수: ${global.prismaConnections.active}/${prismaPoolConfig.max}`)
 
       // 대기열 처리 로직 (필요시 구현)
       await new Promise((resolve) => setTimeout(resolve, 500))
 
       // 연결이 여전히 최대치라면 오류 발생
       if (global.prismaConnections.active >= prismaPoolConfig.max) {
-        throw new Error('Database connection pool exhausted')
+        throw new Error('데이터베이스 연결 풀이 소진되었습니다')
       }
     }
 
@@ -91,7 +89,7 @@ const prismaClientSingleton = () => {
 
   // 글로벌 에러 처리
   process.on('uncaughtException', (error) => {
-    console.error('Prisma Error (uncaught):', error)
+    console.error(`Prisma Error (uncaught): ${error}`)
   })
 
   return prisma
@@ -134,9 +132,9 @@ export const disconnectPrisma = async () => {
       global.prismaConnections.idle = 0
     }
 
-    console.log('Database connection closed successfully')
+    console.log('데이터베이스 연결을 성공적으로 마쳤습니다.')
   } catch (error) {
-    console.error('Error disconnecting from database:', error)
+    console.error(`데이터베이스 연결 중 문제 발생: ${error}`)
     process.exit(1)
   }
 }
@@ -144,7 +142,7 @@ export const disconnectPrisma = async () => {
 // 비상 연결 해제 함수 (연결 풀 문제 발생 시)
 export const emergencyResetConnections = async () => {
   try {
-    console.warn('[DB Pool] Emergency connection reset initiated')
+    console.warn('[DB Pool] 연결풀 문제 발생! 긴급 재설정을 시작합니다.')
 
     // 기존 연결 종료
     await prisma.$disconnect()
@@ -161,10 +159,10 @@ export const emergencyResetConnections = async () => {
     // 새 연결 테스트 (간단한 쿼리 실행)
     await prisma.$queryRaw`SELECT 1 as test`
 
-    console.log('[DB Pool] Connection pool successfully reset')
+    console.log('[DB Pool] 연결 풀 재설정 완료.')
     return true
   } catch (error) {
-    console.error('[DB Pool] Failed to reset connection pool:', error)
+    console.error(`[DB Pool] 연결 풀 재설정 실패: ${error}`)
     return false
   }
 }
@@ -174,7 +172,7 @@ export const withConnectionTimeout = async <T>(dbOperation: () => Promise<T>, ti
   // 타임아웃 Promise 생성
   const timeoutPromise = new Promise<never>((_, reject) => {
     setTimeout(() => {
-      reject(new Error(`Database operation timed out after ${timeoutMs}ms`))
+      reject(new Error(`데이터베이스 작업시간 초과: ${timeoutMs}ms`))
     }, timeoutMs)
   })
 
@@ -184,11 +182,11 @@ export const withConnectionTimeout = async <T>(dbOperation: () => Promise<T>, ti
   } catch (error) {
     // 타임아웃 에러인 경우 연결 풀 상태 로깅
     if ((error as Error).message.includes('timed out')) {
-      console.error('[DB Pool] Connection timeout. Current pool status:', getConnectionStatus())
+      console.error('[DB Pool] 연결 풀 시간 초과. 현재 상태 :', getConnectionStatus())
 
       // 연결 풀이 거의 찼다면 비상 재설정 고려
       if (global.prismaConnections.active > prismaPoolConfig.max * 0.9) {
-        console.warn('[DB Pool] High connection usage detected, considering pool reset')
+        console.warn('[DB Pool] 연결 풀 사용량이 거의 다 찼습니다. 설정을 검토해주세요. ')
       }
     }
     throw error

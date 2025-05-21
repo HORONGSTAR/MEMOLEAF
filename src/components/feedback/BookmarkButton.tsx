@@ -8,13 +8,13 @@ import { useState } from 'react'
 interface Props {
   id: number
   state: string
-  count: number
+  count?: number
 }
 
 export default function BookmarkButton(props: Props) {
   const [id, setId] = useState(props.id)
   const [state, setState] = useState(props.state)
-  const [count, setCount] = useState(props.count)
+  const [count, setCount] = useState(props.count || 0)
   const [message, setMessage] = useState('')
 
   const handleBookmark = (action: 'check' | 'uncheck') => {

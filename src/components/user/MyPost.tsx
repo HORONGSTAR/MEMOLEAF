@@ -1,7 +1,9 @@
 'use client'
-import { Divider, Tab, Tabs, Box, Stack } from '@mui/material'
+import { Divider, Box, Tab } from '@mui/material'
+import { TabContext, TabList, TabPanel } from '@mui/lab'
+
 import { ReactNode, useState } from 'react'
-import { MyPostItem } from '@/components'
+import { MemoList } from '@/components'
 
 interface Props {
   id: number
@@ -9,28 +11,28 @@ interface Props {
 }
 
 export default function MyPost({ id, children }: Props) {
-  const [value, setValue] = useState(0)
-  const labels = ['게시글', '북마크', '팔로우']
+  const [value, setValue] = useState('myposts')
 
-  const items: { [key: number]: ReactNode } = {
-    0: <MyPostItem endpoint={{ mypost: id }} />,
-    1: <MyPostItem endpoint={{ bookmark: id }} />,
-    2: children,
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue)
+  }
+  const items: { [key: string]: ReactNode } = {
+    myposts: <MemoList path="my" endpoint={{ mypost: id }} />,
+    bookmarks: <MemoList path="my" endpoint={{ bookmark: id }} />,
+    follows: children,
   }
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box>
-        <Tabs value={value} onChange={(_, newValue) => setValue(newValue)} aria-label="모아보기">
-          {labels.map((label, i) => (
-            <Tab key={`tab${i}`} label={label} id={`tab${i}`} aria-controls={`panel${i}`} />
-          ))}
-        </Tabs>
-      </Box>
-      <Divider />
-      <Box key={`panel${value}`} role={`panel${value}`} id={`panel${value}`} aria-labelledby={`tab${value}`} hidden={value !== value} pt={2}>
-        <Stack spacing={2}>{items[value]}</Stack>
-      </Box>
+      <TabContext value={value}>
+        <TabList onChange={handleChange} aria-label="lab API tabs example">
+          <Tab label="게시글" value="myposts" />
+          <Tab label="북마크" value="bookmarks" />
+          <Tab label="팔로우" value="follows" />
+        </TabList>
+        <Divider />
+        <TabPanel value={value}>{items[value]}</TabPanel>
+      </TabContext>
     </Box>
   )
 }

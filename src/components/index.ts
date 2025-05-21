@@ -4,10 +4,10 @@ export { default as Account } from '@/components/auth/Account'
 
 //memo
 export { default as MemoList } from '@/components/memo/MemoList'
+export { default as MemoThread } from '@/components/memo/MemoThread'
 export { default as MemoForm } from '@/components/memo/MemoForm'
 export { default as MemoBox } from '@/components/memo/MemoBox'
 export { default as MemoContent } from '@/components/memo/MemoContent'
-export { default as MemoThread } from '@/components/memo/MemoThread'
 export { default as MemoLink } from '@/components/memo/sub/MemoLink'
 export { default as MemoDeco } from '@/components/memo/sub/MemoDeco'
 export { default as MemoDecoItem } from '@/components/memo/sub/MemoDecoItem'

@@ -9,7 +9,7 @@ import { swapOnOff } from '@/lib/utills'
 import { theme } from '@/styles/MuiTheme'
 
 interface Props {
-  count: number
+  count?: number
   children?: ReactNode
   id: number
   user: UserData

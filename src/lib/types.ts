@@ -65,10 +65,10 @@ export interface BookmarkParams {
 export interface MemoData extends Memo {
   images: Image[]
   decos: Deco[]
-  bookmarks: BookMark[]
   user: User
   createdAt: Date
-  _count: { comments: number; bookmarks: number; leafs: number }
+  bookmarks?: BookMark[]
+  _count?: { comments: number; bookmarks: number; leafs: number }
 }
 
 export interface MemoParams {
