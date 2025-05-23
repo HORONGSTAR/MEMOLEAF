@@ -3,8 +3,8 @@ import { getUsers } from '@/lib/fetch/userApi'
 import { Button, Chip, ChipProps, Divider, List, ListItem, ListItemAvatar, ListItemText, Stack, Typography } from '@mui/material'
 import { User } from '@prisma/client'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AsyncBox, Avatar, LinkBox } from '@/components'
-import { OnOffItem, Status } from '@/lib/types'
+import { Avatar, LinkBox } from '@/components/common'
+import { OnOffItem } from '@/lib/types'
 import { checkCurrentOnOff } from '@/lib/utills'
 
 interface Props {
@@ -17,7 +17,6 @@ export default function UserList({ id, name, search }: Props) {
   const [users, setUsers] = useState<User[]>([])
   const [count, setCount] = useState(0)
   const [aria, setAria] = useState<'follower' | 'following' | 'search'>('follower')
-  const [status, setStatus] = useState<Status>('idle')
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const pageRef = useRef<HTMLDivElement>(null)
@@ -25,7 +24,6 @@ export default function UserList({ id, name, search }: Props) {
   const totalPage = Math.ceil(total / limit)
 
   useEffect(() => {
-    setStatus('loading')
     let data
     if (search?.keyword) {
       setAria('search')
@@ -33,14 +31,11 @@ export default function UserList({ id, name, search }: Props) {
     } else {
       data = { category: { [aria]: id }, pagination: { page, limit } }
     }
-    getUsers(data)
-      .then((result) => {
-        setUsers(result.users)
-        setStatus('succeeded')
-        setTotal(result.total)
-        setCount(result.total)
-      })
-      .catch(() => setStatus('failed'))
+    getUsers(data).then((result) => {
+      setUsers(result.users)
+      setTotal(result.total)
+      setCount(result.total)
+    })
   }, [aria, id, page, search])
 
   useEffect(() => {
@@ -85,7 +80,7 @@ export default function UserList({ id, name, search }: Props) {
   }[aria]
 
   return (
-    <AsyncBox state={status}>
+    <>
       <Stack direction="row" spacing={1}>
         {search ? (
           <Typography variant="body2" color="textSecondary">
@@ -126,6 +121,6 @@ export default function UserList({ id, name, search }: Props) {
         ))}
         {pageButton[isLast]}
       </List>
-    </AsyncBox>
+    </>
   )
 }

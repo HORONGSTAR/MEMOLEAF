@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
     if (userId !== memo.userId) {
       await prisma.alarm.create({
-        data: { linkId: id, readerId: userId, authorId: memo.userId, aria: 'bookmark' },
+        data: { linkId: id, readerId: userId, authorId: memo.userId, aria: 'comment' },
       })
     }
 

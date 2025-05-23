@@ -1,6 +1,6 @@
 'use client'
 import { Typography, List, ListItem, Box, ListItemText, Button, Divider, Snackbar } from '@mui/material'
-import { Dialog } from '@/components'
+import { Dialog } from '@/components/common'
 import { useCallback, useState } from 'react'
 import { deleteAllMemos, deleteUserAccount } from '@/lib/fetch/controlApi'
 import { signOut, useSession } from 'next-auth/react'

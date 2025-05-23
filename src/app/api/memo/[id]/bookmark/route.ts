@@ -7,16 +7,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const { searchParams } = new URL(req.url)
     const cursor = parseInt(searchParams.get('cursor') || '0')
     const limit = parseInt(searchParams.get('limit') || '10')
-    const keyword = searchParams.get('keyword')
 
     const bookmarks = await prisma.bookMark.findMany({
       where: {
         userId: parseInt(id),
-        ...(cursor && { id: { lt: cursor } }),
-        ...(keyword && { parentId: undefined, content: { contains: keyword } }),
+        memoId: { lt: cursor },
       },
       take: limit,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { memoId: 'desc' },
       include: {
         memo: {
           include: {
@@ -30,17 +28,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     })
 
     const memos = bookmarks.map((bookmark) => ({ ...bookmark.memo, bookmarks: [{ id: bookmark.id }] }))
-    const searchTotal = await prisma.memo.count({
-      where: {
-        userId: parseInt(id),
-        ...(keyword && { parentId: undefined, content: { contains: keyword } }),
-      },
-    })
-    const nextCursor = memos.length > 0 ? memos.slice(-1)[0].id : 0
+
+    const nextCursor = memos[9]?.id || 0
 
     return NRes.json({
       memos,
-      searchTotal,
       nextCursor,
     })
   } catch (error) {

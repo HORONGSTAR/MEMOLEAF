@@ -1,6 +1,6 @@
 'use client'
-import { Box, Chip, Snackbar, Stack } from '@mui/material'
-import { InputText, Paper, TextCount } from '@/components'
+import { Box, Chip, Paper, Snackbar, Stack } from '@mui/material'
+import { InputText, TextCount } from '@/components/common'
 import { useCallback, useState } from 'react'
 
 interface CommentFormData {
@@ -23,7 +23,7 @@ export default function CommentForm(inti: CommentFormData) {
 
   return (
     <Stack spacing={1} alignItems="end">
-      <Paper sx={{ p: 1, width: '100%' }}>
+      <Paper variant="outlined" sx={{ width: '100%', p: 1 }}>
         <InputText
           fullWidth
           aria-label="댓글 글자수 제한 191자"

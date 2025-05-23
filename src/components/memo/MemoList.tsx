@@ -1,86 +1,83 @@
 'use client'
-import { Paper, MemoBox, MemoForm, AsyncBox } from '@/components'
+import { MemoBox, MemoForm } from '@/components/memo'
+import { createMemo, getMemos } from '@/lib/fetch/memoApi'
 import { OnOffItem, MemoData, MemoParams, EndPoint } from '@/lib/types'
-import { checkCurrentOnOff } from '@/lib/utills'
 import { useAppSelector } from '@/store/hooks'
-import { useAppDispatch } from '@/store/hooks'
-import { createMemoThunk, getMemosThunk } from '@/store/slices/memoSlice'
-import { Box, Button, Divider, Stack, Typography } from '@mui/material'
+import { Paper, Stack, Typography, useTheme } from '@mui/material'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import MemoThread from './MemoThread'
 
 interface Props {
   search?: { keyword: string }
   endpoint?: EndPoint
   path: 'home' | 'my' | 'search'
+  lastMemoId: number
 }
 
 export default function MemoList(props: Props) {
-  const { memos, searchTotal, nextCursor, status } = useAppSelector((state) => state.memo)
   const { profile } = useAppSelector((state) => state.profile)
-  const { search, endpoint, path } = props
-  const [beforeMemo, setBeforeMemo] = useState<MemoData[]>([])
+  const { search, endpoint, path, lastMemoId } = props
+  const [memos, setMemos] = useState<MemoData[]>([])
   const [addItemStyle, setItemStyle] = useState('')
-  const [cursor, setCursor] = useState(0)
-  const pageRef = useRef<HTMLDivElement>(null)
-  const isLast = checkCurrentOnOff(searchTotal, memos.length + beforeMemo.length)
+  const [cursor, setCursor] = useState(lastMemoId + 1)
+  const [loading, setLoading] = useState(false)
+  const theme = useTheme()
+
   const limit = 10
+  const observerRef = useRef(null)
 
   const isActiev = {
     form: { home: 'on', my: 'off', search: 'off' }[path],
-    layout: { home: 'card', my: 'card', search: 'card' }[path],
   }
 
-  const dispatch = useAppDispatch()
-  useEffect(() => {
+  const loadMoreMemos = useCallback(() => {
     const params = {
       category: endpoint,
-      pagination: { ...(cursor && { cursor }), limit, ...search },
+      pagination: { cursor, limit, ...search },
     }
-    dispatch(getMemosThunk(params))
-  }, [dispatch, endpoint, search, cursor, limit])
+    getMemos(params)
+      .then((result) => {
+        setMemos((prev) => [...prev, ...result.memos])
+        setCursor(result.nextCursor)
+      })
+      .catch()
+      .finally(() => setLoading(false))
+  }, [endpoint, search, cursor, limit])
 
   useEffect(() => {
-    if (cursor) {
-      setTimeout(() => {
-        if (pageRef.current) {
-          pageRef.current.scrollIntoView({ behavior: 'smooth' })
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          loadMoreMemos()
         }
-      }, 1000)
+      },
+      { threshold: 0.1 }
+    )
+    if (observerRef.current) {
+      observer.observe(observerRef.current)
     }
-  }, [cursor])
-
-  const handleNextPage = useCallback(() => {
-    setBeforeMemo((prev) => [...memos, ...prev])
-    setCursor(nextCursor)
-  }, [memos, nextCursor])
+    return () => observer.disconnect()
+  }, [loading, loadMoreMemos])
 
   const handleCreateMemo = useCallback(
     (formData: Omit<MemoParams, 'id'>) => {
       if (!profile) return
-      const memo = { ...formData, ...(endpoint?.thread && { parentId: endpoint.thread }) }
+      const memo = { ...formData }
       setItemStyle('memo_loading_effect')
-      dispatch(createMemoThunk({ memo, user: profile }))
-        .unwrap()
-        .then(() => setItemStyle('memo_create_effect'))
+      createMemo({ ...memo }).then((result) => {
+        setItemStyle('memo_create_effect')
+        setMemos((prev) => [{ ...result, user: profile }, ...prev])
+      })
       setTimeout(() => {
         setItemStyle('')
       }, 1000)
     },
-    [dispatch, profile, endpoint]
+    [profile]
   )
-
-  const pageButton: OnOffItem = {
-    off: (
-      <Divider>
-        <Button onClick={handleNextPage}>더 보기</Button>
-      </Divider>
-    ),
-    on: null,
-  }
 
   const form: OnOffItem = {
     on: (
-      <Paper use="create">
+      <Paper variant="outlined" sx={{ bgcolor: theme.palette.secondary.light, p: 1 }}>
         <MemoForm onSubmit={handleCreateMemo} />
       </Paper>
     ),
@@ -89,22 +86,18 @@ export default function MemoList(props: Props) {
 
   return (
     <>
-      <AsyncBox state={status}>
-        <Typography variant="body2" color="textSecondary">
-          {search ? <>{searchTotal}건의 검색결과</> : null}
-        </Typography>
-        {form[isActiev.form]}
-        <Stack spacing={2} className={addItemStyle}>
-          {beforeMemo.map((memo: MemoData) => (
-            <MemoBox key={'before-loading-memo' + memo.id} memo={memo} layout={isActiev.layout} />
-          ))}
-          {memos.map((memo: MemoData) => (
-            <MemoBox key={'after-loading-memo' + memo.id} memo={memo} layout={isActiev.layout} />
-          ))}
-          {pageButton[isLast]}
-        </Stack>
-      </AsyncBox>
-      <Box ref={pageRef} />
+      <Typography variant="body2" color="textSecondary">
+        {search ? <>건의 검색결과</> : null}
+      </Typography>
+      {form[isActiev.form]}
+      <Stack spacing={2} className={addItemStyle}>
+        {memos.map((memo: MemoData) => (
+          <Paper variant="outlined" key={'home-memo' + memo.id}>
+            <MemoBox memo={memo} layout="list" thread={<MemoThread id={memo.id} count={memo._count?.leafs || 0} />} />
+          </Paper>
+        ))}
+      </Stack>
+      <div ref={observerRef} />
     </>
   )
 }

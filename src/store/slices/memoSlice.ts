@@ -50,6 +50,7 @@ export const deleteMemoThunk = createAsyncThunk<MemoData, number>('memo/deleteMe
 interface State {
   memos: MemoData[] | []
   searchTotal: number
+  beforeCursor?: number
   nextCursor: number
   status: Status
 }
@@ -57,6 +58,7 @@ interface State {
 const initialState: State = {
   memos: [],
   searchTotal: 10,
+  beforeCursor: 0,
   nextCursor: 0,
   status: 'idle',
 }
@@ -72,9 +74,10 @@ export const memoSlice = createSlice({
       })
       .addCase(getMemosThunk.fulfilled, (state, action) => {
         state.status = 'succeeded'
+        state.beforeCursor = state.nextCursor
+        state.nextCursor = action.payload.nextCursor
         state.memos = action.payload.memos
         state.searchTotal = action.payload.searchTotal
-        state.nextCursor = action.payload.nextCursor
       })
       .addCase(getMemosThunk.rejected, (state) => {
         state.status = 'failed'
@@ -97,7 +100,6 @@ export const memoSlice = createSlice({
         state.status = 'succeeded'
         for (const i in state.memos) {
           if (state.memos[i].id === action.payload.id) {
-            console.log(action.payload)
             state.memos[i] = { ...state.memos[i], ...action.payload }
           }
         }

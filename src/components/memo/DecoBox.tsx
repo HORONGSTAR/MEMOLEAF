@@ -1,6 +1,6 @@
 'use client'
 import { ReactNode } from 'react'
-import { MemoDecoItem } from '@/components'
+import DecoItem from './DecoItem'
 import { Deco, EditDeco } from '@/lib/types'
 import { Box } from '@mui/material'
 
@@ -11,7 +11,7 @@ interface Props {
 
 type Component = { [key: string]: ReactNode }
 
-export default function MemoDeco(props: Props) {
+export default function DecoBox(props: Props) {
   const { decos, children } = props
   const kind: EditDeco = {
     subtext: { active: 'off', extra: '' },
@@ -22,25 +22,25 @@ export default function MemoDeco(props: Props) {
   decos.forEach((style) => (kind[style.kind] = { active: 'on', extra: style.extra }))
 
   const subtext: Component = {
-    on: <MemoDecoItem kind="subtext" extra={kind.subtext.extra} />,
+    on: <DecoItem kind="subtext" extra={kind.subtext.extra} />,
     off: null,
   }
 
   const folder: Component = {
     on: (
-      <MemoDecoItem kind="folder" extra={kind.folder.extra}>
+      <DecoItem kind="folder" extra={kind.folder.extra}>
         {children}
-      </MemoDecoItem>
+      </DecoItem>
     ),
     off: children,
   }
 
   const secret: Component = {
     on: (
-      <MemoDecoItem kind="secret" extra={kind.secret.extra}>
+      <DecoItem kind="secret" extra={kind.secret.extra}>
         {subtext[kind.subtext.active]}
         {folder[kind.folder.active]}
-      </MemoDecoItem>
+      </DecoItem>
     ),
     off: (
       <>

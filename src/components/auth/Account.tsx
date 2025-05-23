@@ -2,17 +2,21 @@
 import { useState } from 'react'
 import { Button } from '@mui/material'
 import { useSession, signOut } from 'next-auth/react'
-import { LoginBox, Dialog, Menu, Avatar } from '@/components'
+import { Dialog, Menu } from '@/components/common'
+
+import LoginBox from './LoginBox'
+import MyAvatar from './MyAvatar'
 import { useRouter } from 'next/navigation'
 import { Logout, PersonOutlineOutlined, SettingsOutlined } from '@mui/icons-material'
-import { useAppSelector } from '@/store/hooks'
+import { checkCurrentOnOff } from '@/lib/utills'
+import { OnOffItem } from '@/lib/types'
 
 export default function Account() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
-  const { profile } = useAppSelector((state) => state.profile)
   const { data: session } = useSession()
-  const myId = session?.user.id
+  const myId = session?.user.id || 0
+  const isNotLogin = checkCurrentOnOff(myId, 0)
 
   const dialogProps = {
     open,
@@ -20,17 +24,6 @@ export default function Account() {
     onClose: () => setOpen(false),
     closeLabel: '닫기',
   }
-
-  if (!myId)
-    return (
-      <>
-        <Button onClick={() => setOpen(true)}>로그인</Button>
-        <Dialog {...dialogProps}>
-          <LoginBox />
-        </Dialog>
-      </>
-    )
-
   const meunItems = [
     {
       label: '마이 페이지',
@@ -49,5 +42,17 @@ export default function Account() {
     },
   ]
 
-  return <Menu icon={<Avatar user={profile} />} label={'내 계정'} items={meunItems} />
+  const components: OnOffItem = {
+    on: (
+      <>
+        <Button onClick={() => setOpen(true)}>로그인</Button>
+        <Dialog {...dialogProps}>
+          <LoginBox />
+        </Dialog>
+      </>
+    ),
+    off: <Menu icon={<MyAvatar />} label={'내 계정'} items={meunItems} />,
+  }
+
+  return components[isNotLogin]
 }

@@ -1,6 +1,5 @@
 import { AddPhotoAlternate } from '@mui/icons-material'
 import { Button, Stack, Box, Avatar } from '@mui/material'
-import imageCompression from 'browser-image-compression'
 import { Dispatch, SetStateAction, useCallback } from 'react'
 
 interface Props {
@@ -14,15 +13,8 @@ export default function ImgUploader(props: Props) {
   const handleImageChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files
-
-      if (!files) return
-
-      const file = await imageCompression(files[0], {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 200,
-        useWebWorker: true,
-      })
-      setImage({ file, url: URL.createObjectURL(file) })
+      if (!files?.length) return
+      setImage({ file: files[0], url: URL.createObjectURL(files[0]) })
     },
     [setImage]
   )

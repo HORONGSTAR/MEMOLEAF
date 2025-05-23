@@ -1,7 +1,12 @@
-import { SearchBox } from '@/components'
-import { disconnectPrisma } from '@/lib/prisma'
+import { SearchBox } from '@/components/shared'
+import prisma, { disconnectPrisma } from '@/lib/prisma'
 
 export default async function SearchPage() {
   disconnectPrisma()
-  return <SearchBox />
+  const lastMemo = await prisma.memo.findFirst({
+    take: 1,
+    select: { id: true },
+    orderBy: { createdAt: 'desc' },
+  })
+  return <SearchBox lastMemoId={lastMemo?.id || 0} />
 }

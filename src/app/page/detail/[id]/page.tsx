@@ -1,7 +1,10 @@
-import { BackButton, MemoBox, MemoThread } from '@/components'
-import { Stack, Typography } from '@mui/material'
-import { Error } from '@mui/icons-material'
+import { MemoBox } from '@/components/memo'
+import { Button, Stack, Typography } from '@mui/material'
+import { ArrowBack, Error } from '@mui/icons-material'
 import prisma, { disconnectPrisma } from '@/lib/prisma'
+import Link from 'next/link'
+import MemoThread from '@/components/memo/MemoThread'
+import MemoThreadForm from '@/components/memo/MemoThreadForm'
 
 export default async function DetailPage({ params }: { params: Promise<{ id: string }> }) {
   disconnectPrisma()
@@ -14,6 +17,7 @@ export default async function DetailPage({ params }: { params: Promise<{ id: str
       decos: true,
       images: true,
       bookmarks: { where: { userId: parseInt(id) } },
+      leafs: { take: 1, select: { id: true } },
       _count: { select: { comments: true, bookmarks: true, leafs: true } },
     },
   })
@@ -22,9 +26,11 @@ export default async function DetailPage({ params }: { params: Promise<{ id: str
     <>
       {memo ? (
         <div>
-          <BackButton />
-          <MemoBox memo={memo} layout="detail" />
-          <MemoThread id={parseInt(id)} count={memo._count.leafs} userId={memo.userId} />
+          <Button startIcon={<ArrowBack />} LinkComponent={Link} href="/">
+            목록으로 돌아가기
+          </Button>
+          <MemoBox memo={memo} layout="detail" thread={<MemoThread id={memo.id} count={memo._count.leafs} />} />
+          <MemoThreadForm id={memo.id} count={memo._count.leafs} userId={memo.userId} />
         </div>
       ) : (
         <Stack alignItems="center" spacing={2} pt={3}>

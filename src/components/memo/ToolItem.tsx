@@ -1,5 +1,5 @@
 'use client'
-import { Dialog, InputText } from '@/components'
+import { Dialog, InputText } from '@/components/common'
 import { Dispatch, SetStateAction, useState, useCallback } from 'react'
 import { EditDeco, OnOffItem } from '@/lib/types'
 import { Box, Chip, ChipProps, IconButton, Button, Divider, Stack, Typography } from '@mui/material'
@@ -11,7 +11,7 @@ interface Props {
   setDecos: Dispatch<SetStateAction<EditDeco>>
 }
 
-export default function MemoToolItem(props: Props) {
+export default function ToolItem(props: Props) {
   const { decos, setDecos } = props
   const [edit, setEdit] = useState('off')
   const [open, setOpen] = useState('off')

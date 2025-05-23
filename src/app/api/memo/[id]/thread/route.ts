@@ -1,12 +1,8 @@
 import { NextRequest, NextResponse as NRes } from 'next/server'
 import prisma from '@/lib/prisma'
-import { authOptions } from '@/lib/auth'
-import { getServerSession } from 'next-auth'
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await getServerSession(authOptions)
-    const userId = session?.user.id
     const { id } = await params
     const { searchParams } = new URL(req.url)
     const cursor = parseInt(searchParams.get('cursor') || '0')
@@ -20,11 +16,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       take: limit,
       orderBy: { id: 'asc' },
       include: {
-        user: true,
-        images: true,
-        decos: true,
-        bookmarks: { where: { userId } },
-        _count: { select: { comments: true, bookmarks: true } },
+        images: { select: { id: true, url: true, alt: true } },
+        decos: { select: { id: true, kind: true, extra: true } },
       },
     })
 

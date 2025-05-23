@@ -2,7 +2,7 @@
 import { ReactNode, useState } from 'react'
 import { Collapse, Typography, Chip, Box, Paper, Stack, Divider, Button } from '@mui/material'
 import { ExpandMore } from '@mui/icons-material'
-import { InputText } from '@/components'
+import { InputText } from '@/components/common'
 import { Deco, OnOffItem } from '@/lib/types'
 import { swapOnOff } from '@/lib/utills'
 
@@ -11,7 +11,7 @@ interface Props extends Deco {
   form?: ReactNode
 }
 
-export default function MemoDecoItem(props: Props) {
+export default function DecoItem(props: Props) {
   const { kind, extra, children } = props
   const [password, setPassword] = useState('')
   const [checked, setChecked] = useState('off')

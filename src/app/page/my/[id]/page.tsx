@@ -1,11 +1,10 @@
-import { MyProfile, MyPost, UserList } from '@/components'
+import { MyProfile, MyPost } from '@/components/user'
 import { Typography, Stack } from '@mui/material'
 import { Error } from '@mui/icons-material'
 import prisma, { disconnectPrisma } from '@/lib/prisma'
 
 export default async function MyPage({ params }: { params: Promise<{ id: string }> }) {
   disconnectPrisma()
-
   const { id } = await params
   const profile = await prisma.user.findUnique({
     where: { id: parseInt(id) },
@@ -19,14 +18,26 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
     },
   })
 
+  const lastMyMemo = await prisma.memo.findFirst({
+    where: { userId: parseInt(id) },
+    take: 1,
+    select: { id: true },
+    orderBy: { createdAt: 'desc' },
+  })
+
+  const lastBookmark = await prisma.bookMark.findFirst({
+    where: { userId: parseInt(id) },
+    take: 1,
+    orderBy: { createdAt: 'desc' },
+    include: { memo: { select: { id: true } } },
+  })
+
   return (
     <>
       {profile ? (
         <>
           <MyProfile {...profile} />
-          <MyPost id={parseInt(id)}>
-            <UserList id={parseInt(id)} name={profile.name} />
-          </MyPost>
+          <MyPost lastMyMemoId={lastMyMemo?.id || 0} lastBookmarkId={lastBookmark?.memo?.id || 0} id={parseInt(id)} name={profile.name} />
         </>
       ) : (
         <Stack alignItems="center" spacing={2} pt={3}>

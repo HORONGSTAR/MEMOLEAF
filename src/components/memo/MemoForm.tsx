@@ -1,9 +1,12 @@
 'use client'
-import { Button, Snackbar, Stack } from '@mui/material'
-import { ImgForm, ImgPreview, Blank, InputText, MemoTool, MemoToolItem, TextCount } from '@/components'
+import { Button, Snackbar, Stack, Box } from '@mui/material'
+import { InputText, TextCount } from '@/components/common'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { swapOnOff } from '@/lib/utills'
 import { MemoData, MemoParams, EditImage, EditDeco } from '@/lib/types'
+import { ImgPreview, ImgForm } from '@/components/img'
+import ToolBox from './ToolBox'
+import ToolItem from './ToolItem'
 
 interface MemoFormData extends Partial<Omit<MemoData, 'decos'>> {
   decos?: EditDeco
@@ -55,7 +58,7 @@ export default function MemoForm(inti: MemoFormData) {
   return (
     <>
       <Stack sx={{ bgcolor: '#fff', p: 1, mb: 2 }}>
-        <MemoToolItem {...decoProps} />
+        <ToolItem {...decoProps} />
         <InputText
           id="content"
           multiline
@@ -71,8 +74,8 @@ export default function MemoForm(inti: MemoFormData) {
       </Stack>
       <Stack direction="row" alignItems="center">
         <ImgForm {...imageProps} />
-        <MemoTool {...decoProps} />
-        <Blank />
+        <ToolBox {...decoProps} />
+        <Box flexGrow={1} />
         {children}
         <Button size="large" variant={isEdit ? 'text' : 'contained'} onClick={handleSubmit}>
           {isEdit ? '수정' : '메모'}

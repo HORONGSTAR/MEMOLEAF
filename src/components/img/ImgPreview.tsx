@@ -1,10 +1,11 @@
 'use client'
-import { Dialog, ImgGrid, TextCount } from '@/components'
+import { Dialog, TextCount } from '@/components/common'
 import { imgPath } from '@/lib/utills'
 import { EditImage, Image } from '@/lib/types'
 import { Box, IconButton, Stack, TextField, Typography } from '@mui/material'
 import { Cancel, NoteAlt } from '@mui/icons-material'
 import { Dispatch, SetStateAction, useState } from 'react'
+import ImgGrid from './ImgGrid'
 
 interface Props {
   images: EditImage

@@ -1,27 +1,29 @@
 'use client'
 import { Close, ForumOutlined } from '@mui/icons-material'
-import { Box, IconButton, Dialog, Pagination, Stack, Typography, DialogContent, DialogTitle, DialogActions, useMediaQuery } from '@mui/material'
-import { Blank, CommentBox, CommentForm } from '@/components'
-import { ReactNode, useCallback, useEffect, useState } from 'react'
-import { OnOff, UserData, CommentData } from '@/lib/types'
+import { Box, IconButton, Dialog, Pagination, Stack, DialogContent, DialogTitle, DialogActions, useMediaQuery } from '@mui/material'
+import CommentBox from './CommentBox'
+import CommentForm from './CommentForm'
+import FeedbackCount from './FeedbackCount'
+import { useCallback, useEffect, useState } from 'react'
+import { OnOff, CommentData } from '@/lib/types'
 import { createComment, deleteComment, getComments } from '@/lib/fetch/feedbackApi'
 import { swapOnOff } from '@/lib/utills'
 import { theme } from '@/styles/MuiTheme'
+import { useAppSelector } from '@/store/hooks'
 
 interface Props {
   count?: number
-  children?: ReactNode
   id: number
-  user: UserData
 }
-export default function CommentButton(props: Props) {
+export default function CommentButton({ id, count }: Props) {
+  const { profile } = useAppSelector((state) => state.profile)
+
   const [comments, setComments] = useState<CommentData[]>([])
-  const [count, setCount] = useState(props.count || 0)
+  const [total, setTotal] = useState(count || 0)
   const [active, setActive] = useState<OnOff>('off')
-  const { id, user } = props
   const [page, setPage] = useState(1)
   const limit = 5
-  const totalPage = Math.ceil(count / limit)
+  const totalPage = Math.ceil(total / limit)
 
   const isMobile = useMediaQuery(theme.breakpoints.down('xs'))
 
@@ -36,13 +38,13 @@ export default function CommentButton(props: Props) {
     (text: string) => {
       createComment({ text, id })
         .then((result) => {
-          const newComment = { ...result, user }
+          const newComment = { ...result, user: profile }
           setComments((prev) => [newComment, ...prev])
-          setCount((prev) => prev + 1)
+          setTotal((prev) => prev + 1)
         })
         .catch((err) => console.error(err))
     },
-    [user, id, setCount]
+    [id, profile]
   )
 
   const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
@@ -51,23 +53,23 @@ export default function CommentButton(props: Props) {
 
   const handleDelete = useCallback((id: number) => {
     deleteComment(id)
-    setCount((prev) => prev - 1)
+    setTotal((prev) => prev - 1)
     setComments((prev) => prev.filter((p) => p.id !== id))
   }, [])
 
   return (
     <>
-      <IconButton aria-label="댓글창 열기" onClick={() => setActive('on')}>
-        <ForumOutlined fontSize="small" />
-        <Typography variant="body2" sx={{ position: 'absolute', right: -2, fontWeight: 'bold' }}>
-          {count}
-        </Typography>
-      </IconButton>
+      <FeedbackCount count={total}>
+        <IconButton aria-label="댓글창 열기" onClick={() => setActive('on')}>
+          <ForumOutlined fontSize="small" />
+        </IconButton>
+      </FeedbackCount>
+
       <Dialog scroll="paper" open={swapOnOff[active].bool} fullWidth fullScreen={isMobile} onClose={() => setActive('off')}>
         <DialogTitle>
           <Stack direction="row" alignItems="center">
             댓글창
-            <Blank />
+            <Box flexGrow={1} />
             <IconButton onClick={() => setActive('off')} aria-label="닫기">
               <Close />
             </IconButton>

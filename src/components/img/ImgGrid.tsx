@@ -1,6 +1,6 @@
 'use client'
 import { Image, Layout } from '@/lib/types'
-import { ImgModal } from '@/components'
+import ImgModal from './ImgModal'
 import { ImageList, ImageListItem } from '@mui/material'
 import { ReactNode } from 'react'
 
@@ -52,5 +52,5 @@ export default function ImgGrid({ images, layout, dense }: Props) {
     </ImageList>
   )
 
-  return <>{{ card: basic, list: basic, detail: <Detail /> }[layout]}</>
+  return <>{{ list: basic, detail: <Detail /> }[layout]}</>
 }

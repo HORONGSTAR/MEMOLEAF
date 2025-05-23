@@ -32,7 +32,6 @@ export const createMemo = async (params: MemoParams) => {
   if (images.file.length > 0) {
     const uploads = await uploadImages(images.file)
     imageUrl = images.imgs.map((img, i) => ({ url: uploads[i], alt: img.alt }))
-    console.log('uploads:', uploads, 'imageUrl1:', imageUrl)
   }
   const data = metaData('POST', { id, content, images: imageUrl, decos, parentId })
 
@@ -49,7 +48,6 @@ export const updateMemo = async (params: MemoParams) => {
   if (images.file.length > 0) {
     const uploads = await uploadImages(images.file)
     imageUrl = images.imgs.map((img, i) => ({ url: uploads[i], alt: img.alt }))
-    console.log('uploads:', uploads, 'imageUrl1:', imageUrl)
   }
   const data = metaData('PATCH', { id, content, images: imageUrl, decos })
   const res = await fetch(memoUrl, data)

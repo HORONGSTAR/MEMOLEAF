@@ -4,7 +4,7 @@ import { AddCircle, AddCircleOutline, Lock, LockOutlined, SubtitlesOutlined, Sub
 import { ReactNode, useState, Dispatch, SetStateAction, useCallback } from 'react'
 import { OnOff, EditDeco } from '@/lib/types'
 import { swapOnOff } from '@/lib/utills'
-import { LiveAnnouncer } from '@/components'
+import { LiveAnnouncer } from '@/components/common'
 
 interface Props {
   decos: EditDeco
@@ -20,7 +20,7 @@ type Tool = {
   }
 }
 
-export default function MemoTool(props: Props) {
+export default function ToolBox(props: Props) {
   const { decos, setDecos } = props
   const [extend, setExtend] = useState('off')
   const [readToolInfo, setReadToolInfo] = useState('off')

@@ -1,7 +1,7 @@
 import { BookMark, Comment, Memo, User } from '@prisma/client'
 import { ReactNode } from 'react'
 
-export type Layout = 'list' | 'detail' | 'card' | string
+export type Layout = 'list' | 'detail' | string
 export type OnOff = 'on' | 'off' | string
 export type OnOffItem = { [key: OnOff]: ReactNode }
 export type Action = { id: null | number; state: null | string }

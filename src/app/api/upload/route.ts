@@ -42,8 +42,6 @@ export async function POST(request: NextRequest): Promise<NRes> {
           upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET,
         })) as CloudinaryUploadResponse
 
-        console.log(uploadResult.public_id)
-
         return uploadResult.public_id
       } catch (error) {
         console.error('개별 이미지 업로드 실패:', error)

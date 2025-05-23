@@ -2,8 +2,9 @@
 import { BookmarkMemo } from '@/lib/fetch/feedbackApi'
 import { OnOffItem } from '@/lib/types'
 import { Bookmark, BookmarkBorder } from '@mui/icons-material'
-import { IconButton, Snackbar, Typography } from '@mui/material'
+import { IconButton, Snackbar } from '@mui/material'
 import { useState } from 'react'
+import FeedbackCount from './FeedbackCount'
 
 interface Props {
   id: number
@@ -31,20 +32,18 @@ export default function BookmarkButton(props: Props) {
 
   const followButton: OnOffItem = {
     uncheck: (
-      <IconButton aria-label="북마크 하기" onClick={() => handleBookmark('check')} sx={{ position: 'relative' }}>
-        <BookmarkBorder fontSize="small" />
-        <Typography variant="body2" sx={{ position: 'absolute', right: -2, fontWeight: 'bold' }}>
-          {count}
-        </Typography>
-      </IconButton>
+      <FeedbackCount count={count}>
+        <IconButton size="small" aria-label="북마크 하기" onClick={() => handleBookmark('check')} sx={{ position: 'relative' }}>
+          <BookmarkBorder fontSize="small" />
+        </IconButton>
+      </FeedbackCount>
     ),
     check: (
-      <IconButton aria-label="북마크 취소" color="primary" onClick={() => handleBookmark('uncheck')} sx={{ position: 'relative' }}>
-        <Bookmark fontSize="small" />
-        <Typography variant="body2" sx={{ position: 'absolute', right: -2, fontWeight: 'bold' }}>
-          {count}
-        </Typography>
-      </IconButton>
+      <FeedbackCount color="primary" count={count}>
+        <IconButton size="small" aria-label="북마크 취소" color="primary" onClick={() => handleBookmark('uncheck')} sx={{ position: 'relative' }}>
+          <Bookmark fontSize="small" />
+        </IconButton>
+      </FeedbackCount>
     ),
     none: null,
   }

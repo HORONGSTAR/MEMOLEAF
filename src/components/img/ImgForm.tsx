@@ -1,6 +1,5 @@
 'use client'
 import { IconButton, Snackbar, Tooltip } from '@mui/material'
-import imageCompression from 'browser-image-compression'
 import { Dispatch, SetStateAction, useRef, useState } from 'react'
 import { ImageSearch } from '@mui/icons-material'
 import { EditImage } from '@/lib/types'
@@ -26,20 +25,13 @@ export default function ImgForm(props: Props) {
       return
     }
 
-    const newImgFiles: File[] = []
     const newImgUrls: string[] = []
-
-    for (let i = 0; i < files.length; i++) {
-      const file = await imageCompression(files[i], {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1024,
-        useWebWorker: true,
-      })
-      newImgFiles.push(file)
-      newImgUrls.push(URL.createObjectURL(file))
+    for (const i in files) {
+      newImgUrls.push(URL.createObjectURL(files[i]))
     }
+
     setImages((prev) => ({
-      file: [...prev.file, ...newImgFiles],
+      file: [...prev.file, ...files],
       imgs: [...prev.imgs, ...newImgUrls.map((img) => ({ url: img, alt: '' }))],
     }))
     setLoading(false)

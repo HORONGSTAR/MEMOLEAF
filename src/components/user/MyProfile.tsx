@@ -1,13 +1,15 @@
 'use client'
 import { Typography, List, ListItem, Stack, IconButton, TextField } from '@mui/material'
 import { DriveFileRenameOutline } from '@mui/icons-material'
-import { Avatar, Dialog, FollowButton, ImgUploader, TextCount } from '@/components'
+import { Avatar, Dialog, TextCount } from '@/components/common'
 import { useState, useCallback, useMemo } from 'react'
 import { UserData, UserParams } from '@/lib/types'
 import { useSession } from 'next-auth/react'
 import { checkCurrentOnOff, imgPath, swapOnOff } from '@/lib/utills'
 import { useAppDispatch } from '@/store/hooks'
 import { updateProfileThunk } from '@/store/slices/profileSlice'
+import AvatarUploader from './AvatarUploader'
+import FollowButton from './FollowButton'
 
 export default function MyProfile(inti: UserData) {
   const [profile, setProfile] = useState(inti)
@@ -87,7 +89,7 @@ export default function MyProfile(inti: UserData) {
 
       <Dialog {...dialogProps}>
         <Stack spacing={2} mt={2}>
-          <ImgUploader image={image} setImage={setImage} />
+          <AvatarUploader image={image} setImage={setImage} />
           <Stack spacing={1}>
             <TextField label="이름" size="small" placeholder="최대 글자수 10자" value={name} onChange={(e) => handleChangeName(e.target.value)} />
             <TextCount text={name} max={10} />

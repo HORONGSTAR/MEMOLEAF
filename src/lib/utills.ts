@@ -9,8 +9,10 @@ export const swapOnOff: {
   [key: string]: { next: string; bool: boolean }
 } = { on: { next: 'off', bool: true }, off: { next: 'on', bool: false } }
 
-export const changeDate = (date: Date, format?: string) => {
-  return dayjs(date).format(format || 'YYYY.MM.DD HH:mm')
+const now = dayjs()
+export const changeDate = (date: Date) => {
+  const isToday = now.isSame(date, 'day')
+  return dayjs(date).format(isToday ? 'A hh:mm' : 'YYYY.MM.DD')
 }
 
 export const addImagePath = (images: Image[]) => {
@@ -20,17 +22,6 @@ export const addImagePath = (images: Image[]) => {
 export const checkCurrentOnOff = (besic: number, current: number) => {
   const result: { [key: number]: OnOff } = { [current]: 'off', [besic]: 'on' }
   return result[current]
-}
-
-//extra method
-export const copyText = async (text: string, label: string) => {
-  try {
-    await navigator.clipboard.writeText(text)
-    return label + ' 클립보드에 복사했습니다.'
-  } catch (err) {
-    console.error('복사 실패:', err)
-    return label + ' 복사하는 중 문제가 발생했습니다.'
-  }
 }
 
 export const randomProfile = () => {

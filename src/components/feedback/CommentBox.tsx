@@ -1,6 +1,6 @@
 'use client'
-
-import { CommentForm, Dialog, LinkBox, Avatar } from '@/components'
+import { Dialog, LinkBox, Avatar } from '@/components/common'
+import CommentForm from './CommentForm'
 import { useCallback, useState } from 'react'
 import { OnOffItem, CommentData } from '@/lib/types'
 import { updateComment } from '@/lib/fetch/feedbackApi'
@@ -46,9 +46,20 @@ export default function CommentBox(props: Props) {
   const menu: OnOffItem = {
     on: (
       <Box my={0.2}>
-        <IconButton size="small" aria-label="댓글 수정폼 열기" onClick={() => setAction('edit')}>
-          {{ edit: <ExitToApp fontSize="small" />, view: <DriveFileRenameOutline fontSize="small" /> }[action]}
-        </IconButton>
+        {
+          {
+            view: (
+              <IconButton size="small" aria-label="댓글 수정폼 열기" onClick={() => setAction('edit')}>
+                <DriveFileRenameOutline fontSize="small" />
+              </IconButton>
+            ),
+            edit: (
+              <IconButton size="small" aria-label="댓글 수정폼 닫기" onClick={() => setAction('view')}>
+                <ExitToApp fontSize="small" />
+              </IconButton>
+            ),
+          }[action]
+        }
         <IconButton size="small" aria-label="댓글 삭제" onClick={() => setOpen(true)}>
           <DeleteForever fontSize="small" />
         </IconButton>
@@ -73,7 +84,7 @@ export default function CommentBox(props: Props) {
       </Typography>
     ),
     edit: (
-      <Box sx={{ p: 1 }}>
+      <Box sx={{ py: 1, width: '100%' }}>
         <CommentForm onSubmit={onSubmit} {...comment} />
       </Box>
     ),

@@ -3,9 +3,8 @@ import { Noto_Sans_KR } from 'next/font/google'
 import { ThemeProvider } from '@mui/material'
 import { theme } from '@/styles/MuiTheme'
 import Providers from '@/lib/Providers'
-
 import './globals.css'
-import { SplashScreen } from '@/components'
+import { SplashScreen } from '@/components/shared'
 
 export const notoSans = Noto_Sans_KR({
   variable: '--font-noto-sans',

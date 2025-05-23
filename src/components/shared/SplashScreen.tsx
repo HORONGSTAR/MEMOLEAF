@@ -6,7 +6,8 @@ import { BasicProps } from '@/lib/types'
 import { useAppDispatch } from '@/store/hooks'
 import { getProfileThunk } from '@/store/slices/profileSlice'
 import { useSession } from 'next-auth/react'
-import { Footer, LoginBox, Navbar } from '@/components'
+import Navbar from './Navbar'
+import Footer from './Footer'
 
 export default function SplashScreen(props: BasicProps) {
   const { children } = props
@@ -43,7 +44,6 @@ export default function SplashScreen(props: BasicProps) {
         <Typography align="center" color="primary" variant="body2" gutterBottom>
           소셜로그인으로 간편하게 사용할 수 있어요.
         </Typography>
-        <LoginBox />
       </Box>
     ),
   }

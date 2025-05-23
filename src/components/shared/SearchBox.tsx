@@ -2,10 +2,11 @@
 import { TextField, IconButton, Stack, Box, Divider, Tab, Tabs } from '@mui/material'
 import { ReactNode, useCallback, useState } from 'react'
 import { Search } from '@mui/icons-material'
-import { MemoList, UserList } from '@/components'
+import { MemoList } from '@/components/memo'
+import { UserList } from '@/components/user'
 import { OnOffItem } from '@/lib/types'
 
-export default function SearchBar() {
+export default function SearchBar({ lastMemoId }: { lastMemoId: number }) {
   const [value, setValue] = useState(0)
   const [text, setText] = useState('')
   const [keyword, setKeyword] = useState('')
@@ -26,7 +27,7 @@ export default function SearchBar() {
   const labels = ['게시글', '사용자']
 
   const items: { [key: number]: ReactNode } = {
-    0: <MemoList search={{ keyword }} path={'search'} />,
+    0: <MemoList search={{ keyword }} path={'search'} lastMemoId={lastMemoId} />,
     1: <UserList search={{ keyword }} />,
   }
 

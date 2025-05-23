@@ -1,4 +1,4 @@
-import { ControlBox } from '@/components'
+import { ControlBox } from '@/components/user'
 
 function SettingPage() {
   return <ControlBox />

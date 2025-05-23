@@ -15,16 +15,16 @@ export async function GET(req: NextRequest) {
     const memos = await prisma.memo.findMany({
       where: {
         parentId: null,
-        ...(cursor && { id: { lt: cursor } }),
-        ...(keyword && { parentId: undefined, content: { contains: keyword } }),
+        id: { lt: cursor },
+        ...(keyword && { content: { contains: keyword } }),
       },
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: {
-        user: true,
-        images: true,
-        decos: true,
-        bookmarks: { where: { userId } },
+        user: { select: { id: true, name: true, image: true, userNum: true } },
+        images: { select: { id: true, url: true, alt: true } },
+        decos: { select: { id: true, kind: true, extra: true } },
+        bookmarks: { where: { userId }, select: { id: true } },
         _count: { select: { comments: true, bookmarks: true, leafs: true } },
       },
     })
@@ -32,10 +32,11 @@ export async function GET(req: NextRequest) {
     const searchTotal = await prisma.memo.count({
       where: {
         parentId: null,
-        ...(keyword && { parentId: undefined, content: { contains: keyword } }),
+        ...(keyword && { content: { contains: keyword } }),
       },
     })
-    const nextCursor = memos.length > 0 ? memos.slice(-1)[0].id : 0
+
+    const nextCursor = memos[9]?.id || 0
 
     return NRes.json({
       memos,

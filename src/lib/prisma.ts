@@ -11,7 +11,6 @@ declare const global: CustomNodeJsGlobal
 const getPrismaOptions = (): Prisma.PrismaClientOptions => {
   // 개발 환경에서는 쿼리 로깅, 배포 환경에서는 에러만 로깅
   const isProduction = process.env.NODE_ENV === 'production'
-  console.log('NODE_ENV :', process.env.NODE_ENV)
 
   // 로그 옵션 설정 - 타입 문제로 인해 기본 설정만 사용
   return {
