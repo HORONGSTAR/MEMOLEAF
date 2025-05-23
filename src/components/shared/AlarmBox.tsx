@@ -35,6 +35,7 @@ export default function AlarmBox() {
     setCount(0)
   }, [])
 
+  if (!userId) return null
   const components: OnOffItem = {
     on: (
       <Stack minHeight={100} alignItems="center" justifyContent="center">

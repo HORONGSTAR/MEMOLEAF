@@ -7,10 +7,10 @@ export default function LoginBox() {
     <Stack spacing={2}>
       <Button
         color="inherit"
-        sx={{ textTransform: 'none' }}
+        sx={{ textTransform: 'none', bgcolor: '#fff', color: '#222', border: '1px solid #222' }}
         size="large"
         startIcon={<SvgIcon>{googleIcon}</SvgIcon>}
-        variant="outlined"
+        variant="contained"
         onClick={() => signIn('google')}
       >
         Google로 시작하기

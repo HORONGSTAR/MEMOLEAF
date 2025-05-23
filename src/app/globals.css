@@ -38,6 +38,10 @@ body {
   animation: slideIn 0.5s ease-out forwards;
 }
 
+.index-banner {
+  background-size: contain;
+}
+
 @keyframes slideIn {
   from {
     opacity: 0;

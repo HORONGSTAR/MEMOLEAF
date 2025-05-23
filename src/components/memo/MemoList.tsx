@@ -3,9 +3,13 @@ import { MemoBox, MemoForm } from '@/components/memo'
 import { createMemo, getMemos } from '@/lib/fetch/memoApi'
 import { OnOffItem, MemoData, MemoParams, EndPoint } from '@/lib/types'
 import { useAppSelector } from '@/store/hooks'
-import { Paper, Stack, Typography, useTheme } from '@mui/material'
+import { CircularProgress, Divider, Paper, Stack, Typography, useTheme } from '@mui/material'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import MemoThread from './MemoThread'
+import { useSession } from 'next-auth/react'
+import Image from 'next/image'
+import { green } from '@mui/material/colors'
+import LoginBanner from '../auth/LoginBanner'
 
 interface Props {
   search?: { keyword: string }
@@ -20,8 +24,10 @@ export default function MemoList(props: Props) {
   const [memos, setMemos] = useState<MemoData[]>([])
   const [addItemStyle, setItemStyle] = useState('')
   const [cursor, setCursor] = useState(lastMemoId + 1)
+  const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const theme = useTheme()
+  const { status } = useSession()
 
   const limit = 10
   const observerRef = useRef(null)
@@ -39,6 +45,7 @@ export default function MemoList(props: Props) {
       .then((result) => {
         setMemos((prev) => [...prev, ...result.memos])
         setCursor(result.nextCursor)
+        setTotal(result.searchTotal)
       })
       .catch()
       .finally(() => setLoading(false))
@@ -84,12 +91,47 @@ export default function MemoList(props: Props) {
     off: null,
   }
 
+  const components = {
+    authenticated: form[isActiev.form],
+    loading: (
+      <Stack alignItems="center" justifyContent="center" minHeight={200}>
+        <CircularProgress />
+      </Stack>
+    ),
+    unauthenticated: (
+      <Stack
+        direction={{ sm: 'row', xs: 'column' }}
+        sx={{ bgcolor: green[50], borderRadius: 1, p: 2 }}
+        justifyContent="space-around"
+        alignItems="center"
+      >
+        <Image src={'/undraw_development_s4gv.svg'} alt="의견을 게시하는 사람들" width={250} height={120} priority />
+        <Stack maxWidth={300} spacing={2} alignItems="center">
+          <Stack alignItems="center">
+            <Typography color="primary" variant="h6">
+              메모리프에 오신 걸 환영합니다!
+            </Typography>
+            <Typography color="primary" variant="body2">
+              메모리프는 공용 테이블에 펼쳐진 낙서장 같은 공간이에요. 일상적인 기록을 남기고, 다른 사람의 기록도 구경하세요.
+            </Typography>
+          </Stack>
+          <Divider flexItem>
+            <Typography variant="caption" color="textSecondary">
+              소셜 로그인
+            </Typography>
+          </Divider>
+          <LoginBanner />
+        </Stack>
+      </Stack>
+    ),
+  }[status]
+
   return (
     <>
       <Typography variant="body2" color="textSecondary">
-        {search ? <>건의 검색결과</> : null}
+        {search ? <>{total}건의 검색결과</> : null}
       </Typography>
-      {form[isActiev.form]}
+      {components}
       <Stack spacing={2} className={addItemStyle}>
         {memos.map((memo: MemoData) => (
           <Paper variant="outlined" key={'home-memo' + memo.id}>

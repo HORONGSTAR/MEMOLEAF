@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
-import { Box, CircularProgress, Container, Stack, Toolbar, Typography } from '@mui/material'
+import { Box, Container, Stack, Toolbar } from '@mui/material'
 import Image from 'next/image'
 import { BasicProps } from '@/lib/types'
 import { useAppDispatch } from '@/store/hooks'
@@ -14,7 +14,7 @@ export default function SplashScreen(props: BasicProps) {
   const [ready, setReady] = useState(false)
   const [mounted, setMounted] = useState(false)
   const dispatch = useAppDispatch()
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const myId = session?.user.id
 
   useEffect(() => {
@@ -28,25 +28,6 @@ export default function SplashScreen(props: BasicProps) {
   }, [dispatch, myId])
 
   if (!mounted) return null
-
-  const components = {
-    authenticated: children,
-    loading: (
-      <Stack alignItems="center" justifyContent="center" minHeight={200}>
-        <CircularProgress />
-      </Stack>
-    ),
-    unauthenticated: (
-      <Box sx={{ width: '100%', py: 4 }}>
-        <Typography align="center" color="primary" variant="h6">
-          로그인 후 기록을 남겨보세요!
-        </Typography>
-        <Typography align="center" color="primary" variant="body2" gutterBottom>
-          소셜로그인으로 간편하게 사용할 수 있어요.
-        </Typography>
-      </Box>
-    ),
-  }
 
   return (
     <>
@@ -72,7 +53,7 @@ export default function SplashScreen(props: BasicProps) {
             <Toolbar />
             <Container>
               <Stack py={2} px={{ sm: 2, xs: 0 }} spacing={2}>
-                {components[status]}
+                {children}
               </Stack>
             </Container>
           </Box>
