@@ -156,6 +156,16 @@ export default function MemoList(props: Props) {
           </Paper>
         ))}
       </Stack>
+      {
+        {
+          on: (
+            <Stack alignItems="center" justifyContent="center" minHeight={200}>
+              <CircularProgress />
+            </Stack>
+          ),
+          off: null,
+        }[loading]
+      }
       <div ref={observerRef} />
     </>
   )
