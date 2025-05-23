@@ -1,3 +1,9 @@
+import { CircularProgress, Stack } from '@mui/material'
+
 export default function Loading() {
-  return <div className="loading-spinner">로딩 중...</div>
+  return (
+    <Stack alignItems="center" justifyContent="center" minHeight={200}>
+      <CircularProgress />
+    </Stack>
+  )
 }
