@@ -3,7 +3,7 @@ import { MemoBox, MemoForm } from '@/components/memo'
 import { createMemo, getMemos } from '@/lib/fetch/memoApi'
 import { OnOffItem, MemoData, MemoParams, EndPoint } from '@/lib/types'
 import { useAppSelector } from '@/store/hooks'
-import { CircularProgress, Divider, Paper, Stack, Typography, useTheme } from '@mui/material'
+import { CircularProgress, Divider, Paper, Skeleton, Stack, Typography, useTheme } from '@mui/material'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import MemoThread from './MemoThread'
 import { useSession } from 'next-auth/react'
@@ -25,7 +25,7 @@ export default function MemoList(props: Props) {
   const [addItemStyle, setItemStyle] = useState('')
   const [cursor, setCursor] = useState(lastMemoId + 1)
   const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState('off')
   const theme = useTheme()
   const { status } = useSession()
 
@@ -37,6 +37,7 @@ export default function MemoList(props: Props) {
   }
 
   const loadMoreMemos = useCallback(() => {
+    setLoading('on')
     const params = {
       category: endpoint,
       pagination: { cursor, limit, ...search },
@@ -48,7 +49,7 @@ export default function MemoList(props: Props) {
         setTotal(result.searchTotal)
       })
       .catch()
-      .finally(() => setLoading(false))
+      .finally(() => setLoading('off'))
   }, [endpoint, search, cursor, limit])
 
   useEffect(() => {
@@ -64,7 +65,7 @@ export default function MemoList(props: Props) {
       observer.observe(observerRef.current)
     }
     return () => observer.disconnect()
-  }, [loading, loadMoreMemos])
+  }, [loadMoreMemos])
 
   const handleCreateMemo = useCallback(
     (formData: Omit<MemoParams, 'id'>) => {
@@ -98,32 +99,35 @@ export default function MemoList(props: Props) {
         <CircularProgress />
       </Stack>
     ),
-    unauthenticated: (
-      <Stack
-        direction={{ sm: 'row', xs: 'column' }}
-        sx={{ bgcolor: green[50], borderRadius: 1, p: 2 }}
-        justifyContent="space-around"
-        alignItems="center"
-      >
-        <Image src={'/undraw_development_s4gv.svg'} alt="의견을 게시하는 사람들" width={250} height={120} priority />
-        <Stack maxWidth={300} spacing={2} alignItems="center">
-          <Stack alignItems="center">
-            <Typography color="primary" variant="h6">
-              메모리프에 오신 걸 환영합니다!
-            </Typography>
-            <Typography color="primary" variant="body2">
-              메모리프는 공용 테이블에 펼쳐진 낙서장 같은 공간이에요. 일상적인 기록을 남기고, 다른 사람의 기록도 구경하세요.
-            </Typography>
+    unauthenticated: {
+      on: (
+        <Stack
+          direction={{ sm: 'row', xs: 'column' }}
+          sx={{ bgcolor: green[50], borderRadius: 1, p: 2 }}
+          justifyContent="space-around"
+          alignItems="center"
+        >
+          <Image src={'/undraw_development_s4gv.svg'} alt="의견을 게시하는 사람들" width={250} height={120} priority />
+          <Stack maxWidth={300} spacing={2} alignItems="center">
+            <Stack alignItems="center">
+              <Typography color="primary" variant="h6">
+                메모리프에 오신 걸 환영합니다!
+              </Typography>
+              <Typography color="primary" variant="body2">
+                메모리프는 공용 테이블에 펼쳐진 낙서장 같은 공간이에요. 일상적인 기록을 남기고, 다른 사람의 기록도 구경하세요.
+              </Typography>
+            </Stack>
+            <Divider flexItem>
+              <Typography variant="caption" color="textSecondary">
+                소셜 로그인
+              </Typography>
+            </Divider>
+            <LoginBanner />
           </Stack>
-          <Divider flexItem>
-            <Typography variant="caption" color="textSecondary">
-              소셜 로그인
-            </Typography>
-          </Divider>
-          <LoginBanner />
         </Stack>
-      </Stack>
-    ),
+      ),
+      off: null,
+    }[isActiev.form],
   }[status]
 
   return (
@@ -132,6 +136,19 @@ export default function MemoList(props: Props) {
         {search ? <>{total}건의 검색결과</> : null}
       </Typography>
       {components}
+      {
+        {
+          on: (
+            <>
+              <Skeleton variant="rounded" height={160} />
+              <Skeleton variant="rounded" height={160} />
+              <Skeleton variant="rounded" height={160} />
+              <Skeleton variant="rounded" height={160} />
+            </>
+          ),
+          off: null,
+        }[loading]
+      }
       <Stack spacing={2} className={addItemStyle}>
         {memos.map((memo: MemoData) => (
           <Paper variant="outlined" key={'home-memo' + memo.id}>

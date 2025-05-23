@@ -2,7 +2,7 @@
 import { getMemos } from '@/lib/fetch/memoApi'
 import { MemoData } from '@/lib/types'
 import { checkCurrentOnOff, swapOnOff } from '@/lib/utills'
-import { Box, Button, Chip, CircularProgress, Collapse, List } from '@mui/material'
+import { Box, Button, Chip, Collapse, List, Skeleton, Stack } from '@mui/material'
 import { grey } from '@mui/material/colors'
 import { useCallback, useMemo, useState } from 'react'
 import MemoThreadBox from './MemoThreadBox'
@@ -73,7 +73,13 @@ export default function MemoThread({ id, count }: Props) {
         </Collapse>
       </List>
     ),
-    on: <CircularProgress />,
+    on: (
+      <Stack py={2} spacing={1}>
+        <Skeleton />
+        <Skeleton />
+        <Skeleton />
+      </Stack>
+    ),
   }[loading]
 
   return (

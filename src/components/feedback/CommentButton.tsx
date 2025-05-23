@@ -1,6 +1,6 @@
 'use client'
 import { Close, ForumOutlined } from '@mui/icons-material'
-import { Box, IconButton, Dialog, Pagination, Stack, DialogContent, DialogTitle, DialogActions, useMediaQuery } from '@mui/material'
+import { Box, IconButton, Dialog, Pagination, Stack, DialogContent, DialogTitle, DialogActions, useMediaQuery, Skeleton } from '@mui/material'
 import CommentBox from './CommentBox'
 import CommentForm from './CommentForm'
 import FeedbackCount from './FeedbackCount'
@@ -17,7 +17,7 @@ interface Props {
 }
 export default function CommentButton({ id, count }: Props) {
   const { profile } = useAppSelector((state) => state.profile)
-
+  const [loading, setLoading] = useState('off')
   const [comments, setComments] = useState<CommentData[]>([])
   const [total, setTotal] = useState(count || 0)
   const [active, setActive] = useState<OnOff>('off')
@@ -29,9 +29,11 @@ export default function CommentButton({ id, count }: Props) {
 
   useEffect(() => {
     if (!swapOnOff[active].bool) return
+    setLoading('on')
     getComments({ page, limit }, id)
       .then((result) => setComments(result.comments))
       .catch((err) => console.error(err))
+      .finally(() => setLoading('off'))
   }, [active, page, id])
 
   const onSubmit = useCallback(
@@ -79,6 +81,18 @@ export default function CommentButton({ id, count }: Props) {
           <CommentForm onSubmit={onSubmit} />
         </Box>
         <DialogContent>
+          {
+            {
+              on: (
+                <Stack py={2} spacing={1}>
+                  <Skeleton />
+                  <Skeleton />
+                  <Skeleton />
+                </Stack>
+              ),
+              off: null,
+            }[loading]
+          }
           {comments.map((comment) => (
             <CommentBox key={'comment' + comment.id} onDelete={handleDelete} comment={comment} />
           ))}
