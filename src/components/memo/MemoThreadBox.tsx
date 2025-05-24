@@ -70,13 +70,14 @@ export default function MemoBox(props: Props) {
 
   const memoStateBox: OnOffItem = {
     view: (
-      <Box sx={{ p: 1 }}>
+      <Box>
         <DecoBox decos={memo.decos}>
-          <ListItem key={'first-memothread' + memo.id} disablePadding alignItems="flex-start" secondaryAction={memu}>
+          <ListItem dense secondaryAction={memu}>
             <ListItemIcon>{children}</ListItemIcon>
-            <ListItemText primary={memo.content} secondary={changeDate(memo.createdAt)} />
+            <ListItemText secondary={changeDate(memo.createdAt)} />
           </ListItem>
-          <ListItem dense divider>
+          <ListItem dense>{memo.content}</ListItem>
+          <ListItem disablePadding divider>
             <ImgGrid layout="list" images={addImagePath(memo.images)} />
           </ListItem>
         </DecoBox>

@@ -1,10 +1,9 @@
 import { MyProfile, MyPost } from '@/components/user'
 import { Typography, Stack } from '@mui/material'
 import { Error } from '@mui/icons-material'
-import prisma, { disconnectPrisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 
 export default async function MyPage({ params }: { params: Promise<{ id: string }> }) {
-  disconnectPrisma()
   const { id } = await params
   const profile = await prisma.user.findUnique({
     where: { id: parseInt(id) },

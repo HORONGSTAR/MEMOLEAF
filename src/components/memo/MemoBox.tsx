@@ -109,7 +109,7 @@ export default function MemoBox(props: Props) {
         </ListItem>
         <DecoBox decos={memo.decos}>
           <ListItem>{memo.content}</ListItem>
-          <ListItem>
+          <ListItem disablePadding>
             <ImgGrid layout={layout} images={addImagePath(memo.images)} />
           </ListItem>
         </DecoBox>

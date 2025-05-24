@@ -1,14 +1,12 @@
 import { MemoBox } from '@/components/memo'
 import { Button, Stack, Typography } from '@mui/material'
 import { ArrowBack, Error } from '@mui/icons-material'
-import prisma, { disconnectPrisma } from '@/lib/prisma'
+import prisma from '@/lib/prisma'
 import Link from 'next/link'
 import MemoThread from '@/components/memo/MemoThread'
 import MemoThreadForm from '@/components/memo/MemoThreadForm'
 
 export default async function DetailPage({ params }: { params: Promise<{ id: string }> }) {
-  disconnectPrisma()
-
   const { id } = await params
   const memo = await prisma.memo.findUnique({
     where: { id: parseInt(id) },
