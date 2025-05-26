@@ -1,4 +1,4 @@
-import { SearchBox } from '@/components/shared'
+import SearchContainer from '@/components/Container/SearchContainer'
 import prisma from '@/lib/prisma'
 
 export default async function SearchPage() {
@@ -7,5 +7,5 @@ export default async function SearchPage() {
     select: { id: true },
     orderBy: { createdAt: 'desc' },
   })
-  return <SearchBox lastMemoId={lastMemo?.id || 0} />
+  return <SearchContainer lastMemoId={lastMemo?.id || 0} />
 }

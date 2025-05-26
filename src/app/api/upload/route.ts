@@ -27,7 +27,6 @@ interface UploadResult {
 
 export async function POST(request: NextRequest): Promise<NRes> {
   try {
-    // 요청 본문 확인
     const body = await request.json()
 
     if (!body || !body.images || !Array.isArray(body.images) || body.images.length === 0) {

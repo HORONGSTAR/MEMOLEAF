@@ -1,10 +1,11 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { getProfile, updateProfile } from '@/lib/fetch/userApi'
-import { UserData, UserParams } from '@/lib/types'
+import { fetchProfile, updateProfile } from '@/shared/fetch/usersApi'
+import { UserParams } from '@/shared/types/api'
+import { UserData } from '@/shared/types/client'
 
-export const getProfileThunk = createAsyncThunk<UserData, number>('user/getProfile', async (id) => {
+export const fetchProfileThunk = createAsyncThunk<UserData, number>('user/fetchProfile', async (id) => {
   try {
-    return await getProfile(id)
+    return await fetchProfile(id)
   } catch (error) {
     console.error(error || '유저 조회 실패')
   }
@@ -34,14 +35,14 @@ export const authSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getProfileThunk.pending, (state) => {
+      .addCase(fetchProfileThunk.pending, (state) => {
         state.status = 'loading'
       })
-      .addCase(getProfileThunk.fulfilled, (state, action) => {
+      .addCase(fetchProfileThunk.fulfilled, (state, action) => {
         state.status = 'succeeded'
         state.profile = action.payload
       })
-      .addCase(getProfileThunk.rejected, (state) => {
+      .addCase(fetchProfileThunk.rejected, (state) => {
         state.status = 'failed'
       })
       .addCase(updateProfileThunk.pending, (state) => {

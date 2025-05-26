@@ -1,17 +1,18 @@
 'use client'
 import { Typography, List, ListItem, Stack, IconButton, TextField } from '@mui/material'
-import { DriveFileRenameOutline } from '@mui/icons-material'
-import { Avatar, Dialog, TextCount } from '@/components/common'
+import { checkOnOff, imgPath, swapOnOff } from '@/shared/utils/common'
 import { useState, useCallback, useMemo } from 'react'
-import { UserData, UserParams } from '@/lib/types'
-import { useSession } from 'next-auth/react'
-import { checkCurrentOnOff, imgPath, swapOnOff } from '@/lib/utills'
-import { useAppDispatch } from '@/store/hooks'
+import { Avatar, Dialog, TextCount } from '@/components/common'
+import { DriveFileRenameOutline } from '@mui/icons-material'
 import { updateProfileThunk } from '@/store/slices/profileSlice'
-import AvatarUploader from './AvatarUploader'
-import FollowButton from './FollowButton'
+import { useAppDispatch } from '@/store/hooks'
+import { useSession } from 'next-auth/react'
+import { UserParams } from '@/shared/types/api'
+import { ProfileData } from '@/shared/types/client'
+import AvatarUploader from '@/components/user/AvatarUploader'
+import FollowButton from '@/components/user/FollowButton'
 
-export default function MyProfile(inti: UserData) {
+export default function MyProfile(inti: ProfileData) {
   const [profile, setProfile] = useState(inti)
   const [image, setImage] = useState<{ file?: File; url: string }>({ url: imgPath + inti.image })
   const [name, setName] = useState(profile.name)
@@ -21,7 +22,7 @@ export default function MyProfile(inti: UserData) {
   const dispatch = useAppDispatch()
 
   const myId = session?.user.id
-  const isMine = checkCurrentOnOff(profile.id, myId || 0)
+  const isMine = checkOnOff(profile.id, myId || 0)
 
   const handleChangeName = useCallback((value: string) => {
     if (value.length > 12) return

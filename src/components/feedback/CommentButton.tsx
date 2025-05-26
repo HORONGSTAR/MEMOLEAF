@@ -1,15 +1,13 @@
 'use client'
 import { Close, ForumOutlined } from '@mui/icons-material'
 import { Box, IconButton, Dialog, Pagination, Stack, DialogContent, DialogTitle, DialogActions, useMediaQuery, Skeleton } from '@mui/material'
-import CommentBox from './CommentBox'
-import CommentForm from './CommentForm'
-import FeedbackCount from './FeedbackCount'
+import { createComment, deleteComment, fetchComments } from '@/shared/fetch/commentsApi'
+import { CommentForm, CommentBox, FeedbackCount } from '@/components/feedback'
 import { useCallback, useEffect, useState } from 'react'
-import { OnOff, CommentData } from '@/lib/types'
-import { createComment, deleteComment, getComments } from '@/lib/fetch/feedbackApi'
-import { swapOnOff } from '@/lib/utills'
-import { theme } from '@/styles/MuiTheme'
 import { useAppSelector } from '@/store/hooks'
+import { CommentData } from '@/shared/types/client'
+import { swapOnOff } from '@/shared/utils/common'
+import { theme } from '@/styles/MuiTheme'
 
 interface Props {
   count?: number
@@ -20,7 +18,7 @@ export default function CommentButton({ id, count }: Props) {
   const [loading, setLoading] = useState('off')
   const [comments, setComments] = useState<CommentData[]>([])
   const [total, setTotal] = useState(count || 0)
-  const [active, setActive] = useState<OnOff>('off')
+  const [active, setActive] = useState('off')
   const [page, setPage] = useState(1)
   const limit = 5
   const totalPage = Math.ceil(total / limit)
@@ -30,7 +28,7 @@ export default function CommentButton({ id, count }: Props) {
   useEffect(() => {
     if (!swapOnOff[active].bool) return
     setLoading('on')
-    getComments({ page, limit }, id)
+    fetchComments(page, id)
       .then((result) => setComments(result.comments))
       .catch((err) => console.error(err))
       .finally(() => setLoading('off'))
@@ -60,7 +58,7 @@ export default function CommentButton({ id, count }: Props) {
   }, [])
 
   return (
-    <>
+    <div onClick={(e) => e.stopPropagation()}>
       <FeedbackCount count={total}>
         <IconButton aria-label="댓글창 열기" onClick={() => setActive('on')}>
           <ForumOutlined fontSize="small" />
@@ -103,6 +101,6 @@ export default function CommentButton({ id, count }: Props) {
           </Stack>
         </DialogActions>
       </Dialog>
-    </>
+    </div>
   )
 }

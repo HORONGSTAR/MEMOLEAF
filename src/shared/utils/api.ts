@@ -1,0 +1,16 @@
+export const memosUrl = '/api/memos'
+export const uploadUrl = '/api/upload'
+export const commentsUrl = '/api/comments'
+export const bookmarksUrl = '/api/bookmarks'
+export const alarmUrl = '/api/alarm'
+export const usersUrl = '/api/users'
+export const settingsUrl = '/api/settings'
+export const searchUrl = '/api/search'
+
+export const buildApiCall = (method: string, data: unknown) => {
+  return {
+    method: method,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  }
+}

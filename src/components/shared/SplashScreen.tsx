@@ -1,16 +1,14 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { Box, Container, Stack, Toolbar } from '@mui/material'
-import Image from 'next/image'
-import { BasicProps } from '@/lib/types'
+import { fetchProfileThunk } from '@/store/slices/profileSlice'
 import { useAppDispatch } from '@/store/hooks'
-import { getProfileThunk } from '@/store/slices/profileSlice'
 import { useSession } from 'next-auth/react'
-import Navbar from './Navbar'
-import Footer from './Footer'
+import Navbar from '@/components/shared/Navbar'
+import Footer from '@/components/shared/Footer'
+import Image from 'next/image'
 
-export default function SplashScreen(props: BasicProps) {
-  const { children } = props
+export default function SplashScreen({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false)
   const [mounted, setMounted] = useState(false)
   const dispatch = useAppDispatch()
@@ -24,7 +22,7 @@ export default function SplashScreen(props: BasicProps) {
   }, [])
 
   useEffect(() => {
-    if (myId) dispatch(getProfileThunk(myId))
+    if (myId) dispatch(fetchProfileThunk(myId))
   }, [dispatch, myId])
 
   if (!mounted) return null

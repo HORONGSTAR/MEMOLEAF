@@ -1,126 +1,77 @@
 'use client'
-import { getUsers } from '@/lib/fetch/userApi'
-import { Button, Chip, ChipProps, Divider, List, ListItem, ListItemAvatar, ListItemText, Stack, Typography } from '@mui/material'
-import { User } from '@prisma/client'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Avatar, LinkBox } from '@/components/common'
-import { OnOffItem } from '@/lib/types'
-import { checkCurrentOnOff } from '@/lib/utills'
+import { fetchtFollow } from '@/shared/fetch/usersApi'
+import { Chip, ChipProps, List, Typography } from '@mui/material'
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
+import { swapOnOff } from '@/shared/utils/common'
+import { UserData } from '@/shared/types/client'
 
 interface Props {
-  search?: { keyword: string }
-  id?: number
-  name?: string
+  user: { id: number; name: string }
+  nextCursor: number
+  children: ReactNode
+  loadingBox: ReactNode
+  addUserList: (values: UserData[]) => void
 }
 
-export default function UserList({ id, name, search }: Props) {
-  const [users, setUsers] = useState<User[]>([])
+type EndPoint = 'follower' | 'following'
+
+export default function UserList(props: Props) {
+  const { user, nextCursor, loadingBox, children, addUserList } = props
+  const [endpoint, setEndPoint] = useState<EndPoint>('follower')
   const [count, setCount] = useState(0)
-  const [aria, setAria] = useState<'follower' | 'following' | 'search'>('follower')
-  const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
-  const pageRef = useRef<HTMLDivElement>(null)
-  const limit = 10
-  const totalPage = Math.ceil(total / limit)
+  const [cursor, setCursor] = useState(nextCursor)
+  const [loading, setLoading] = useState('off')
+  const observerRef = useRef(null)
+
+  const loadMoreUser = useCallback(() => {
+    if (cursor < 0) return
+    setLoading('on')
+    fetchtFollow({ id: user.id, endpoint })
+      .then((result) => {
+        setCount(result.searchTotal)
+        addUserList(result.memos)
+        setCursor(result.nextCursor)
+      })
+      .catch()
+      .finally(() => setLoading('off'))
+  }, [addUserList, cursor, endpoint, user.id])
 
   useEffect(() => {
-    let data
-    if (search?.keyword) {
-      setAria('search')
-      data = { pagination: { page, limit, keyword: search.keyword } }
-    } else {
-      data = { category: { [aria]: id }, pagination: { page, limit } }
-    }
-    getUsers(data).then((result) => {
-      setUsers(result.users)
-      setTotal(result.total)
-      setCount(result.total)
-    })
-  }, [aria, id, page, search])
-
-  useEffect(() => {
-    if (page > 1) {
-      setTimeout(() => {
-        if (pageRef.current) {
-          pageRef.current.scrollIntoView({ behavior: 'smooth' })
-        } else {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !swapOnOff[loading].bool) {
+          loadMoreUser()
         }
-      }, 1000)
+      },
+      { threshold: 0.1 }
+    )
+    if (observerRef.current) {
+      observer.observe(observerRef.current)
     }
-  }, [page])
-
-  const handleNextPage = useCallback(() => {
-    setUsers((prev) => [...users, ...prev])
-    setPage((prev) => prev + 1)
-  }, [users])
-
-  const isLast = checkCurrentOnOff(totalPage || 1, page)
-
-  const pageButton: OnOffItem = {
-    off: (
-      <Divider>
-        <Button onClick={handleNextPage}>
-          더 보기{page}/{totalPage}
-        </Button>
-      </Divider>
-    ),
-    on: null,
-  }
-
-  const chipProps: { from: ChipProps; to: ChipProps } = {
-    to: { color: 'default' },
-    from: { color: 'default' },
-    [aria]: { color: 'primary' },
-  }
+    return () => observer.disconnect()
+  }, [loadMoreUser, loading])
 
   const followInfo = {
     following: { [count]: `${name}님이 팔로워 ${count}명`, 0: '팔로워 정보가 없습니다.' }[count],
     follower: { [count]: `${name}님의 팔로잉 ${count}명`, 0: '팔로잉 정보가 없습니다.' }[count],
-    search: { [count]: `${count}건의 검색 결과`, 0: '유저 정보가 없습니다.' }[count],
-  }[aria]
+  }[endpoint]
+
+  const chipProps: { follower: ChipProps; following: ChipProps } = {
+    follower: { color: 'default' },
+    following: { color: 'default' },
+    [endpoint]: { color: 'primary' },
+  }
 
   return (
     <>
-      <Stack direction="row" spacing={1}>
-        {search ? (
-          <Typography variant="body2" color="textSecondary">
-            유저 ID를 검색하면 정확한 결과가 나옵니다.
-          </Typography>
-        ) : (
-          <>
-            <Chip {...chipProps.from} onClick={() => setAria('follower')} label={`팔로잉`} />
-            <Chip {...chipProps.to} onClick={() => setAria('following')} label={`팔로워`} />
-          </>
-        )}
-      </Stack>
-      <List>
-        <ListItem disableGutters>
-          <Typography variant="body2" color="textSecondary">
-            {followInfo}
-          </Typography>
-        </ListItem>
-        {users.map((user) => (
-          <ListItem disableGutters key={'followList' + user.id} alignItems="flex-start" divider>
-            <ListItemAvatar>
-              <LinkBox link={`/page/my/${user.id}`}>
-                <Avatar user={user} size={40} />
-              </LinkBox>
-            </ListItemAvatar>
-            <ListItemText
-              primary={
-                <Stack direction="row" spacing={1}>
-                  <LinkBox link={`/page/my/${user.id}`}>{user.name}</LinkBox>
-                  <Typography variant="body2" color="textDisabled">
-                    ID {user.userNum}
-                  </Typography>
-                </Stack>
-              }
-              secondary={user.info || '자기소개가 없습니다.'}
-            />
-          </ListItem>
-        ))}
-        {pageButton[isLast]}
-      </List>
+      <Chip {...chipProps.follower} onClick={() => setEndPoint('follower')} label={`팔로잉`} />
+      <Chip {...chipProps.following} onClick={() => setEndPoint('following')} label={`팔로워`} />
+      <Typography variant="body2" color="textSecondary">
+        {followInfo}
+      </Typography>
+      <List>{children}</List>
+      <div ref={observerRef} />
+      {{ on: loadingBox, off: null }[loading]}
     </>
   )
 }

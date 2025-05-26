@@ -1,7 +1,8 @@
 import GoogleProvider from 'next-auth/providers/google'
 import KakaoProvider from 'next-auth/providers/kakao'
 import NaverProvider from 'next-auth/providers/naver'
-import { randomProfile, generateUserNum } from '@/lib/utills'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import { generateRandomProfile, generateUserNum } from '@/shared/utils/create'
 import prisma from '@/lib/prisma'
 import { NextAuthOptions } from 'next-auth'
 
@@ -19,7 +20,24 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.NAVER_CLIENT_ID as string,
       clientSecret: process.env.NAVER_CLIENT_SECRET as string,
     }),
+    CredentialsProvider({
+      credentials: {
+        password: {
+          label: '열람 인증',
+          type: 'password',
+        },
+      },
+      async authorize(credentials) {
+        if (credentials?.password === 'demo_account') {
+          return {
+            id: 'demo_portfolio',
+          }
+        }
+        return null
+      },
+    }),
   ],
+
   pages: { signIn: '/page/account/login' },
   callbacks: {
     async redirect({ baseUrl }) {
@@ -32,12 +50,13 @@ export const authOptions: NextAuthOptions = {
         google: 'google' + profile?.sub,
         kakao: 'kakao' + profile?.id,
         naver: 'naver' + profile?.response?.id,
+        credentials: 'demo_portfolio',
       }[key]
 
       if (credit) {
         const user = await prisma.user.findUnique({ where: { credit } })
         if (!user) {
-          const { name, image } = randomProfile()
+          const { name, image } = generateRandomProfile()
           const newUser = await prisma.user.create({ data: { credit, name, image } })
 
           const userNum = generateUserNum(newUser.id)

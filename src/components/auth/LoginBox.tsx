@@ -1,6 +1,6 @@
+import { googleIcon, kakaoIcon, naverIcon } from '@/styles/Icons'
 import { Button, Stack, SvgIcon } from '@mui/material'
 import { signIn } from 'next-auth/react'
-import { googleIcon, kakaoIcon, naverIcon } from '@/styles/Icons'
 
 export default function LoginBox() {
   return (
@@ -24,7 +24,6 @@ export default function LoginBox() {
       >
         카카오로 시작하기
       </Button>
-
       <Button
         sx={{ bgcolor: '#2DB400', color: '#ffffff' }}
         size="large"

@@ -1,13 +1,12 @@
 'use client'
-import { CircleNotifications, Notifications } from '@mui/icons-material'
 import { Badge, Box, Button, IconButton, List, ListItem, ListItemAvatar, Stack, Typography } from '@mui/material'
-import { Avatar, Dialog, LinkBox } from '@/components/common'
+import { CircleNotifications, Notifications } from '@mui/icons-material'
 import { useCallback, useEffect, useState } from 'react'
-import { getAlarm, removeAlarm } from '@/lib/fetch/feedbackApi'
-import { useSession } from 'next-auth/react'
+import { fetchAlarm, deleteAlarm } from '@/shared/fetch/alarmApi'
+import { Avatar, Dialog, LinkBox } from '@/components/common'
 import { Alarm, User } from '@prisma/client'
-import { checkCurrentOnOff } from '@/lib/utills'
-import { OnOffItem } from '@/lib/types'
+import { useSession } from 'next-auth/react'
+import { checkOnOff } from '@/shared/utils/common'
 
 interface AlarmData extends Alarm {
   reader: User
@@ -21,7 +20,7 @@ export default function AlarmBox() {
   const userId = session?.user.id
 
   useEffect(() => {
-    getAlarm()
+    fetchAlarm()
       .then((result) => {
         setCount(result.count)
         setAlarms(result.alarms)
@@ -30,13 +29,13 @@ export default function AlarmBox() {
   }, [userId])
 
   const handleDelete = useCallback(() => {
-    removeAlarm()
+    deleteAlarm()
     setAlarms([])
     setCount(0)
   }, [])
 
   if (!userId) return null
-  const components: OnOffItem = {
+  const components = {
     on: (
       <Stack minHeight={100} alignItems="center" justifyContent="center">
         <CircleNotifications sx={{ mb: 1 }} color="disabled" fontSize="large" />
@@ -79,7 +78,7 @@ export default function AlarmBox() {
         </ListItem>
       </List>
     ),
-  }
+  }[checkOnOff(count, 0)]
 
   return (
     <>
@@ -89,7 +88,7 @@ export default function AlarmBox() {
         </Badge>
       </IconButton>
       <Dialog open={open} onClose={() => setOpen(false)} title="알림창">
-        {components[checkCurrentOnOff(count, 0)]}
+        {components}
       </Dialog>
     </>
   )

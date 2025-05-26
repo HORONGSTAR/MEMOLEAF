@@ -1,12 +1,12 @@
 'use client'
-import { Dialog, LinkBox, Avatar } from '@/components/common'
-import CommentForm from './CommentForm'
-import { useCallback, useState } from 'react'
-import { OnOffItem, CommentData } from '@/lib/types'
-import { updateComment } from '@/lib/fetch/feedbackApi'
-import { changeDate, checkCurrentOnOff } from '@/lib/utills'
 import { List, ListItem, Box, Typography, IconButton, ListItemText, ListItemAvatar, Snackbar } from '@mui/material'
 import { DriveFileRenameOutline, DeleteForever, ExitToApp } from '@mui/icons-material'
+import { Dialog, LinkBox, Avatar } from '@/components/common'
+import { convertDate, checkOnOff } from '@/shared/utils/common'
+import { useCallback, useState } from 'react'
+import { updateComment } from '@/shared/fetch/commentsApi'
+import { CommentForm } from '@/components/feedback'
+import { CommentData } from '@/shared/types/client'
 import { useSession } from 'next-auth/react'
 
 interface Props {
@@ -21,7 +21,7 @@ export default function CommentBox(props: Props) {
   const { onDelete } = props
   const { data: session } = useSession()
   const myId = session?.user.id
-  const isMine = checkCurrentOnOff(comment.user.id, myId || 0)
+  const isMine = checkOnOff(comment.user.id, myId || 0)
   const [message, setMessage] = useState('')
 
   const onSubmit = useCallback(
@@ -43,7 +43,7 @@ export default function CommentBox(props: Props) {
     setOpen(false)
   }, [comment, onDelete])
 
-  const menu: OnOffItem = {
+  const menu = {
     on: (
       <Box my={0.2}>
         {
@@ -66,7 +66,7 @@ export default function CommentBox(props: Props) {
       </Box>
     ),
     off: null,
-  }
+  }[isMine]
 
   const dialogProps = {
     open,
@@ -77,7 +77,7 @@ export default function CommentBox(props: Props) {
     onAction: handleDelete,
   }
 
-  const components: OnOffItem = {
+  const components = {
     view: (
       <Typography px={2} pb={2} variant="body2">
         {comment.text}
@@ -93,13 +93,13 @@ export default function CommentBox(props: Props) {
         <Typography color="textDisabled">삭제된 댓글입니다.</Typography>
       </Box>
     ),
-  }
+  }[action]
 
   return (
     <>
       <List disablePadding>
         <Box whiteSpace="pre-line">
-          <ListItem secondaryAction={menu[isMine]}>
+          <ListItem secondaryAction={menu}>
             <ListItemAvatar>
               <LinkBox link={`/page/my/${comment.user.id}`}>
                 <Avatar user={comment.user} size={36} />
@@ -111,11 +111,11 @@ export default function CommentBox(props: Props) {
                   {comment.user.name}
                 </LinkBox>
               }
-              secondary={changeDate(comment.createdAt)}
+              secondary={convertDate(comment.createdAt)}
             />
           </ListItem>
           <ListItem divider disablePadding>
-            {components[action]}
+            {components}
           </ListItem>
         </Box>
       </List>

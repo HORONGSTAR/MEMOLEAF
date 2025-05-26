@@ -69,11 +69,6 @@ const prismaClientSingleton = () => {
     try {
       // 쿼리 실행
       const result = await next(params)
-      const timing = Date.now() - startTime
-
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`Query: ${params.model}.${params.action} took ${timing}ms`)
-      }
 
       return result
     } catch (error) {

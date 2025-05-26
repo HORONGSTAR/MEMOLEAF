@@ -1,12 +1,14 @@
-import { MyProfile, MyPost } from '@/components/user'
+import MyContainer from '@/components/Container/MyContainer'
 import { Typography, Stack } from '@mui/material'
 import { Error } from '@mui/icons-material'
 import prisma from '@/lib/prisma'
+import { MyProfile } from '@/components/user'
 
 export default async function MyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const userId = parseInt(id)
   const profile = await prisma.user.findUnique({
-    where: { id: parseInt(id) },
+    where: { id: userId },
     select: {
       id: true,
       name: true,
@@ -17,18 +19,10 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
     },
   })
 
-  const lastMyMemo = await prisma.memo.findFirst({
-    where: { userId: parseInt(id) },
-    take: 1,
+  const lastMemo = await prisma.memo.findFirst({
+    where: { parentId: null },
+    orderBy: { createdAt: 'desc' },
     select: { id: true },
-    orderBy: { createdAt: 'desc' },
-  })
-
-  const lastBookmark = await prisma.bookMark.findFirst({
-    where: { userId: parseInt(id) },
-    take: 1,
-    orderBy: { createdAt: 'desc' },
-    include: { memo: { select: { id: true } } },
   })
 
   return (
@@ -36,7 +30,7 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
       {profile ? (
         <>
           <MyProfile {...profile} />
-          <MyPost lastMyMemoId={lastMyMemo?.id || 0} lastBookmarkId={lastBookmark?.memo?.id || 0} id={parseInt(id)} name={profile.name} />
+          <MyContainer id={profile.id} name={profile.name} lastMemoId={lastMemo?.id} />
         </>
       ) : (
         <Stack alignItems="center" spacing={2} pt={3}>

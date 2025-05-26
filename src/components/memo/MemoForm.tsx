@@ -1,85 +1,92 @@
 'use client'
+import { ImgPreview, ImgForm, ToolBox, ToolItem } from '@/components/memo/sub'
+import { ReactNode, useCallback, useState } from 'react'
 import { Button, Snackbar, Stack, Box } from '@mui/material'
 import { InputText, TextCount } from '@/components/common'
-import { ReactNode, useCallback, useMemo, useState } from 'react'
-import { swapOnOff } from '@/lib/utills'
-import { MemoData, MemoParams, EditImage, EditDeco } from '@/lib/types'
-import { ImgPreview, ImgForm } from '@/components/img'
-import ToolBox from './ToolBox'
-import ToolItem from './ToolItem'
+import { DecoData, ImageData } from '@/shared/types/client'
+import { MemoParams } from '@/shared/types/api'
+import { swapOnOff } from '@/shared/utils/common'
 
-interface MemoFormData extends Partial<Omit<MemoData, 'decos'>> {
-  decos?: EditDeco
-  placeholder?: string
+interface IntiMemoValue {
+  action: 'create' | 'update'
+  id?: number
+  parentId: number | null
+  content?: string
+  images?: ImageData[]
+  decos?: DecoData
   children?: ReactNode
-  onSubmit: (params: Omit<MemoParams, 'id'>) => void
+  onSubmint: (params: MemoParams) => void
 }
 
-const kindData = {
+const intiDecoValue = {
   subtext: { active: 'off', extra: '' },
   folder: { active: 'off', extra: '' },
   secret: { active: 'off', extra: Math.random().toString(36).slice(2, 8) },
 }
 
-export default function MemoForm(inti: MemoFormData) {
-  const [images, setImages] = useState<EditImage>({ file: [], imgs: inti.images || [] })
-  const [decos, setDecos] = useState<EditDeco>({ ...kindData, ...inti.decos })
+export default function MemoForm(inti: IntiMemoValue) {
   const [content, setContent] = useState(inti.content || '')
+  const [files, setFiles] = useState<File[]>([])
+  const [imgs, setImgs] = useState(inti?.images || [])
+  const [decos, setDecos] = useState<DecoData>({ ...intiDecoValue, ...inti.decos })
   const [message, setMessage] = useState('')
-  const imageProps = { images, setImages }
-  const decoProps = { decos, setDecos }
-  const { children, placeholder } = inti
+
+  const { action, id, parentId, children, onSubmint } = inti
 
   const handleSubmit = useCallback(() => {
     if (!content) return setMessage('내용을 입력하세요.')
-
-    const editDecos = Object.keys(decos)
-      .filter((key) => swapOnOff[decos[key].active].bool)
-      .map((key) => ({ kind: key, extra: decos[key].extra }))
-
-    inti.onSubmit({
+    const formData = {
+      decos: Object.keys(decos)
+        .filter((key) => swapOnOff[decos[key].active].bool)
+        .map((key) => ({ kind: key, extra: decos[key].extra })),
+      id,
+      parentId,
       content,
-      images,
-      decos: editDecos,
-    })
-
+    }
+    onSubmint({ formData, imgs, files })
     setContent('')
-    setImages({ file: [], imgs: [] })
-    setDecos({ ...kindData })
-  }, [content, images, decos, inti])
+    setFiles([])
+    setImgs([])
+    setDecos(intiDecoValue)
+  }, [content, decos, id, parentId, files, imgs, onSubmint])
 
-  const handleChange = (value: string) => {
+  const handleContentChange = (value: string) => {
     if (value.length > 191) return
     setContent(value)
   }
 
-  const isEdit = useMemo(() => (inti.id ? true : false), [inti])
-
   return (
-    <>
+    <div onClick={(e) => e.stopPropagation()}>
       <Stack sx={{ bgcolor: '#fff', p: 1, mb: 2 }}>
-        <ToolItem {...decoProps} />
+        <ToolItem decos={decos} setDecos={setDecos} />
         <InputText
           id="content"
           multiline
           minRows={3}
           aria-label="메모 작성. 글자수 제한 191자."
-          placeholder={placeholder || '기록을 남겨보세요!'}
+          placeholder={'기록을 남겨보세요!'}
           value={content}
           fontSize="body1"
-          onChange={(e) => handleChange(e.target.value)}
+          onChange={(e) => handleContentChange(e.target.value)}
         />
-        <ImgPreview {...imageProps} />
+        <ImgPreview imgs={imgs} setImgs={setImgs} setFiles={setFiles} />
         <TextCount text={content} max={191} />
       </Stack>
       <Stack direction="row" alignItems="center">
-        <ImgForm {...imageProps} />
-        <ToolBox {...decoProps} />
+        <ImgForm imgs={imgs} setImgs={setImgs} setFiles={setFiles} />
+        <ToolBox decos={decos} setDecos={setDecos} />
         <Box flexGrow={1} />
         {children}
-        <Button size="large" variant={isEdit ? 'text' : 'contained'} onClick={handleSubmit}>
-          {isEdit ? '수정' : '메모'}
-        </Button>
+        {
+          {
+            create: (
+              <Button size="large" variant="contained" onClick={handleSubmit}>
+                메모
+              </Button>
+            ),
+            update: <Button onClick={handleSubmit}>수정</Button>,
+          }[action]
+        }
       </Stack>
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
@@ -88,6 +95,6 @@ export default function MemoForm(inti: MemoFormData) {
         onClose={() => setMessage('')}
         message={message}
       />
-    </>
+    </div>
   )
 }

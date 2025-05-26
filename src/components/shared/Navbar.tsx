@@ -1,8 +1,8 @@
 import { AppBar, Toolbar, Container, IconButton, Box } from '@mui/material'
 import { Account } from '@/components/auth'
-import AlarmBox from './AlarmBox'
-import Link from 'next/link'
 import { Search } from '@mui/icons-material'
+import AlarmBox from '@/components/shared/AlarmBox'
+import Link from 'next/link'
 
 export default function Navbar() {
   return (

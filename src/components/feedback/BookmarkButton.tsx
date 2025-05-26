@@ -1,56 +1,93 @@
 'use client'
-import { BookmarkMemo } from '@/lib/fetch/feedbackApi'
-import { OnOffItem } from '@/lib/types'
+import { createBookmark, deleteBookmark } from '@/shared/fetch/bookmarksApi'
 import { Bookmark, BookmarkBorder } from '@mui/icons-material'
 import { IconButton, Snackbar } from '@mui/material'
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import FeedbackCount from './FeedbackCount'
 
 interface Props {
   id: number
-  state: string
+  checked: 'on' | 'off'
   count?: number
 }
 
 export default function BookmarkButton(props: Props) {
   const [id, setId] = useState(props.id)
-  const [state, setState] = useState(props.state)
+  const [checked, setChecked] = useState(props.checked)
   const [count, setCount] = useState(props.count || 0)
   const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleBookmark = (action: 'check' | 'uncheck') => {
-    const value = { check: +1, uncheck: -1 }
-    BookmarkMemo({ id, action })
+  const handleCreateBookmark = useCallback(() => {
+    setLoading(true)
+    createBookmark(id)
       .then((result) => {
         setId(result)
-        setCount((prev) => prev + value[action])
-        setMessage({ check: '게시글을 북마크 했습니다.', uncheck: '북마크를 해제했습니다.' }[action])
+        setCount((prev) => prev + 1)
+        setMessage('게시글을 북마크 했습니다.')
       })
       .catch()
-    setState(action)
-  }
+      .finally(() => {
+        setChecked('on')
+        setLoading(false)
+      })
+  }, [id])
 
-  const followButton: OnOffItem = {
-    uncheck: (
-      <FeedbackCount count={count}>
-        <IconButton size="small" aria-label="북마크 하기" onClick={() => handleBookmark('check')} sx={{ position: 'relative' }}>
-          <BookmarkBorder fontSize="small" />
-        </IconButton>
-      </FeedbackCount>
-    ),
-    check: (
-      <FeedbackCount color="primary" count={count}>
-        <IconButton size="small" aria-label="북마크 취소" color="primary" onClick={() => handleBookmark('uncheck')} sx={{ position: 'relative' }}>
-          <Bookmark fontSize="small" />
-        </IconButton>
-      </FeedbackCount>
-    ),
-    none: null,
-  }
+  const handleDeleteBookmark = useCallback(() => {
+    setLoading(true)
+    deleteBookmark(id)
+      .then((result) => {
+        setId(result)
+        setCount((prev) => prev - 1)
+        setMessage('북마크를 해제했습니다.')
+      })
+      .catch()
+      .finally(() => {
+        setChecked('off')
+        setLoading(false)
+      })
+  }, [id])
+
+  const followButton = (
+    <FeedbackCount count={count}>
+      {
+        {
+          on: (
+            <IconButton
+              disabled={loading}
+              size="small"
+              aria-label="북마크 취소"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleDeleteBookmark()
+              }}
+              sx={{ position: 'relative' }}
+            >
+              <Bookmark fontSize="small" />
+            </IconButton>
+          ),
+          off: (
+            <IconButton
+              disabled={loading}
+              size="small"
+              aria-label="북마크 하기"
+              onClick={(e) => {
+                e.stopPropagation()
+                handleCreateBookmark()
+              }}
+              sx={{ position: 'relative' }}
+            >
+              <BookmarkBorder fontSize="small" />
+            </IconButton>
+          ),
+        }[checked]
+      }
+    </FeedbackCount>
+  )
 
   return (
     <>
-      {followButton[state]}
+      {followButton}
       <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
     </>
   )

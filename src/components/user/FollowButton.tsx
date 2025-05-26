@@ -1,6 +1,5 @@
 'use client'
-import { followUser } from '@/lib/fetch/userApi'
-import { OnOffItem } from '@/lib/types'
+import { followUser, unfollowUser } from '@/shared/fetch/usersApi'
 import { Button, Snackbar } from '@mui/material'
 import { useState } from 'react'
 
@@ -15,26 +14,27 @@ export default function FollowButton(props: Props) {
   const [state, setState] = useState(props.state || 'follow')
   const { toUserId, toUserName } = props
 
-  const handleFollow = (action: string) => {
-    followUser({ toUserId, action })
-    setState(action)
-    setMessage(
-      {
-        follow: toUserName + '님을 언팔로우 했습니다.',
-        unfollow: toUserName + '님을 팔로우 했습니다.',
-      }[state] || ''
-    )
+  const handleFollow = () => {
+    followUser(toUserId)
+    setState('follow')
+    setMessage(toUserName + '님을 팔로우 했습니다.')
   }
 
-  const followButton: OnOffItem = {
-    unfollow: <Button onClick={() => handleFollow('follow')}>팔로우</Button>,
-    follow: <Button onClick={() => handleFollow('unfollow')}>언팔로우</Button>,
-    none: null,
+  const handleUnFollow = () => {
+    unfollowUser(toUserId)
+    setState('unfollow')
+    setMessage(toUserName + '님을 언팔로우 했습니다.')
   }
+
+  const followButton = {
+    unfollow: <Button onClick={handleFollow}>팔로우</Button>,
+    follow: <Button onClick={handleUnFollow}>언팔로우</Button>,
+    none: null,
+  }[state]
 
   return (
     <>
-      {followButton[state]}
+      {followButton}
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={message ? true : false}

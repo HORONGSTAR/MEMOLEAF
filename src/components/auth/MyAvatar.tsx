@@ -1,6 +1,6 @@
-import { imgPath } from '@/lib/utills'
-import { useAppSelector } from '@/store/hooks'
 import { Avatar as MuiAvatar, AvatarProps } from '@mui/material'
+import { useAppSelector } from '@/store/hooks'
+import { imgPath } from '@/shared/utils/common'
 
 interface Props extends AvatarProps {
   size?: number

@@ -1,4 +1,4 @@
-import { imgPath } from '@/lib/utills'
+import { imgPath } from '@/shared/utils/common'
 import { Avatar as MuiAvatar, AvatarProps } from '@mui/material'
 
 interface Props extends AvatarProps {

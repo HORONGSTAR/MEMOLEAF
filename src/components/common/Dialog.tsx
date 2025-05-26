@@ -16,7 +16,14 @@ export default function Dialog(props: Props) {
 
   return (
     <>
-      <MuiDialog open={open} onClose={onClose}>
+      <MuiDialog
+        open={open}
+        onClose={onClose}
+        onClick={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+      >
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>{children}</DialogContent>
         <DialogActions>

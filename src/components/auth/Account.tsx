@@ -1,22 +1,19 @@
 'use client'
+import { Logout, PersonOutlineOutlined, SettingsOutlined } from '@mui/icons-material'
+import { useSession, signOut } from 'next-auth/react'
+import { LoginBox, MyAvatar } from '@/components/auth'
+import { Dialog, Menu } from '@/components/common'
+import { checkOnOff } from '@/shared/utils/common'
+import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '@mui/material'
-import { useSession, signOut } from 'next-auth/react'
-import { Dialog, Menu } from '@/components/common'
-
-import LoginBox from './LoginBox'
-import MyAvatar from './MyAvatar'
-import { useRouter } from 'next/navigation'
-import { Logout, PersonOutlineOutlined, SettingsOutlined } from '@mui/icons-material'
-import { checkCurrentOnOff } from '@/lib/utills'
-import { OnOffItem } from '@/lib/types'
 
 export default function Account() {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const { data: session } = useSession()
   const myId = session?.user.id || 0
-  const isNotLogin = checkCurrentOnOff(myId, 0)
+  const isNotLogin = checkOnOff(myId, 0)
 
   const dialogProps = {
     open,
@@ -42,7 +39,7 @@ export default function Account() {
     },
   ]
 
-  const components: OnOffItem = {
+  const components = {
     on: (
       <>
         <Button onClick={() => setOpen(true)}>로그인</Button>
@@ -52,7 +49,7 @@ export default function Account() {
       </>
     ),
     off: <Menu icon={<MyAvatar />} label={'내 계정'} items={meunItems} />,
-  }
+  }[isNotLogin]
 
-  return components[isNotLogin]
+  return components
 }

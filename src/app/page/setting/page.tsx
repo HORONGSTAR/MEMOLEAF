@@ -1,7 +1,7 @@
-import { ControlBox } from '@/components/user'
+import SettingContainer from '@/components/Container/SettingContainer'
 
 function SettingPage() {
-  return <ControlBox />
+  return <SettingContainer />
 }
 
 export default SettingPage
