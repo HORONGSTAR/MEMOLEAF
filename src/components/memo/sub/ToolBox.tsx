@@ -2,9 +2,9 @@
 import { AddCircle, AddCircleOutline, Lock, LockOutlined, SubtitlesOutlined, Subtitles, DevicesFoldOutlined, DevicesFold } from '@mui/icons-material'
 import { Stack as MuiStack, IconButton, Collapse, StackProps, Checkbox, Tooltip } from '@mui/material'
 import { useState, Dispatch, SetStateAction, useCallback } from 'react'
-import { LiveAnnouncer } from '@/components/common'
 import { swapOnOff } from '@/shared/utils/common'
 import { DecoData } from '@/shared/types/client'
+import LiveAnnouncer from '@/components/common/LiveAnnouncer'
 
 interface Props {
   decos: DecoData

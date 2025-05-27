@@ -3,12 +3,15 @@ import { Snackbar, Typography, ListItem, ListItemAvatar, ListItemText, Box } fro
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined, Launch } from '@mui/icons-material'
 import { useCallback, useMemo, useState } from 'react'
 import { BookmarkButton, CommentButton } from '@/components/feedback'
-import { Avatar, Menu, Dialog, LinkBox } from '@/components/common'
 import { checkOnOff, convertDate } from '@/shared/utils/common'
 import { DecoBox, ImgGrid } from '@/components/memo/sub'
 import { deleteMemo } from '@/shared/fetch/memosApi'
 import { useRouter } from 'next/navigation'
 import { MemoData } from '@/shared/types/client'
+import MemoMenu from '@/components/memo/MemoMenu'
+import LinkBox from '@/components/common/LinkBox'
+import Avatar from '@/components/common/Avatar'
+import Dialog from '@/components/common/Dialog'
 
 interface Props {
   memo: MemoData
@@ -46,7 +49,7 @@ export default function MemoBox({ memo, myId, editItem, removeItem }: Props) {
   }, [memo])
 
   const memu = (
-    <Menu
+    <MemoMenu
       icon={<MoreHoriz fontSize="small" />}
       label="더 보기"
       items={[
@@ -87,7 +90,9 @@ export default function MemoBox({ memo, myId, editItem, removeItem }: Props) {
         </ListItem>
         <DecoBox decos={memo.decos}>
           <ListItem>{memo.content}</ListItem>
-          <ImgGrid images={memo.images} />
+          <ListItem>
+            <ImgGrid images={memo.images} />
+          </ListItem>
         </DecoBox>
         <ListItem>
           <ListItemText />

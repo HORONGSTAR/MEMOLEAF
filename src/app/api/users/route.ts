@@ -68,6 +68,24 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function PATCH(req: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session) {
+      const message = '로그인이 필요합니다.'
+      return NRes.json({ success: false, message }, { status: 401 })
+    }
+
+    const id = session.user.id
+    const { name, info, image } = await req.json()
+    const result = await prisma.user.update({ where: { id }, data: { name, info, image } })
+    return NRes.json(result)
+  } catch (err) {
+    console.error(err)
+    return NRes.json({ success: false, message: '프로필 수정 중 문제가 발생했습니다.' }, { status: 500 })
+  }
+}
+
 export async function DELETE(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)

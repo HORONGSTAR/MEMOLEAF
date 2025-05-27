@@ -6,7 +6,7 @@ interface Props extends AvatarProps {
   size?: number
   user?: {
     name?: string | null
-    image?: string | null
+    image?: string | null | unknown
   }
 }
 

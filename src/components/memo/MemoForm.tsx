@@ -1,11 +1,11 @@
 'use client'
 import { ImgPreview, ImgForm, ToolBox, ToolItem } from '@/components/memo/sub'
 import { ReactNode, useCallback, useState } from 'react'
-import { Button, Snackbar, Stack, Box } from '@mui/material'
-import { InputText, TextCount } from '@/components/common'
+import { Button, Snackbar, Stack, Box, InputBase } from '@mui/material'
 import { DecoData, ImageData } from '@/shared/types/client'
 import { MemoParams } from '@/shared/types/api'
 import { swapOnOff } from '@/shared/utils/common'
+import TextCount from '@/components/common/TextCount'
 
 interface IntiMemoValue {
   action: 'create' | 'update'
@@ -59,14 +59,13 @@ export default function MemoForm(inti: IntiMemoValue) {
     <div onClick={(e) => e.stopPropagation()}>
       <Stack sx={{ bgcolor: '#fff', p: 1, mb: 2 }}>
         <ToolItem decos={decos} setDecos={setDecos} />
-        <InputText
+        <InputBase
           id="content"
           multiline
           minRows={3}
           aria-label="메모 작성. 글자수 제한 191자."
           placeholder={'기록을 남겨보세요!'}
           value={content}
-          fontSize="body1"
           onChange={(e) => handleContentChange(e.target.value)}
         />
         <ImgPreview imgs={imgs} setImgs={setImgs} setFiles={setFiles} />

@@ -3,10 +3,11 @@ import { Snackbar, Typography, ListItem, ListItemText, ListItemIcon } from '@mui
 import { MoreHoriz, DeleteOutline, EditOutlined } from '@mui/icons-material'
 import { ReactNode, useCallback, useState } from 'react'
 import { DecoBox, ImgGrid } from '@/components/memo/sub'
-import { Menu, Dialog } from '@/components/common'
 import { convertDate } from '@/shared/utils/common'
 import { deleteMemo } from '@/shared/fetch/memosApi'
 import { LeafData } from '@/shared/types/client'
+import MemoMenu from '@/components/memo/MemoMenu'
+import Dialog from '@/components/common/Dialog'
 
 interface Props {
   memo: LeafData
@@ -28,7 +29,7 @@ export default function ThreadBox({ memo, children, isMine, editItem, removeItem
   }, [memo, removeItem])
 
   const memu = (
-    <Menu
+    <MemoMenu
       icon={<MoreHoriz fontSize="small" />}
       label="더 보기"
       items={[
@@ -55,7 +56,7 @@ export default function ThreadBox({ memo, children, isMine, editItem, removeItem
           <ListItemText secondary={convertDate(memo.createdAt)} />
         </ListItem>
         <ListItem dense>{memo.content}</ListItem>
-        <ListItem disablePadding divider>
+        <ListItem dense divider>
           <ImgGrid images={memo.images} />
         </ListItem>
       </DecoBox>

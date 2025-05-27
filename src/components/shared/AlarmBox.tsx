@@ -1,32 +1,30 @@
 'use client'
 import { Badge, Box, Button, IconButton, List, ListItem, ListItemAvatar, Stack, Typography } from '@mui/material'
 import { CircleNotifications, Notifications } from '@mui/icons-material'
-import { useCallback, useEffect, useState } from 'react'
-import { fetchAlarm, deleteAlarm } from '@/shared/fetch/alarmApi'
-import { Avatar, Dialog, LinkBox } from '@/components/common'
-import { Alarm, User } from '@prisma/client'
-import { useSession } from 'next-auth/react'
+import { useCallback, useState } from 'react'
+import { deleteAlarm } from '@/shared/fetch/alarmApi'
 import { checkOnOff } from '@/shared/utils/common'
+import { UserData } from '@/shared/types/client'
+import Dialog from '@/components/common/Dialog'
+import Avatar from '@/components/common/Avatar'
+import LinkBox from '@/components/common/LinkBox'
 
-interface AlarmData extends Alarm {
-  reader: User
+interface AlarmData {
+  id: number
+  aria: 'comment' | 'follow' | 'bookmark'
+  linkId: number
+  reader: UserData
 }
 
-export default function AlarmBox() {
-  const [open, setOpen] = useState(false)
-  const [alarms, setAlarms] = useState<AlarmData[]>([])
-  const [count, setCount] = useState(0)
-  const { data: session } = useSession()
-  const userId = session?.user.id
+interface Props {
+  alarms?: AlarmData[]
+  count?: number
+}
 
-  useEffect(() => {
-    fetchAlarm()
-      .then((result) => {
-        setCount(result.count)
-        setAlarms(result.alarms)
-      })
-      .catch((err) => console.error(err))
-  }, [userId])
+export default function AlarmBox(props: Props) {
+  const [open, setOpen] = useState(false)
+  const [alarms, setAlarms] = useState<AlarmData[]>(props.alarms || [])
+  const [count, setCount] = useState(props.count || 0)
 
   const handleDelete = useCallback(() => {
     deleteAlarm()
@@ -34,7 +32,6 @@ export default function AlarmBox() {
     setCount(0)
   }, [])
 
-  if (!userId) return null
   const components = {
     on: (
       <Stack minHeight={100} alignItems="center" justifyContent="center">
@@ -46,7 +43,7 @@ export default function AlarmBox() {
       <List>
         {alarms.map((alarm) => (
           <ListItem key={alarm.id}>
-            <LinkBox link={`/page/my/${alarm.readerId}`}>
+            <LinkBox link={`/page/my/${alarm.reader.id}`}>
               <ListItemAvatar>
                 <Avatar user={alarm.reader} size={40} />
               </ListItemAvatar>
@@ -55,11 +52,7 @@ export default function AlarmBox() {
               variant="body2"
               color="textPrimary"
               link={
-                {
-                  comment: `/page/detail/${alarm.linkId}`,
-                  follow: `/page/my/${alarm.linkId}`,
-                  bookmark: `/page/detail/${alarm.linkId}`,
-                }[alarm.aria]
+                { comment: `/page/detail/${alarm.linkId}`, follow: `/page/my/${alarm.linkId}`, bookmark: `/page/detail/${alarm.linkId}` }[alarm.aria]
               }
             >
               {

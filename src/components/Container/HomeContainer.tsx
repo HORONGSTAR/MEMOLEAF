@@ -1,13 +1,13 @@
 'use client'
 import { MemoBox, MemoForm, MemoList } from '@/components/memo'
 import { createMemo, updateMemo } from '@/shared/fetch/memosApi'
-import { Button, Paper, Skeleton, useTheme } from '@mui/material'
+import { Button, Container, Paper, Skeleton, useTheme } from '@mui/material'
 import { useCallback, useState } from 'react'
 import { useAppSelector } from '@/store/hooks'
 import { MemoParams } from '@/shared/types/api'
-import { ArrowBack } from '@mui/icons-material'
+import ArrowBack from '@mui/icons-material/ArrowBack'
 import { MemoData } from '@/shared/types/client'
-import DetailContainer from './DetailContainer'
+import DetailContainer from '@/components/container/DetailContainer'
 
 interface Props {
   nextCursor: number
@@ -44,6 +44,7 @@ export default function HomeContainer({ nextCursor, firstLoadMemos, myId }: Prop
   const handleUpdateMemo = useCallback(
     (params: MemoParams) => {
       if (!profile) return
+      setEdit(0)
       updateMemo(params)
         .then((result) =>
           setMemos((prev) =>
@@ -53,7 +54,6 @@ export default function HomeContainer({ nextCursor, firstLoadMemos, myId }: Prop
           )
         )
         .catch()
-        .finally(() => setEdit(0))
     },
     [editId, profile]
   )
@@ -103,8 +103,8 @@ export default function HomeContainer({ nextCursor, firstLoadMemos, myId }: Prop
           </Button>
         </DetailContainer>
       ) : (
-        <>
-          <Paper variant="outlined" sx={{ bgcolor: theme.palette.secondary.light, p: 1 }}>
+        <Container sx={{ mb: 4, minHeight: '100vh' }}>
+          <Paper variant="outlined" sx={{ bgcolor: theme.palette.secondary.light, p: 1, mb: 2 }}>
             <MemoForm action="create" parentId={null} onSubmint={handleCreateMemo} />
           </Paper>
           <MemoList loadingBox={loadingBox} aria="home" addMemoList={addMemoList} nextCursor={nextCursor}>
@@ -114,7 +114,7 @@ export default function HomeContainer({ nextCursor, firstLoadMemos, myId }: Prop
               </Paper>
             ))}
           </MemoList>
-        </>
+        </Container>
       )}
     </>
   )

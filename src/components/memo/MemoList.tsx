@@ -4,9 +4,10 @@ import { fetchMemos } from '@/shared/fetch/memosApi'
 import { swapOnOff } from '@/shared/utils/common'
 import { MemoData } from '@/shared/types/client'
 import { Stack } from '@mui/material'
+import { MemosAria } from '@/shared/types/api'
 
 interface Props {
-  aria: 'home' | 'mypost' | 'bookmark' | 'thread'
+  aria: MemosAria
   id?: number
   nextCursor: number
   children: ReactNode
@@ -18,7 +19,15 @@ export default function MemoList(props: Props) {
   const { aria, nextCursor, children, id, loadingBox, addMemoList } = props
   const [cursor, setCursor] = useState(nextCursor)
   const [loading, setLoading] = useState('off')
+  const isSameAria = useRef(aria)
   const observerRef = useRef(null)
+
+  useEffect(() => {
+    if (isSameAria.current !== aria) {
+      setCursor(nextCursor)
+      isSameAria.current = aria
+    }
+  }, [aria, nextCursor])
 
   const loadMoreMemos = useCallback(() => {
     if (cursor < 0) return

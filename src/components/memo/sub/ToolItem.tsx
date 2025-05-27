@@ -1,10 +1,10 @@
 'use client'
-import { Box, Chip, ChipProps, IconButton, Button, Divider, Stack, Typography } from '@mui/material'
+import { Box, Chip, ChipProps, IconButton, Button, Divider, Stack, Typography, InputBase, useTheme } from '@mui/material'
 import { Dispatch, SetStateAction, useState, useCallback } from 'react'
 import { ExpandMore, DriveFileRenameOutline, Key } from '@mui/icons-material'
-import { Dialog, InputText } from '@/components/common'
 import { swapOnOff } from '@/shared/utils/common'
 import { DecoData } from '@/shared/types/client'
+import Dialog from '@/components/common/Dialog'
 
 interface Props {
   decos: DecoData
@@ -15,6 +15,7 @@ export default function ToolItem(props: Props) {
   const { decos, setDecos } = props
   const [edit, setEdit] = useState('off')
   const [open, setOpen] = useState('off')
+  const theme = useTheme()
 
   const handleChangeSubtext = useCallback(
     (value: string) => {
@@ -51,8 +52,9 @@ export default function ToolItem(props: Props) {
     on: {
       variant: 'outlined',
       label: (
-        <InputText
+        <InputBase
           id="folder"
+          inputProps={{ sx: theme.typography.body2 }}
           value={decos.folder.extra}
           onChange={(e) => handleChangeFolder(e.target.value)}
           autoFocus
@@ -67,8 +69,9 @@ export default function ToolItem(props: Props) {
   const subtextBox = {
     on: (
       <Box>
-        <InputText
+        <InputBase
           id="subtext"
+          inputProps={{ sx: theme.typography.body2 }}
           value={decos.subtext.extra}
           onChange={(e) => handleChangeSubtext(e.target.value)}
           slotProps={{ input: { 'aria-label': '덧붙임 내용 입력' } }}
@@ -107,7 +110,7 @@ export default function ToolItem(props: Props) {
           감추기 비밀번호 설정
         </Button>
         <Dialog {...dialogProps}>
-          <InputText
+          <InputBase
             id="secret"
             autoFocus
             value={decos.secret.extra}

@@ -1,10 +1,10 @@
 'use client'
-import { Typography, List, ListItem, Box, ListItemText, Button, Divider, Snackbar } from '@mui/material'
+import { Typography, List, ListItem, Box, ListItemText, Button, Divider, Snackbar, Container } from '@mui/material'
 import { deleteAllMemos, deleteUserAccount } from '@/shared/fetch/settingsApi'
 import { useCallback, useState } from 'react'
 import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { Dialog } from '@/components/common'
+import Dialog from '@/components/common/Dialog'
 
 export default function SettingContainer() {
   const [open1, setOpen1] = useState(false)
@@ -49,7 +49,7 @@ export default function SettingContainer() {
   }
 
   return (
-    <>
+    <Container sx={{ mb: 4, minHeight: '100vh' }}>
       <List>
         <ListItem>
           <Typography variant="h5">설정</Typography>
@@ -128,6 +128,6 @@ export default function SettingContainer() {
         {{ account: '계정 삭제를 마쳤습니다.', allmemo: '모든 메모를 삭제했습니다.' }[aria] || ''}
       </Dialog>
       <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
-    </>
+    </Container>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 import { ListItem, ListItemAvatar, ListItemText, Stack, Typography } from '@mui/material'
-import { Avatar, LinkBox } from '@/components/common'
+import Avatar from '@/components/common/Avatar'
+import LinkBox from '@/components/common/LinkBox'
 import { ProfileData } from '@/shared/types/client'
 
 export default function UserList(user: ProfileData) {

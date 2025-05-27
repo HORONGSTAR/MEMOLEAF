@@ -1,13 +1,15 @@
 'use client'
 import { List, ListItem, Box, Typography, IconButton, ListItemText, ListItemAvatar, Snackbar } from '@mui/material'
 import { DriveFileRenameOutline, DeleteForever, ExitToApp } from '@mui/icons-material'
-import { Dialog, LinkBox, Avatar } from '@/components/common'
 import { convertDate, checkOnOff } from '@/shared/utils/common'
 import { useCallback, useState } from 'react'
 import { updateComment } from '@/shared/fetch/commentsApi'
 import { CommentForm } from '@/components/feedback'
 import { CommentData } from '@/shared/types/client'
 import { useSession } from 'next-auth/react'
+import Dialog from '@/components/common/Dialog'
+import LinkBox from '@/components/common/LinkBox'
+import Avatar from '@/components/common/Avatar'
 
 interface Props {
   comment: CommentData

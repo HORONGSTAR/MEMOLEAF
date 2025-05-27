@@ -1,101 +1,149 @@
 'use client'
-import { Box, Button, Divider, Paper, Skeleton, Stack, Tab, Tabs } from '@mui/material'
+import { Button, Container, Paper, Skeleton } from '@mui/material'
+import { MemoData, ProfileData, UserData } from '@/shared/types/client'
+import { MyProfile, UserList, UserBox } from '@/components/user'
+import { MemoBox, MemoForm, MemoList } from '@/components/memo'
 import { useCallback, useState } from 'react'
-import { BasicBox, MemoList } from '@/components/memo'
-import { MemoData, UserData } from '@/shared/types/client'
+import { updateMemo } from '@/shared/fetch/memosApi'
+import { MemoParams } from '@/shared/types/api'
 import { ArrowBack } from '@mui/icons-material'
 import DetailContainer from './DetailContainer'
-import { UserList } from '@/components/user'
+import ContainerTab from './sub/ContainerTab'
 
 interface Props {
-  lastMemoId?: number
-  id?: number
-  name?: string
+  profile: ProfileData
+  lastMemoId: number
+  lastUserId: number
 }
 
-export default function MyContainer({ id, name, lastMemoId }: Props) {
-  const [memos, setMemos] = useState<MemoData[]>([])
+export default function MyContainer({ lastMemoId, lastUserId, profile }: Props) {
+  const [posts, setPosts] = useState<MemoData[]>([])
   const [users, setUsers] = useState<UserData[]>([])
-  const [value, setValue] = useState(0)
+  const [aria, setAria] = useState('mypost')
+  const [endpoint, setEndpoint] = useState('follower')
   const [detailItem, setDetailItem] = useState<MemoData | undefined>(undefined)
+  const [editId, setEdit] = useState(0)
 
   const addMemoList = useCallback((values: MemoData[]) => {
-    setMemos((prev) => [...prev, ...values])
+    setPosts((prev) => [...prev, ...values])
   }, [])
 
   const addUserList = useCallback((values: UserData[]) => {
     setUsers((prev) => [...prev, ...values])
   }, [])
 
+  const postLoading = [1, 2, 3, 4, 5].map((el) => <Skeleton sx={{ mb: 2 }} variant="rounded" height={120} key={'loading-post' + el} />)
+
+  const userLoading = [1, 2, 3, 4, 5].map((el) => <Skeleton sx={{ mb: 2 }} key={'loading' + el} />)
+
+  const handleUpdateMemo = useCallback(
+    (params: MemoParams) => {
+      if (!profile) return
+      setEdit(0)
+      updateMemo(params)
+        .then((result) =>
+          setPosts((prev) =>
+            prev.map((p) => {
+              return p.id !== editId ? p : { ...p, ...result }
+            })
+          )
+        )
+        .catch()
+    },
+    [editId, profile]
+  )
+
+  const MemoListItem = (memo: MemoData) => {
+    const item = (
+      <MemoBox
+        memo={memo}
+        myId={profile.id}
+        removeItem={() => setPosts((prev) => prev.filter((p) => p.id !== memo.id))}
+        editItem={() => setEdit(memo.id)}
+      />
+    )
+    const editform = (
+      <MemoForm action="update" {...memo} onSubmint={handleUpdateMemo}>
+        <Button
+          color="error"
+          onClick={(e) => {
+            setEdit(0)
+            e.stopPropagation()
+          }}
+        >
+          취소
+        </Button>
+      </MemoForm>
+    )
+    return { [memo.id]: item, [editId]: editform }[memo.id]
+  }
+
   const handleClick = (memo: MemoData) => {
     const selection = window.getSelection()
-    if (selection && selection.toString().length > 0) {
-      return
-    }
+    if (selection && selection.toString().length > 0) return
     setDetailItem(memo)
   }
 
-  const loadingBox = [1, 2, 3].map((el) => <Skeleton variant="rounded" height={120} key={'loading' + el} />)
-
-  const labels = ['게시글', '팔로우', '북마크']
-
-  const mypost = detailItem ? (
-    <DetailContainer myId={id} firstLoadParent={detailItem}>
-      <Button startIcon={<ArrowBack />} onClick={() => setDetailItem(undefined)}>
-        목록으로 돌아가기
-      </Button>
-    </DetailContainer>
-  ) : (
-    <>
-      <MemoList loadingBox={loadingBox} aria="mypost" id={id} addMemoList={addMemoList} nextCursor={lastMemoId || 0}>
-        {memos.map((memo: MemoData) => (
-          <Paper variant="outlined" key={'home-memo' + memo.id} onClick={() => handleClick(memo)}>
-            <BasicBox memo={memo} />
-          </Paper>
-        ))}
-      </MemoList>
-    </>
-  )
-
-  const bookmark = detailItem ? (
-    <DetailContainer myId={id} firstLoadParent={detailItem}>
-      <Button startIcon={<ArrowBack />} onClick={() => setDetailItem(undefined)}>
-        목록으로 돌아가기
-      </Button>
-    </DetailContainer>
-  ) : (
-    <>
-      <MemoList loadingBox={loadingBox} aria="bookmark" addMemoList={addMemoList} nextCursor={lastMemoId || 0}>
-        {memos.map((memo: MemoData) => (
-          <Paper variant="outlined" key={'my-memo' + memo.id} onClick={() => handleClick(memo)}>
-            <BasicBox memo={memo} />
-          </Paper>
-        ))}
-      </MemoList>
-    </>
-  )
-
-  const follow = (
-    <UserList user={{ id: id || 0, name: name || '' }} nextCursor={0} loadingBox={undefined} addUserList={addUserList}>
-      <></>
-    </UserList>
-  )
+  const panels = [
+    {
+      label: '다이어리',
+      panel: (
+        <MemoList loadingBox={postLoading} aria={aria} id={profile.id} addMemoList={addMemoList} nextCursor={lastMemoId}>
+          {posts.map((memo: MemoData) => (
+            <Paper variant="outlined" key={'home-memo' + memo.id} onClick={() => handleClick(memo)}>
+              <MemoListItem {...memo} />
+            </Paper>
+          ))}
+        </MemoList>
+      ),
+      categorys: [
+        { label: `${profile.name}님의 글`, value: 'mypost' },
+        { label: '북마크', value: 'bookmark' },
+      ],
+      select: (category: string) => {
+        setAria(category)
+      },
+    },
+    {
+      label: '팔로우',
+      panel: (
+        <UserList user={profile} endpoint={endpoint} nextCursor={lastUserId} loadingBox={userLoading} addUserList={addUserList}>
+          {users.map((user) => (
+            <UserBox key={'userlist' + user.id} {...user} />
+          ))}
+        </UserList>
+      ),
+      categorys: [
+        { label: '팔로워', value: 'follower' },
+        { label: '팔로잉', value: 'following' },
+      ],
+      select: (category: string) => {
+        setEndpoint(category)
+      },
+    },
+  ]
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Box>
-        <Tabs value={value} onChange={(_, newValue) => setValue(newValue)} aria-label="모아보기">
-          {labels.map((label, i) => (
-            <Tab key={`tab${i}`} label={label} id={`tab${i}`} aria-controls={`panel${i}`} />
-          ))}
-        </Tabs>
-      </Box>
-      <Divider />
-      {labels.map((_, i) => (
-        <Box key={`panel${i}`} role={`panel${i}`} id={`panel${i}`} aria-labelledby={`tab${i}`} hidden={value !== i}>
-          <Stack spacing={2}>{[mypost, bookmark, follow][i]}</Stack>
-        </Box>
-      ))}
-    </Box>
+    <>
+      {detailItem ? (
+        <DetailContainer myId={profile.id} firstLoadParent={detailItem}>
+          <Button startIcon={<ArrowBack />} onClick={() => setDetailItem(undefined)}>
+            목록으로 돌아가기
+          </Button>
+        </DetailContainer>
+      ) : (
+        <Container sx={{ mb: 4, minHeight: '100vh' }}>
+          <MyProfile {...profile} />
+          <ContainerTab
+            label={'모아보기'}
+            tabs={panels}
+            reset={() => {
+              setPosts([])
+              setUsers([])
+            }}
+          />
+        </Container>
+      )}
+    </>
   )
 }

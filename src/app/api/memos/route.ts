@@ -2,6 +2,7 @@ import { NextRequest, NextResponse as NRes } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { decosToJson } from '@/shared/utils/common'
 
 export async function GET(req: NextRequest) {
   try {
@@ -23,18 +24,18 @@ export async function GET(req: NextRequest) {
       },
     }[aria]
 
-    const addJoinTeble = {
+    const joinTeble = {
       user: { select: { id: true, name: true, image: true, userNum: true } },
       bookmarks: { where: { userId }, select: { id: true } },
       _count: { select: { comments: true, bookmarks: true, leafs: true } },
     }
 
     const includeData = {
-      home: addJoinTeble,
+      home: joinTeble,
       thread: undefined,
-      mypost: undefined,
-      bookmark: addJoinTeble,
-      search: addJoinTeble,
+      mypost: joinTeble,
+      bookmark: joinTeble,
+      search: joinTeble,
     }[aria]
 
     const memolist = await prisma.memo.findMany({
@@ -60,13 +61,7 @@ export async function GET(req: NextRequest) {
     })
 
     const memos = memolist.map((item) => {
-      const decos = {
-        subtext: { active: 'off', extra: '' },
-        folder: { active: 'off', extra: '' },
-        secret: { active: 'off', extra: '' },
-      }
-      item.decos.forEach((deco) => (decos[deco.kind] = { active: 'on', extra: deco.extra }))
-      return { ...item, decos }
+      return { ...item, decos: decosToJson(item.decos) }
     })
 
     const nextCursor = memos[9]?.id || -1
@@ -104,8 +99,7 @@ export async function POST(req: NextRequest) {
 
     const res = { ...newMemo, images, decos }
     res.images = await prisma.image.findMany({ where: { memoId: newMemo.id } })
-    res.decos = await prisma.deco.findMany({ where: { memoId: newMemo.id } })
-
+    res.decos = decosToJson(await prisma.deco.findMany({ where: { memoId: newMemo.id } }))
     return NRes.json(res)
   } catch (error) {
     console.error(error)
@@ -138,7 +132,7 @@ export async function PATCH(req: NextRequest) {
 
     const res = { ...memo, images, decos }
     res.images = await prisma.image.findMany({ where: { memoId: memo.id } })
-    res.decos = await prisma.deco.findMany({ where: { memoId: memo.id } })
+    res.decos = decosToJson(await prisma.deco.findMany({ where: { memoId: memo.id } }))
 
     return NRes.json(res)
   } catch (error) {

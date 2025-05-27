@@ -1,7 +1,9 @@
+export type MemosAria = 'home' | 'mypost' | 'bookmark' | 'thread' | string
+
 export interface GetMemosParams {
   query: {
     [key: string]: unknown
-    aria: 'home' | 'mypost' | 'bookmark' | 'thread'
+    aria: MemosAria
     id?: number
     cursor: number
   }
@@ -9,7 +11,8 @@ export interface GetMemosParams {
 
 export interface GetFollowParams {
   id: number
-  endpoint: 'follower' | 'following'
+  endpoint: 'follower' | 'following' | string
+  cursor: number
 }
 
 export interface MemoParams {

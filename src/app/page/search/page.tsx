@@ -1,4 +1,4 @@
-import SearchContainer from '@/components/Container/SearchContainer'
+import SearchContainer from '@/components/container/SearchContainer'
 import prisma from '@/lib/prisma'
 
 export default async function SearchPage() {

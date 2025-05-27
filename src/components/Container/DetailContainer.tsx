@@ -1,5 +1,5 @@
 'use client'
-import { Button, Chip, ListItem, ListItemText, Paper, Skeleton, useTheme } from '@mui/material'
+import { Button, Chip, Container, ListItem, ListItemText, Paper, Skeleton, useTheme } from '@mui/material'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { MemoBox, MemoForm, MemoList, ThreadBox } from '@/components/memo'
 import { createMemo, updateMemo } from '@/shared/fetch/memosApi'
@@ -64,10 +64,10 @@ export default function DetailContainer(props: Props) {
   const handleUpdateParent = useCallback(
     (params: MemoParams) => {
       if (!profile) return
+      setEdit(0)
       updateMemo(params)
         .then((result) => setParent((prev) => ({ ...prev, ...result })))
         .catch()
-        .finally(() => setEdit(0))
     },
     [profile]
   )
@@ -116,7 +116,7 @@ export default function DetailContainer(props: Props) {
   ))
 
   return (
-    <>
+    <Container sx={{ mb: 4, minHeight: '100vh' }}>
       <div>{children}</div>
       <ParentBox />
       <MemoList loadingBox={loadingBox} addMemoList={addMemoList} id={parent.id} aria={'thread'} nextCursor={0}>
@@ -127,6 +127,6 @@ export default function DetailContainer(props: Props) {
       <Paper variant="outlined" sx={{ bgcolor: theme.palette.secondary.light, p: 1 }}>
         <MemoForm action="create" parentId={parent.id} onSubmint={handleCreateMemo} />
       </Paper>
-    </>
+    </Container>
   )
 }

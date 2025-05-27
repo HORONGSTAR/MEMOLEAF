@@ -1,6 +1,6 @@
 'use client'
 import { fetchtFollow } from '@/shared/fetch/usersApi'
-import { Chip, ChipProps, List, Typography } from '@mui/material'
+import { List, Typography } from '@mui/material'
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { swapOnOff } from '@/shared/utils/common'
 import { UserData } from '@/shared/types/client'
@@ -10,26 +10,32 @@ interface Props {
   nextCursor: number
   children: ReactNode
   loadingBox: ReactNode
+  endpoint: 'follower' | 'following' | string
   addUserList: (values: UserData[]) => void
 }
 
-type EndPoint = 'follower' | 'following'
-
 export default function UserList(props: Props) {
-  const { user, nextCursor, loadingBox, children, addUserList } = props
-  const [endpoint, setEndPoint] = useState<EndPoint>('follower')
+  const { user, nextCursor, loadingBox, children, endpoint, addUserList } = props
   const [count, setCount] = useState(0)
   const [cursor, setCursor] = useState(nextCursor)
   const [loading, setLoading] = useState('off')
+  const isSameEndpoint = useRef(endpoint)
   const observerRef = useRef(null)
+
+  useEffect(() => {
+    if (isSameEndpoint.current !== endpoint) {
+      setCursor(nextCursor)
+      isSameEndpoint.current = endpoint
+    }
+  }, [endpoint, nextCursor])
 
   const loadMoreUser = useCallback(() => {
     if (cursor < 0) return
     setLoading('on')
-    fetchtFollow({ id: user.id, endpoint })
+    fetchtFollow({ id: user.id, endpoint, cursor })
       .then((result) => {
         setCount(result.searchTotal)
-        addUserList(result.memos)
+        addUserList(result.users)
         setCursor(result.nextCursor)
       })
       .catch()
@@ -52,20 +58,12 @@ export default function UserList(props: Props) {
   }, [loadMoreUser, loading])
 
   const followInfo = {
-    following: { [count]: `${name}님이 팔로워 ${count}명`, 0: '팔로워 정보가 없습니다.' }[count],
-    follower: { [count]: `${name}님의 팔로잉 ${count}명`, 0: '팔로잉 정보가 없습니다.' }[count],
+    follower: { [count]: `${user.name}님의 팔로워 ${count}명`, 0: '팔로워 정보가 없습니다.' }[count],
+    following: { [count]: `${user.name}님의 팔로잉 ${count}명`, 0: '팔로잉 정보가 없습니다.' }[count],
   }[endpoint]
-
-  const chipProps: { follower: ChipProps; following: ChipProps } = {
-    follower: { color: 'default' },
-    following: { color: 'default' },
-    [endpoint]: { color: 'primary' },
-  }
 
   return (
     <>
-      <Chip {...chipProps.follower} onClick={() => setEndPoint('follower')} label={`팔로잉`} />
-      <Chip {...chipProps.following} onClick={() => setEndPoint('following')} label={`팔로워`} />
       <Typography variant="body2" color="textSecondary">
         {followInfo}
       </Typography>

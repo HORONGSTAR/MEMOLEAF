@@ -1,8 +1,10 @@
-import MyContainer from '@/components/Container/MyContainer'
 import { Typography, Stack } from '@mui/material'
 import { Error } from '@mui/icons-material'
+import MyContainer from '@/components/container/MyContainer'
 import prisma from '@/lib/prisma'
-import { MyProfile } from '@/components/user'
+import Navbar from '@/components/shared/Navbar'
+import Footer from '@/components/shared/Footer'
+import AlarmBox from '@/components/shared/AlarmBox'
 
 export default async function MyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -25,12 +27,26 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
     select: { id: true },
   })
 
+  const lastUser = await prisma.user.findFirst({
+    orderBy: { createdAt: 'desc' },
+    select: { id: true },
+  })
+
+  const alarms = await prisma.alarm.findMany({
+    where: { authorId: userId },
+    take: 30,
+    include: { reader: true },
+  })
+
   return (
     <>
+      <Navbar>
+        <AlarmBox {...alarms} count={alarms.length} />
+      </Navbar>
       {profile ? (
         <>
-          <MyProfile {...profile} />
-          <MyContainer id={profile.id} name={profile.name} lastMemoId={lastMemo?.id} />
+          <MyContainer profile={profile} lastMemoId={lastMemo?.id || 0} lastUserId={lastUser?.id || 0} />
+          <Footer />
         </>
       ) : (
         <Stack alignItems="center" spacing={2} pt={3}>

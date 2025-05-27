@@ -17,7 +17,7 @@ export type DecoData = {
     extra: string
   }
 }
-export interface ProfileData extends Required<UserData> {
+export interface ProfileData extends UserData {
   userNum?: number | null
   toUsers?: { fromUserId: number; toUserId: number }[]
 }

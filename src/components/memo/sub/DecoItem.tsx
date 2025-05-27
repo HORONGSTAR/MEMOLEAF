@@ -1,8 +1,7 @@
 'use client'
-import { Collapse, Typography, Chip, Box, Paper, Stack, Divider, Button } from '@mui/material'
+import { Collapse, Typography, Chip, Box, Stack, Divider, Button, TextField } from '@mui/material'
 import { ReactNode, useState } from 'react'
 import { ExpandMore } from '@mui/icons-material'
-import { InputText } from '@/components/common'
 import { swapOnOff } from '@/shared/utils/common'
 
 interface Props {
@@ -18,22 +17,17 @@ export default function DecoItem(props: Props) {
   const [checked, setChecked] = useState('off')
   const [unLock, setUnLock] = useState('off')
 
-  const transform = { on: '-180deg', off: '0deg' }[checked]
-  const chipLabel = { on: '내용 접기', off: extra || '내용 열기' }[checked]
-
   const handleChange = (value: string) => {
     setPassword(value)
   }
 
   const secretBox = {
-    on: <Box>{children}</Box>,
+    on: children,
     off: (
       <Stack alignItems="center" spacing={1}>
         <Typography variant="body2">비공개 글입니다.</Typography>
         <Typography variant="body2">열람 비밀번호가 필요합니다.</Typography>
-        <Paper variant="outlined" sx={{ px: 1, maxWidth: 120 }}>
-          <InputText fontSize="body2" value={password} onChange={(e) => handleChange(e.target.value)} placeholder="비밀번호 입력" />
-        </Paper>
+        <TextField label="비밀번호 입력" value={password} onChange={(e) => handleChange(e.target.value)} />
         <Button
           onClick={(e) => {
             e.stopPropagation()
@@ -55,14 +49,15 @@ export default function DecoItem(props: Props) {
         <Divider sx={{ my: 1 }} />
       </Box>
     ),
+
     folder: (
       <Box>
         <Chip
           sx={{ mx: 2, my: 1 }}
           onClick={() => setChecked(swapOnOff[checked].next)}
-          label={chipLabel}
+          label={{ on: '내용 접기', off: extra || '내용 열기' }[checked]}
           size="small"
-          icon={<ExpandMore sx={{ transform: `rotate(${transform})`, transition: 'transform 0.3s ease' }} />}
+          icon={<ExpandMore sx={{ transform: `rotate(${{ on: '-180deg', off: '0deg' }[checked]})`, transition: 'transform 0.3s ease' }} />}
         />
         <Collapse in={swapOnOff[checked].bool}>{children}</Collapse>
       </Box>

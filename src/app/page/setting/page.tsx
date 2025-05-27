@@ -1,7 +1,13 @@
-import SettingContainer from '@/components/Container/SettingContainer'
+import SettingContainer from '@/components/container/SettingContainer'
+import Footer from '@/components/shared/Footer'
+import Navbar from '@/components/shared/Navbar'
 
-function SettingPage() {
-  return <SettingContainer />
+export default async function SettingPage() {
+  return (
+    <>
+      <Navbar />
+      <SettingContainer />
+      <Footer />
+    </>
+  )
 }
-
-export default SettingPage

@@ -2,15 +2,17 @@
 import { Typography, List, ListItem, Stack, IconButton, TextField } from '@mui/material'
 import { checkOnOff, imgPath, swapOnOff } from '@/shared/utils/common'
 import { useState, useCallback, useMemo } from 'react'
-import { Avatar, Dialog, TextCount } from '@/components/common'
 import { DriveFileRenameOutline } from '@mui/icons-material'
 import { updateProfileThunk } from '@/store/slices/profileSlice'
 import { useAppDispatch } from '@/store/hooks'
 import { useSession } from 'next-auth/react'
 import { UserParams } from '@/shared/types/api'
 import { ProfileData } from '@/shared/types/client'
+import Dialog from '@/components/common/Dialog'
 import AvatarUploader from '@/components/user/AvatarUploader'
 import FollowButton from '@/components/user/FollowButton'
+import Avatar from '@/components/common/Avatar'
+import TextCount from '@/components/common/TextCount'
 
 export default function MyProfile(inti: ProfileData) {
   const [profile, setProfile] = useState(inti)

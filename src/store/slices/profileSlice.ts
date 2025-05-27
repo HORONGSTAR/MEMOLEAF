@@ -1,15 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { fetchProfile, updateProfile } from '@/shared/fetch/usersApi'
+import { updateProfile } from '@/shared/fetch/usersApi'
 import { UserParams } from '@/shared/types/api'
 import { UserData } from '@/shared/types/client'
-
-export const fetchProfileThunk = createAsyncThunk<UserData, number>('user/fetchProfile', async (id) => {
-  try {
-    return await fetchProfile(id)
-  } catch (error) {
-    console.error(error || '유저 조회 실패')
-  }
-})
 
 export const updateProfileThunk = createAsyncThunk<UserData, UserParams>('user/updateProfile', async (params) => {
   try {
@@ -32,19 +24,13 @@ const initialState: State = {
 export const authSlice = createSlice({
   name: 'profile',
   initialState,
-  reducers: {},
+  reducers: {
+    setProfile: (state, action) => {
+      state.profile = action.payload
+    },
+  },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProfileThunk.pending, (state) => {
-        state.status = 'loading'
-      })
-      .addCase(fetchProfileThunk.fulfilled, (state, action) => {
-        state.status = 'succeeded'
-        state.profile = action.payload
-      })
-      .addCase(fetchProfileThunk.rejected, (state) => {
-        state.status = 'failed'
-      })
       .addCase(updateProfileThunk.pending, (state) => {
         state.status = 'loading'
       })
@@ -57,5 +43,7 @@ export const authSlice = createSlice({
       })
   },
 })
+
+export const { setProfile } = authSlice.actions
 
 export default authSlice.reducer

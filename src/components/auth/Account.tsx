@@ -1,54 +1,89 @@
 'use client'
 import { Logout, PersonOutlineOutlined, SettingsOutlined } from '@mui/icons-material'
 import { useSession, signOut } from 'next-auth/react'
-import { LoginBox, MyAvatar } from '@/components/auth'
-import { Dialog, Menu } from '@/components/common'
 import { checkOnOff } from '@/shared/utils/common'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { Button } from '@mui/material'
+import { Button, Menu, MenuItem, Tooltip, IconButton, ListItemIcon, ListItemText } from '@mui/material'
+import Dialog from '@/components/common/Dialog'
+import LoginBox from '@/components/auth/LoginBox'
+import MyAvatar from '@/components/auth/MyAvatar'
+import { useRouter } from 'next/navigation'
 
 export default function Account() {
   const router = useRouter()
-  const [open, setOpen] = useState(false)
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const [dialogOpen, setDialogOpen] = useState(false)
   const { data: session } = useSession()
   const myId = session?.user.id || 0
   const isNotLogin = checkOnOff(myId, 0)
 
+  const menuOpen = Boolean(anchorEl)
+
   const dialogProps = {
-    open,
+    open: dialogOpen,
     title: '소셜 로그인',
-    onClose: () => setOpen(false),
+    onClose: () => setDialogOpen(false),
     closeLabel: '닫기',
   }
-  const meunItems = [
-    {
-      label: '마이 페이지',
-      icon: <PersonOutlineOutlined fontSize="small" />,
-      onClick: () => router.push(`/page/my/${myId}`),
-    },
-    {
-      label: '설정',
-      icon: <SettingsOutlined fontSize="small" />,
-      onClick: () => router.push('/page/setting'),
-    },
-    {
-      label: '로그아웃',
-      icon: <Logout fontSize="small" />,
-      onClick: () => signOut(),
-    },
-  ]
+
+  const label = '내 계정'
 
   const components = {
     on: (
       <>
-        <Button onClick={() => setOpen(true)}>로그인</Button>
+        <Button onClick={() => setDialogOpen(true)}>로그인</Button>
         <Dialog {...dialogProps}>
           <LoginBox />
         </Dialog>
       </>
     ),
-    off: <Menu icon={<MyAvatar />} label={'내 계정'} items={meunItems} />,
+    off: (
+      <>
+        <Tooltip title={label}>
+          <IconButton
+            size="small"
+            aria-label={label}
+            onClick={(e) => setAnchorEl(e.currentTarget)}
+            aria-controls={menuOpen ? label : undefined}
+            aria-haspopup="true"
+            aria-expanded={menuOpen ? 'true' : undefined}
+          >
+            <MyAvatar user={session?.user} />
+          </IconButton>
+        </Tooltip>
+        <Menu
+          id={label}
+          anchorEl={anchorEl}
+          open={menuOpen}
+          onClick={() => setAnchorEl(null)}
+          slotProps={{
+            paper: { elevation: 3 },
+            list: { 'aria-labelledby': label },
+          }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        >
+          <MenuItem dense onClick={() => router.push(`/page/my/${myId}`)}>
+            <ListItemIcon>
+              <PersonOutlineOutlined fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>마이페이지</ListItemText>
+          </MenuItem>
+          <MenuItem dense onClick={() => router.push('/page/setting')}>
+            <ListItemIcon>
+              <SettingsOutlined fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>설정</ListItemText>
+          </MenuItem>
+          <MenuItem dense onClick={() => signOut()}>
+            <ListItemIcon>
+              <Logout fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>로그아웃</ListItemText>
+          </MenuItem>
+        </Menu>
+      </>
+    ),
   }[isNotLogin]
 
   return components

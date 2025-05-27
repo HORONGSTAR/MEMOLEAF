@@ -1,8 +1,12 @@
-import HomeContainer from '@/components/Container/HomeContainer'
+import HomeContainer from '@/components/container/HomeContainer'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { decosToJson } from '@/shared/utils/common'
 import prisma from '@/lib/prisma'
+import Navbar from '@/components/shared/Navbar'
+import Footer from '@/components/shared/Footer'
+import AlarmBox from '@/components/shared/AlarmBox'
+
 export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
@@ -25,5 +29,19 @@ export default async function HomePage() {
   const memos = memolist.map((item) => ({ ...item, decos: decosToJson(item.decos) }))
   const nextCursor = memos.length > 0 ? memos.slice(-1)[0].id : 0
 
-  return <HomeContainer firstLoadMemos={memos} nextCursor={nextCursor} myId={userId} />
+  const alarms = await prisma.alarm.findMany({
+    where: { authorId: userId },
+    take: 30,
+    include: { reader: true },
+  })
+
+  return (
+    <>
+      <Navbar>
+        <AlarmBox {...alarms} count={alarms.length} />
+      </Navbar>
+      <HomeContainer firstLoadMemos={memos} nextCursor={nextCursor} myId={userId} />
+      <Footer />
+    </>
+  )
 }

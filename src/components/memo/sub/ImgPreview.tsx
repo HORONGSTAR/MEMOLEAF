@@ -1,10 +1,11 @@
 'use client'
 import { Box, IconButton, ImageList, ImageListItem, Stack, TextField, Typography } from '@mui/material'
 import { Dispatch, SetStateAction, useState } from 'react'
-import { Dialog, TextCount } from '@/components/common'
 import { Cancel, NoteAlt } from '@mui/icons-material'
 import { ImageData } from '@/shared/types/client'
 import { imgPath } from '@/shared/utils/common'
+import TextCount from '@/components/common/TextCount'
+import Dialog from '@/components/common/Dialog'
 import Image from 'next/image'
 
 interface Props {
