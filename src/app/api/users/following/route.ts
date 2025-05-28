@@ -1,17 +1,16 @@
 import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse as NRes } from 'next/server'
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest) {
   try {
-    const { id } = await params
     const { searchParams } = new URL(req.url)
     const cursor = parseInt(searchParams.get('cursor') || '0')
-
-    const whereData = { fromUserId: parseInt(id) }
+    const id = parseInt(searchParams.get('id') || '0')
+    const whereData = { fromUserId: id }
     const selectData = { select: { id: true, name: true, image: true, info: true, userNum: true } }
 
     const follows = await prisma.follow.findMany({
-      where: { toUserId: { lt: cursor }, ...whereData },
+      where: { ...(cursor && { toUserId: { lt: cursor } }), ...whereData },
       take: 10,
       orderBy: { toUserId: 'desc' },
       include: { toUser: selectData },

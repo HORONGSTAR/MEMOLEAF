@@ -1,18 +1,25 @@
-export type MemosAria = 'home' | 'mypost' | 'bookmark' | 'thread' | string
+export type MemosAria = 'home' | 'mypost' | 'bookmark' | 'thread' | 'search' | string
 
 export interface GetMemosParams {
   query: {
     [key: string]: unknown
     aria: MemosAria
     id?: number
-    cursor: number
+    cursor?: number
+    keyword?: string
+    filter?: string
   }
 }
 
 export interface GetFollowParams {
-  id: number
-  endpoint: 'follower' | 'following' | string
-  cursor: number
+  endpoint: 'follower' | 'following' | 'search' | string
+  query: {
+    [key: string]: unknown
+    cursor?: number
+    id?: number
+    keyword?: string
+    filter?: string
+  }
 }
 
 export interface MemoParams {

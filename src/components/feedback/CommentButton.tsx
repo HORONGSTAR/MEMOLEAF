@@ -1,5 +1,5 @@
 'use client'
-import { Close, ForumOutlined } from '@mui/icons-material'
+import { Close, SmsOutlined } from '@mui/icons-material'
 import { Box, IconButton, Dialog, Pagination, Stack, DialogContent, DialogTitle, DialogActions, useMediaQuery, Skeleton } from '@mui/material'
 import { createComment, deleteComment, fetchComments } from '@/shared/fetch/commentsApi'
 import { CommentForm, CommentBox, FeedbackCount } from '@/components/feedback'
@@ -61,7 +61,7 @@ export default function CommentButton({ id, count }: Props) {
     <div onClick={(e) => e.stopPropagation()}>
       <FeedbackCount count={total}>
         <IconButton aria-label="댓글창 열기" onClick={() => setActive('on')}>
-          <ForumOutlined fontSize="small" />
+          <SmsOutlined sx={{ fontSize: 18 }} />
         </IconButton>
       </FeedbackCount>
 

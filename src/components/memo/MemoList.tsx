@@ -7,39 +7,43 @@ import { Stack } from '@mui/material'
 import { MemosAria } from '@/shared/types/api'
 
 interface Props {
-  aria: MemosAria
-  id?: number
-  nextCursor: number
+  query: {
+    aria: MemosAria
+    id?: number
+    keyword?: string
+    filter?: string
+  }
+  nextCursor?: number
   children: ReactNode
   loadingBox: ReactNode
   addMemoList: (values: MemoData[]) => void
 }
 
 export default function MemoList(props: Props) {
-  const { aria, nextCursor, children, id, loadingBox, addMemoList } = props
-  const [cursor, setCursor] = useState(nextCursor)
+  const { nextCursor, query, children, loadingBox, addMemoList } = props
+  const [cursor, setCursor] = useState<undefined | number>(nextCursor)
   const [loading, setLoading] = useState('off')
-  const isSameAria = useRef(aria)
+  const isSameAria = useRef(JSON.stringify(query))
   const observerRef = useRef(null)
 
   useEffect(() => {
-    if (isSameAria.current !== aria) {
+    if (isSameAria.current !== JSON.stringify(query)) {
       setCursor(nextCursor)
-      isSameAria.current = aria
+      isSameAria.current = JSON.stringify(query)
     }
-  }, [aria, nextCursor])
+  }, [isSameAria, query, nextCursor])
 
   const loadMoreMemos = useCallback(() => {
-    if (cursor < 0) return
+    if (cursor && cursor < 0) return
     setLoading('on')
-    fetchMemos({ query: { aria, cursor, id } })
+    fetchMemos({ query: { ...query, cursor } })
       .then((result) => {
         addMemoList(result.memos)
         setCursor(result.nextCursor)
       })
       .catch()
       .finally(() => setLoading('off'))
-  }, [cursor, aria, id, addMemoList])
+  }, [cursor, query, addMemoList])
 
   useEffect(() => {
     const observer = new IntersectionObserver(

@@ -1,5 +1,4 @@
-import { AppBar, Toolbar, Container, IconButton, Box } from '@mui/material'
-import { Search } from '@mui/icons-material'
+import { AppBar, Toolbar, Container, Box } from '@mui/material'
 import Account from '@/components/auth/Account'
 import Link from 'next/link'
 import { ReactNode } from 'react'
@@ -14,9 +13,6 @@ export default function Navbar({ children }: { children?: ReactNode }) {
               <img src={'/memoleaf.svg'} alt="MEMOLEAF" width={120} height={20} />
             </Link>
             <Box flexGrow={1} />
-            <IconButton aria-label="검색 페이지" component={Link} href="/page/search">
-              <Search />
-            </IconButton>
             {children}
             <Account />
           </Toolbar>

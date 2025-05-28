@@ -1,38 +1,38 @@
 'use client'
-import { fetchtFollow } from '@/shared/fetch/usersApi'
-import { List, Typography } from '@mui/material'
+import { fetchtUsers } from '@/shared/fetch/usersApi'
+import { List, Skeleton, Typography } from '@mui/material'
 import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { swapOnOff } from '@/shared/utils/common'
 import { UserData } from '@/shared/types/client'
 
 interface Props {
-  user: { id: number; name: string }
-  nextCursor: number
   children: ReactNode
-  loadingBox: ReactNode
-  endpoint: 'follower' | 'following' | string
+  endpoint: 'follower' | 'following' | 'search' | string
+  user?: { id: number; name: string }
+  filter?: string
+  keyword?: string
   addUserList: (values: UserData[]) => void
 }
 
 export default function UserList(props: Props) {
-  const { user, nextCursor, loadingBox, children, endpoint, addUserList } = props
+  const { user, children, endpoint, filter, keyword, addUserList } = props
   const [count, setCount] = useState(0)
-  const [cursor, setCursor] = useState(nextCursor)
+  const [cursor, setCursor] = useState<undefined | number>(undefined)
   const [loading, setLoading] = useState('off')
   const isSameEndpoint = useRef(endpoint)
   const observerRef = useRef(null)
 
   useEffect(() => {
     if (isSameEndpoint.current !== endpoint) {
-      setCursor(nextCursor)
+      setCursor(undefined)
       isSameEndpoint.current = endpoint
     }
-  }, [endpoint, nextCursor])
+  }, [endpoint])
 
   const loadMoreUser = useCallback(() => {
-    if (cursor < 0) return
+    if (cursor && cursor < 0) return
     setLoading('on')
-    fetchtFollow({ id: user.id, endpoint, cursor })
+    fetchtUsers({ endpoint, query: { id: user?.id, endpoint, cursor, keyword, filter } })
       .then((result) => {
         setCount(result.searchTotal)
         addUserList(result.users)
@@ -40,7 +40,7 @@ export default function UserList(props: Props) {
       })
       .catch()
       .finally(() => setLoading('off'))
-  }, [addUserList, cursor, endpoint, user.id])
+  }, [addUserList, cursor, endpoint, filter, keyword, user?.id])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -58,14 +58,16 @@ export default function UserList(props: Props) {
   }, [loadMoreUser, loading])
 
   const followInfo = {
-    follower: { [count]: `${user.name}님의 팔로워 ${count}명`, 0: '팔로워 정보가 없습니다.' }[count],
-    following: { [count]: `${user.name}님의 팔로잉 ${count}명`, 0: '팔로잉 정보가 없습니다.' }[count],
+    follower: { [count]: `${user?.name}님의 팔로워 ${count}명`, 0: '팔로워 정보가 없습니다.' }[count],
+    following: { [count]: `${user?.name}님의 팔로잉 ${count}명`, 0: '팔로잉 정보가 없습니다.' }[count],
   }[endpoint]
+
+  const loadingBox = [1, 2, 3].map((el) => <Skeleton variant="rounded" height={120} key={'loading' + el} sx={{ mb: 2 }} />)
 
   return (
     <>
       <Typography variant="body2" color="textSecondary">
-        {followInfo}
+        {user ? followInfo : null}
       </Typography>
       <List>{children}</List>
       <div ref={observerRef} />

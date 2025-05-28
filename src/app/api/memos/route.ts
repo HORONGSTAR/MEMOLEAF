@@ -13,15 +13,14 @@ export async function GET(req: NextRequest) {
     const id = parseInt(searchParams.get('id') || '0')
     const aria = searchParams.get('aria') || 'home'
     const keyword = searchParams.get('keyword')
+    const filter = searchParams.get('filter')
 
     const whereData = {
       home: {},
-      thread: { parentId: id, id: { gt: cursor } },
+      thread: { parentId: id, ...(cursor && { id: { gt: cursor } }) },
       mypost: { userId: id },
       bookmark: { bookmarks: { some: { userId: id } } },
-      search: {
-        ...(keyword && { content: { contains: keyword } }),
-      },
+      search: { ...(keyword && { content: { contains: keyword } }) },
     }[aria]
 
     const joinTeble = {
@@ -38,10 +37,17 @@ export async function GET(req: NextRequest) {
       search: joinTeble,
     }[aria]
 
+    const filterData = {
+      all: { parentId: undefined },
+      thread: { leafs: { some: {} } },
+      images: { images: { some: {} } },
+    }[filter || 'all']
+
     const memolist = await prisma.memo.findMany({
       where: {
         parentId: null,
-        id: { lt: cursor },
+        ...(cursor && { id: { lt: cursor } }),
+        ...filterData,
         ...whereData,
       },
       take: 10,

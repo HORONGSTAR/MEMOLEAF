@@ -1,12 +1,11 @@
 'use client'
 import { Logout, PersonOutlineOutlined, SettingsOutlined } from '@mui/icons-material'
 import { useSession, signOut } from 'next-auth/react'
-import { checkOnOff } from '@/shared/utils/common'
+import { checkOnOff, imgPath } from '@/shared/utils/common'
 import { useState } from 'react'
-import { Button, Menu, MenuItem, Tooltip, IconButton, ListItemIcon, ListItemText } from '@mui/material'
+import { Button, Menu, MenuItem, Tooltip, IconButton, ListItemIcon, ListItemText, Avatar } from '@mui/material'
 import Dialog from '@/components/common/Dialog'
 import LoginBox from '@/components/auth/LoginBox'
-import MyAvatar from '@/components/auth/MyAvatar'
 import { useRouter } from 'next/navigation'
 
 export default function Account() {
@@ -48,7 +47,7 @@ export default function Account() {
             aria-haspopup="true"
             aria-expanded={menuOpen ? 'true' : undefined}
           >
-            <MyAvatar user={session?.user} />
+            <Avatar sx={{ width: 32, height: 32 }} src={imgPath + session?.user.image} alt={`${session?.user.name}프로필 사진`} />
           </IconButton>
         </Tooltip>
         <Menu
@@ -63,7 +62,7 @@ export default function Account() {
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          <MenuItem dense onClick={() => router.push(`/page/my/${myId}`)}>
+          <MenuItem dense onClick={() => router.push(`/page/profile/${myId}`)}>
             <ListItemIcon>
               <PersonOutlineOutlined fontSize="small" />
             </ListItemIcon>

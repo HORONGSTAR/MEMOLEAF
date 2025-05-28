@@ -29,7 +29,10 @@ export default function DecoBox({ decos, children }: Props) {
     <Box>
       <Chip
         sx={{ mx: 2, my: 1 }}
-        onClick={() => setChecked(swapOnOff[checked].next)}
+        onClick={(e) => {
+          e.stopPropagation()
+          setChecked(swapOnOff[checked].next)
+        }}
         label={{ on: '내용 접기', off: folder.extra || '내용 열기' }[checked]}
         size="small"
         icon={<ExpandMore sx={{ transform: `rotate(${{ on: '-180deg', off: '0deg' }[checked]})`, transition: 'transform 0.3s ease' }} />}
@@ -45,9 +48,15 @@ export default function DecoBox({ decos, children }: Props) {
         <br />
         열람 비밀번호가 필요합니다.
       </Typography>
-      <Box sx={{ display: 'flex', gap: 2 }}>
+      <Box sx={{ display: 'flex', gap: 1 }}>
         <TextField sx={{ width: 140 }} size="small" label="비밀번호 입력" value={password} onChange={(e) => setPassword(e.target.value)} />
-        <Button variant="contained" onClick={() => setLock(password !== secret.extra ? 'on' : 'off')}>
+        <Button
+          sx={{ minWidth: 50 }}
+          onClick={(e) => {
+            e.stopPropagation()
+            setLock(password !== secret.extra ? 'on' : 'off')
+          }}
+        >
           확인
         </Button>
       </Box>

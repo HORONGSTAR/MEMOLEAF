@@ -57,12 +57,12 @@ export default function MemoForm(inti: IntiMemoValue) {
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <Stack sx={{ bgcolor: '#fff', p: 1, mb: 2 }}>
+      <Stack sx={{ bgcolor: '#fff', p: 1, mb: 1 }}>
         <ToolItem decos={decos} setDecos={setDecos} />
         <InputBase
           id="content"
           multiline
-          minRows={3}
+          minRows={2}
           aria-label="메모 작성. 글자수 제한 191자."
           placeholder={'기록을 남겨보세요!'}
           value={content}
@@ -79,7 +79,7 @@ export default function MemoForm(inti: IntiMemoValue) {
         {
           {
             create: (
-              <Button size="large" variant="contained" onClick={handleSubmit}>
+              <Button variant="contained" onClick={handleSubmit}>
                 메모
               </Button>
             ),

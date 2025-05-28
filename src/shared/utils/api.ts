@@ -5,7 +5,6 @@ export const bookmarksUrl = '/api/bookmarks'
 export const alarmUrl = '/api/alarm'
 export const usersUrl = '/api/users'
 export const settingsUrl = '/api/settings'
-export const searchUrl = '/api/search'
 
 export const buildApiCall = (method: string, data: unknown) => {
   return {

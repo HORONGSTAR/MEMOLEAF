@@ -43,7 +43,7 @@ export default function AlarmBox(props: Props) {
       <List>
         {alarms.map((alarm) => (
           <ListItem key={alarm.id}>
-            <LinkBox link={`/page/my/${alarm.reader.id}`}>
+            <LinkBox link={`/page/profile/${alarm.reader.id}`}>
               <ListItemAvatar>
                 <Avatar user={alarm.reader} size={40} />
               </ListItemAvatar>
@@ -52,7 +52,9 @@ export default function AlarmBox(props: Props) {
               variant="body2"
               color="textPrimary"
               link={
-                { comment: `/page/detail/${alarm.linkId}`, follow: `/page/my/${alarm.linkId}`, bookmark: `/page/detail/${alarm.linkId}` }[alarm.aria]
+                { comment: `/page/detail/${alarm.linkId}`, follow: `/page/profile/${alarm.linkId}`, bookmark: `/page/detail/${alarm.linkId}` }[
+                  alarm.aria
+                ]
               }
             >
               {

@@ -6,6 +6,9 @@ import prisma from '@/lib/prisma'
 import Navbar from '@/components/shared/Navbar'
 import Footer from '@/components/shared/Footer'
 import AlarmBox from '@/components/shared/AlarmBox'
+import { Container, IconButton } from '@mui/material'
+import { Search } from '@mui/icons-material'
+import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,7 +30,6 @@ export default async function HomePage() {
   })
 
   const memos = memolist.map((item) => ({ ...item, decos: decosToJson(item.decos) }))
-  const nextCursor = memos.length > 0 ? memos.slice(-1)[0].id : 0
 
   const alarms = await prisma.alarm.findMany({
     where: { authorId: userId },
@@ -38,9 +40,14 @@ export default async function HomePage() {
   return (
     <>
       <Navbar>
+        <IconButton aria-label="검색 페이지" component={Link} href="/page/search">
+          <Search />
+        </IconButton>
         <AlarmBox {...alarms} count={alarms.length} />
       </Navbar>
-      <HomeContainer firstLoadMemos={memos} nextCursor={nextCursor} myId={userId} />
+      <Container sx={{ mb: 4, minHeight: '100vh' }}>
+        <HomeContainer firstLoadMemos={memos} myId={userId || 0} />
+      </Container>
       <Footer />
     </>
   )

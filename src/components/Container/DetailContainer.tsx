@@ -1,5 +1,5 @@
 'use client'
-import { Button, Chip, Container, ListItem, ListItemText, Paper, Skeleton, useTheme } from '@mui/material'
+import { Button, Chip, ListItem, ListItemText, Paper, Skeleton, useTheme } from '@mui/material'
 import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { MemoBox, MemoForm, MemoList, ThreadBox } from '@/components/memo'
 import { createMemo, updateMemo } from '@/shared/fetch/memosApi'
@@ -96,7 +96,7 @@ export default function DetailContainer(props: Props) {
   }
 
   const ParentBox = () => {
-    const item = <MemoBox memo={parent} myId={myId} removeItem={() => router.push('/')} editItem={() => setEdit(parent.id)} />
+    const item = <MemoBox memo={parent} removeItem={() => router.push('/')} editItem={() => setEdit(parent.id)} myId={myId || 0} />
     const editform = (
       <MemoForm action="update" {...parent} onSubmint={handleUpdateParent}>
         <Button color="error" onClick={() => setEdit(0)}>
@@ -115,18 +115,25 @@ export default function DetailContainer(props: Props) {
     </ListItem>
   ))
 
+  const form = {
+    on: (
+      <Paper variant="outlined" sx={{ bgcolor: theme.palette.secondary.light, p: 1, my: 2 }}>
+        <MemoForm action="create" parentId={parent.id} onSubmint={handleCreateMemo} />
+      </Paper>
+    ),
+    off: null,
+  }[isMine]
+
   return (
-    <Container sx={{ mb: 4, minHeight: '100vh' }}>
+    <>
       <div>{children}</div>
       <ParentBox />
-      <MemoList loadingBox={loadingBox} addMemoList={addMemoList} id={parent.id} aria={'thread'} nextCursor={0}>
+      <MemoList {...{ loadingBox, addMemoList, query: { id: parent.id, aria: 'thread' } }}>
         {leafs.map((leaf: LeafData, index) => (
           <ThreadItem key={'detail-memo' + leaf.id} leaf={leaf} index={index} />
         ))}
       </MemoList>
-      <Paper variant="outlined" sx={{ bgcolor: theme.palette.secondary.light, p: 1 }}>
-        <MemoForm action="create" parentId={parent.id} onSubmint={handleCreateMemo} />
-      </Paper>
-    </Container>
+      {form}
+    </>
   )
 }

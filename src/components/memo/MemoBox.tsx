@@ -1,5 +1,5 @@
 'use client'
-import { Snackbar, Typography, ListItem, ListItemAvatar, ListItemText, Box } from '@mui/material'
+import { Snackbar, Typography, ListItem, ListItemAvatar, ListItemText } from '@mui/material'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined, Launch } from '@mui/icons-material'
 import { useCallback, useMemo, useState } from 'react'
 import { BookmarkButton, CommentButton } from '@/components/feedback'
@@ -14,8 +14,8 @@ import Avatar from '@/components/common/Avatar'
 import Dialog from '@/components/common/Dialog'
 
 interface Props {
+  myId: number
   memo: MemoData
-  myId?: number
   editItem: () => void
   removeItem: () => void
 }
@@ -23,7 +23,7 @@ interface Props {
 export default function MemoBox({ memo, myId, editItem, removeItem }: Props) {
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
-  const isMine = checkOnOff(memo.user.id, myId || 0)
+  const isMine = checkOnOff(memo.user.id, myId)
   const router = useRouter()
 
   const handleDelete = useCallback(() => {
@@ -77,29 +77,34 @@ export default function MemoBox({ memo, myId, editItem, removeItem }: Props) {
     onAction: handleDelete,
   }
 
+  const isThread = checkOnOff(1, memo._count?.leafs || 0)
+  const threadCount = { on: `${memo._count?.leafs}개의 타래글`, off: null }[isThread]
+
   return (
     <>
-      <Box sx={{ p: 1 }}>
-        <ListItem secondaryAction={memu}>
-          <ListItemAvatar>
-            <LinkBox link={`/page/my/${memo.user.id}`}>
-              <Avatar user={memo.user} size={36} />
-            </LinkBox>
-          </ListItemAvatar>
-          <ListItemText primary={<LinkBox link={`/page/my/${memo.user.id}`}>{memo.user?.name}</LinkBox>} secondary={convertDate(memo.createdAt)} />
+      <ListItem secondaryAction={memu}>
+        <ListItemAvatar>
+          <LinkBox link={`/page/profile/${memo.user.id}`}>
+            <Avatar user={memo.user} size={40} />
+          </LinkBox>
+        </ListItemAvatar>
+        <ListItemText primary={<LinkBox link={`/page/profile/${memo.user.id}`}>{memo.user?.name}</LinkBox>} secondary={convertDate(memo.createdAt)} />
+      </ListItem>
+      <DecoBox decos={memo.decos}>
+        <ListItem>{memo.content}</ListItem>
+        <ListItem dense>
+          <ImgGrid images={memo.images} />
         </ListItem>
-        <DecoBox decos={memo.decos}>
-          <ListItem>{memo.content}</ListItem>
-          <ListItem>
-            <ImgGrid images={memo.images} />
-          </ListItem>
-        </DecoBox>
-        <ListItem>
-          <ListItemText />
-          <BookmarkButton {...bookmarkProps} count={memo._count?.bookmarks || 0} />
-          <CommentButton id={memo.id} count={memo._count?.comments || 0} />
-        </ListItem>
-      </Box>
+      </DecoBox>
+      <ListItem>
+        <ListItemText>
+          <Typography variant="button" color="textSecondary">
+            {threadCount}
+          </Typography>
+        </ListItemText>
+        <BookmarkButton {...bookmarkProps} count={memo._count?.bookmarks || 0} />
+        <CommentButton id={memo.id} count={memo._count?.comments || 0} />
+      </ListItem>
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={message ? true : false}

@@ -34,7 +34,7 @@ export default function CommentBox(props: Props) {
           setMessage('댓글을 작성했습니다.')
         })
         .catch(() => setMessage('댓글을 작성 중 문제가 생겼습니다.'))
-      setAction('view')
+        .finally(() => setAction('view'))
     },
     [comment.id]
   )
@@ -72,7 +72,7 @@ export default function CommentBox(props: Props) {
 
   const dialogProps = {
     open,
-    title: '메모를 삭제할까요?',
+    title: '댓글을 삭제할까요?',
     closeLabel: '취소',
     actionLabel: '삭제',
     onClose: () => setOpen(false),
@@ -103,13 +103,13 @@ export default function CommentBox(props: Props) {
         <Box whiteSpace="pre-line">
           <ListItem secondaryAction={menu}>
             <ListItemAvatar>
-              <LinkBox link={`/page/my/${comment.user.id}`}>
+              <LinkBox link={`/page/profile/${comment.user.id}`}>
                 <Avatar user={comment.user} size={36} />
               </LinkBox>
             </ListItemAvatar>
             <ListItemText
               primary={
-                <LinkBox mr={1} link={`/page/my/${comment.user.id}`}>
+                <LinkBox mr={1} link={`/page/profile/${comment.user.id}`}>
                   {comment.user.name}
                 </LinkBox>
               }
@@ -122,7 +122,7 @@ export default function CommentBox(props: Props) {
         </Box>
       </List>
       <Dialog {...dialogProps}>
-        <Typography>삭제한 메모는 복구할 수 없습니다.</Typography>
+        <Typography>삭제한 댓글은 복구할 수 없습니다.</Typography>
       </Dialog>
       <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
     </>

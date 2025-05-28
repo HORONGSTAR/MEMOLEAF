@@ -29,10 +29,14 @@ export const unfollowUser = async (toUserId: number) => {
   return res.json()
 }
 
-export const fetchtFollow = async (params: GetFollowParams) => {
-  const { id, endpoint, cursor } = params
+export const fetchtUsers = async ({ endpoint, query }: GetFollowParams) => {
+  let queryString = ''
+  const keys = Object.keys(query)
+  for (const key of keys) {
+    queryString += `${key}=${query[key]}&`
+  }
 
-  const res = await fetch(usersUrl + `/${id}/${endpoint}?cursor=${cursor}`)
+  const res = await fetch(usersUrl + `/${endpoint}?${queryString}`)
   if (!res.ok) return null
   return res.json()
 }

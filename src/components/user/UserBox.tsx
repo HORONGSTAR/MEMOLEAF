@@ -9,14 +9,14 @@ export default function UserList(user: ProfileData) {
     <>
       <ListItem disableGutters key={'followList' + user.id} alignItems="flex-start" divider>
         <ListItemAvatar>
-          <LinkBox link={`/page/my/${user.id}`}>
+          <LinkBox link={`/page/profile/${user.id}`}>
             <Avatar user={user} size={40} />
           </LinkBox>
         </ListItemAvatar>
         <ListItemText
           primary={
             <Stack direction="row" spacing={1}>
-              <LinkBox link={`/page/my/${user.id}`}>{user.name}</LinkBox>
+              <LinkBox link={`/page/profile/${user.id}`}>{user.name}</LinkBox>
               <Typography variant="body2" color="textDisabled">
                 ID {user.userNum}
               </Typography>

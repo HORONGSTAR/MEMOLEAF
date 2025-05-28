@@ -12,9 +12,16 @@ export default function ImgUploader(props: Props) {
 
   const handleImageChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files
-      if (!files?.length) return
-      setImage({ file: files[0], url: URL.createObjectURL(files[0]) })
+      const file = e.target.files && e.target.files[0]
+      if (!file) return
+      const newImgUrls = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result as string)
+        reader.onerror = () => reject(reader.error)
+        reader.readAsDataURL(file)
+      })
+
+      setImage({ file: file, url: newImgUrls })
     },
     [setImage]
   )

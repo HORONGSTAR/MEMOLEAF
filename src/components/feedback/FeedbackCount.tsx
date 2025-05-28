@@ -9,10 +9,10 @@ interface Props {
 export default function FeedbackCount(props: Props) {
   const { count, children } = props
   return (
-    <Stack direction="row" alignItems="center" minWidth={60}>
+    <Stack direction="row" alignItems="center" minWidth={50}>
       {children}
-      <Typography fontWeight="bold" variant="body2" color="textSecondary">
-        {count > 100 ? '99+' : count}
+      <Typography variant="button" color="textSecondary">
+        {count > 100 ? '9+' : count}
       </Typography>
     </Stack>
   )

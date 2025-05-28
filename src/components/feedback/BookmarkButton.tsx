@@ -26,7 +26,7 @@ export default function BookmarkButton(props: Props) {
         setCount((prev) => prev + 1)
         setMessage('게시글을 북마크 했습니다.')
       })
-      .catch()
+      .catch(() => setMessage('북마크 중 문제가 발생했습니다. 새로고침 후 다시 시도해주세요.'))
       .finally(() => {
         setChecked('on')
         setLoading(false)
@@ -41,7 +41,7 @@ export default function BookmarkButton(props: Props) {
         setCount((prev) => prev - 1)
         setMessage('북마크를 해제했습니다.')
       })
-      .catch()
+      .catch(() => setMessage('북마크 해제 중 문제가 발생했습니다. 새로고침 후 다시 시도해주세요.'))
       .finally(() => {
         setChecked('off')
         setLoading(false)
@@ -63,7 +63,7 @@ export default function BookmarkButton(props: Props) {
               }}
               sx={{ position: 'relative' }}
             >
-              <Bookmark fontSize="small" />
+              <Bookmark sx={{ fontSize: 18 }} />
             </IconButton>
           ),
           off: (
@@ -77,7 +77,7 @@ export default function BookmarkButton(props: Props) {
               }}
               sx={{ position: 'relative' }}
             >
-              <BookmarkBorder fontSize="small" />
+              <BookmarkBorder sx={{ fontSize: 18 }} />
             </IconButton>
           ),
         }[checked]
