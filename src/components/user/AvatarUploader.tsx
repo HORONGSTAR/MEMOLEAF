@@ -1,6 +1,7 @@
+'use client'
 import { AddPhotoAlternate } from '@mui/icons-material'
-import { Button, Stack, Box, Avatar } from '@mui/material'
-import { Dispatch, SetStateAction, useCallback } from 'react'
+import { Button, Stack, Box, Avatar, Snackbar } from '@mui/material'
+import { Dispatch, SetStateAction, useCallback, useState } from 'react'
 
 interface Props {
   image: { file?: File; url: string }
@@ -9,11 +10,18 @@ interface Props {
 
 export default function ImgUploader(props: Props) {
   const { image, setImage } = props
+  const [message, setMessage] = useState('')
 
   const handleImageChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files && e.target.files[0]
+      const maxSize = 5 * 1024 * 1024
       if (!file) return
+      if (file.size > maxSize) {
+        setMessage('파일 크기는 5MB 이하로 업로드해주세요.')
+        e.target.value = ''
+        return
+      }
       const newImgUrls = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader()
         reader.onload = () => resolve(reader.result as string)
@@ -56,6 +64,13 @@ export default function ImgUploader(props: Props) {
           <input type="file" accept="image/*" onChange={handleImageChange} />
         </Box>
       </Button>
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={message ? true : false}
+        autoHideDuration={6000}
+        onClose={() => setMessage('')}
+        message={message}
+      />
     </Stack>
   )
 }

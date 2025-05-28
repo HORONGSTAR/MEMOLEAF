@@ -29,15 +29,23 @@ export default function ImgForm({ imgs, setImgs, setFiles }: Props) {
       return
     }
 
+    const maxSize = 5 * 1024 * 1024
+
     try {
       const fileArray = Array.from(files)
       const readFilePromises = fileArray.map((file) => {
-        return new Promise<string>((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onload = () => resolve(reader.result as string)
-          reader.onerror = () => reject(reader.error)
-          reader.readAsDataURL(file)
-        })
+        if (file.size > maxSize) {
+          setMessage('파일 크기는 5MB 이하로 업로드해주세요.')
+          e.target.value = ''
+          return ''
+        } else {
+          return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader()
+            reader.onload = () => resolve(reader.result as string)
+            reader.onerror = () => reject(reader.error)
+            reader.readAsDataURL(file)
+          })
+        }
       })
 
       const newImgUrls = await Promise.all(readFilePromises)
