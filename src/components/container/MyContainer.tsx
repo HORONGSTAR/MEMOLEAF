@@ -5,7 +5,8 @@ import { useCallback, useMemo, useState } from 'react'
 import DetailContainer from '@/components/container/DetailContainer'
 import MemoList from '@/components/memo/MemoList'
 import TabBox from '../common/TabBox'
-import { useSearchParams } from 'next/navigation'
+import { ArrowBack } from '@mui/icons-material'
+import { Button } from '@mui/material'
 
 interface Props {
   profile: ProfileData
@@ -18,8 +19,11 @@ export default function MyContainer({ profile, myId }: Props) {
   const [aria, setAria] = useState('mypost')
   const [endpoint, setEndpoint] = useState('follower')
   const [cursor, setCursor] = useState<undefined | number>(undefined)
-  const searchParams = useSearchParams()
-  const index = parseInt(searchParams.get('index') || 'NaN')
+  const [index, setIndex] = useState<number>(NaN)
+
+  const handleSetIndex = (index: number) => {
+    setIndex(index)
+  }
 
   const addUserList = useCallback((values: UserData[]) => {
     setUsers((prev) => [...prev, ...values])
@@ -46,7 +50,7 @@ export default function MyContainer({ profile, myId }: Props) {
   const panels = [
     {
       label: '다이어리',
-      panel: <MemoList {...{ myId, memos, removeItem, AddEditedItem, addLoadList, query }} />,
+      panel: <MemoList {...{ myId, memos, removeItem, AddEditedItem, addLoadList, query, handleSetIndex }} />,
       categorys: [
         { label: `${profile.name}님의 글`, value: 'mypost' },
         { label: '북마크', value: 'bookmark' },
@@ -91,7 +95,13 @@ export default function MyContainer({ profile, myId }: Props) {
     </>
   )
 
-  const detail = <DetailContainer firstLoadParent={memos[index]} myId={myId} />
+  const detail = (
+    <DetailContainer firstLoadParent={memos[index]} myId={myId}>
+      <Button startIcon={<ArrowBack />} onClick={() => setIndex(NaN)}>
+        목록으로 돌아가기
+      </Button>
+    </DetailContainer>
+  )
 
   return { [index]: detail, NaN: my }[index]
 }

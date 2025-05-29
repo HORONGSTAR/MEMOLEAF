@@ -1,13 +1,12 @@
 'use client'
-import { IconButton, Stack, TextField } from '@mui/material'
+import { Button, IconButton, Stack, TextField } from '@mui/material'
 import { MemoData, UserData } from '@/shared/types/client'
 import { UserList, UserBox } from '@/components/user'
 import { useCallback, useState } from 'react'
-import { Search } from '@mui/icons-material'
+import { ArrowBack, Search } from '@mui/icons-material'
 import DetailContainer from '@/components/container/DetailContainer'
 import MemoList from '@/components/memo/MemoList'
 import TabBox from '../common/TabBox'
-import { useSearchParams } from 'next/navigation'
 
 interface Props {
   myId: number
@@ -20,8 +19,11 @@ export default function SearchContainer({ myId }: Props) {
   const [keyword, setKeyword] = useState('')
   const [filter, setFilter] = useState({ memo: 'all', user: 'profile' })
   const [cursor, setCursor] = useState<undefined | number>(undefined)
-  const searchParams = useSearchParams()
-  const index = parseInt(searchParams.get('index') || 'NaN')
+  const [index, setIndex] = useState<number>(NaN)
+
+  const handleSetIndex = (index: number) => {
+    setIndex(index)
+  }
 
   const handleChange = useCallback((text: string) => {
     setText(text)
@@ -62,7 +64,7 @@ export default function SearchContainer({ myId }: Props) {
   const panels = [
     {
       label: '게시글',
-      panel: keyword ? <MemoList {...{ myId, memos, removeItem, AddEditedItem, addLoadList, query }} /> : null,
+      panel: keyword ? <MemoList {...{ myId, memos, removeItem, AddEditedItem, addLoadList, query, handleSetIndex }} /> : null,
       categorys: [
         { label: '통합', value: 'all' },
         { label: '타래글', value: 'thread' },
@@ -119,7 +121,13 @@ export default function SearchContainer({ myId }: Props) {
     </>
   )
 
-  const detail = <DetailContainer firstLoadParent={memos[index]} myId={myId} />
+  const detail = (
+    <DetailContainer firstLoadParent={memos[index]} myId={myId}>
+      <Button startIcon={<ArrowBack />} onClick={() => setIndex(NaN)}>
+        목록으로 돌아가기
+      </Button>
+    </DetailContainer>
+  )
 
   return { [index]: detail, NaN: search }[index]
 }

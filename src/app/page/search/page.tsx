@@ -11,7 +11,7 @@ export default async function SearchPage() {
   return (
     <>
       <Navbar />
-      <Container sx={{ mb: 4, minHeight: '100vh' }}>
+      <Container sx={{ mb: 4, minHeight: '90vh' }}>
         <SearchContainer myId={myId || 0} />
       </Container>
       <Footer />

@@ -1,11 +1,11 @@
 'use client'
-import { Snackbar } from '@mui/material'
-import { useMemo, useState } from 'react'
+import { Button, Snackbar } from '@mui/material'
+import { useState } from 'react'
 import { MemoData } from '@/shared/types/client'
-import { useSearchParams } from 'next/navigation'
 import MemoList from '@/components/memo/MemoList'
 import MemoCreateForm from '@/components/memo/MemoCreateForm'
 import DetailContainer from '@/components/container/DetailContainer'
+import { ArrowBack } from '@mui/icons-material'
 
 interface Props {
   firstLoadMemos: MemoData[]
@@ -16,8 +16,11 @@ export default function HomeContainer({ firstLoadMemos, myId }: Props) {
   const [cursor, setCursor] = useState<undefined | number>(firstLoadMemos[9]?.id || undefined)
   const [memos, setMemos] = useState<MemoData[]>(firstLoadMemos || [])
   const [message, setMessage] = useState('')
-  const searchParams = useSearchParams()
-  const index = parseInt(searchParams.get('index') || 'NaN')
+  const [index, setIndex] = useState<number>(NaN)
+
+  const handleSetIndex = (index: number) => {
+    setIndex(index)
+  }
 
   const addCreatedItem = (item: MemoData) => {
     setMemos((prev) => [item, ...prev])
@@ -42,11 +45,17 @@ export default function HomeContainer({ firstLoadMemos, myId }: Props) {
   const home = (
     <>
       <MemoCreateForm add={addCreatedItem} alert={(text: string) => setMessage(text)} />
-      <MemoList {...{ myId, memos, query: { cursor, aria: 'home' }, addLoadList, AddEditedItem, removeItem }} />
+      <MemoList {...{ myId, memos, query: { cursor, aria: 'home' }, addLoadList, AddEditedItem, removeItem, handleSetIndex }} />
     </>
   )
 
-  const detail = useMemo(() => <DetailContainer firstLoadParent={memos[index]} myId={myId} />, [index, memos, myId])
+  const detail = (
+    <DetailContainer firstLoadParent={memos[index]} myId={myId}>
+      <Button startIcon={<ArrowBack />} onClick={() => setIndex(NaN)}>
+        목록으로 돌아가기
+      </Button>
+    </DetailContainer>
+  )
 
   return (
     <>

@@ -1,12 +1,13 @@
 import DetailContainer from '@/components/container/DetailContainer'
-import { Container, Stack, Typography } from '@mui/material'
-import { Error } from '@mui/icons-material'
+import { Button, Container, Stack, Typography } from '@mui/material'
+import { ArrowBack, Error } from '@mui/icons-material'
 import { getServerSession } from 'next-auth/next'
 import { decosToJson } from '@/shared/utils/common'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import Navbar from '@/components/shared/Navbar'
 import Footer from '@/components/shared/Footer'
+import Link from 'next/link'
 
 export default async function DetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions)
@@ -31,8 +32,12 @@ export default async function DetailPage({ params }: { params: Promise<{ id: str
     <>
       <Navbar />
       {memo ? (
-        <Container sx={{ mb: 4, minHeight: '100vh' }}>
-          <DetailContainer firstLoadParent={{ ...memo, decos: decosToJson(memo.decos) }} myId={userId || 0} />
+        <Container sx={{ mb: 4, minHeight: '90vh' }}>
+          <DetailContainer firstLoadParent={{ ...memo, decos: decosToJson(memo.decos) }} myId={userId || 0}>
+            <Button startIcon={<ArrowBack />} LinkComponent={Link} href="/">
+              메모리프 홈으로 가기
+            </Button>
+          </DetailContainer>
         </Container>
       ) : (
         <Stack alignItems="center" spacing={2} pt={3}>

@@ -7,7 +7,7 @@ export default async function SettingPage() {
   return (
     <>
       <Navbar />
-      <Container sx={{ mb: 4, minHeight: '100vh' }}>
+      <Container sx={{ mb: 4, minHeight: '90vh' }}>
         <SettingContainer />
       </Container>
       <Footer />

@@ -1,10 +1,9 @@
 'use client'
 import { Button, Chip, Skeleton, Snackbar } from '@mui/material'
-import { useCallback, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { MemoData, LeafData } from '@/shared/types/client'
 import { checkOnOff, swapOnOff } from '@/shared/utils/common'
 import { useRouter } from 'next/navigation'
-import { ArrowBack } from '@mui/icons-material'
 import MemoBox from '@/components/memo/MemoBox'
 import ThreadBox from '@/components/memo/ThreadBox'
 import MemoCreateForm from '../memo/MemoCreateForm'
@@ -15,10 +14,11 @@ import CursorObserver from '../common/CursorObserver'
 interface Props {
   myId: number
   firstLoadParent: MemoData
+  children: ReactNode
 }
 
 export default function DetailContainer(props: Props) {
-  const { firstLoadParent, myId } = props
+  const { firstLoadParent, myId, children } = props
   const [cursor, setCursor] = useState<undefined | number>(firstLoadParent.id)
   const [message, setMessage] = useState('')
   const [parent, setParent] = useState<MemoData>(firstLoadParent)
@@ -85,9 +85,14 @@ export default function DetailContainer(props: Props) {
 
   const creatForm = <MemoCreateForm add={addCreatedItem} parentId={parent.id} alert={(text: string) => setMessage(text)} />
 
-  const leafList = leafs.map((leaf: LeafData, index) => {
-    return <ThreadItem key={'detail-memo' + leaf.id} leaf={leaf} index={index} />
-  })
+  const leafList = (
+    <>
+      {leafs.map((leaf: LeafData, index) => {
+        return <ThreadItem key={'detail-memo' + leaf.id} leaf={leaf} index={index} />
+      })}
+      <CursorObserver loadMoreItems={loadMoreMemos} />
+    </>
+  )
 
   const loadingBox = Array(3).map((_, i) => {
     return <Skeleton sx={{ mb: 2 }} key={'loading' + i} />
@@ -95,15 +100,11 @@ export default function DetailContainer(props: Props) {
 
   return (
     <>
-      <Button startIcon={<ArrowBack />} onClick={() => router.back()}>
-        목록으로 돌아가기
-      </Button>
+      {children}
       <ParentBox />
-
       {{ on: leafList, off: null }[open]}
       {{ on: loadingBox, off: null }[loading]}
       {{ on: creatForm, off: null }[isMine]}
-      <CursorObserver loadMoreItems={loadMoreMemos} />
       <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
     </>
   )

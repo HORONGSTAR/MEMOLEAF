@@ -44,7 +44,7 @@ export default async function HomePage() {
         </IconButton>
         <AlarmBox alarms={alarms} count={alarms.length} />
       </Navbar>
-      <Container sx={{ mb: 4, minHeight: '100vh' }}>
+      <Container sx={{ mb: 4, minHeight: '90vh' }}>
         <HomeContainer firstLoadMemos={memos} myId={userId || 0} />
       </Container>
       <Footer />

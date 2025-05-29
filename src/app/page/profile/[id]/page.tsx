@@ -29,7 +29,7 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
     <>
       <Navbar />
       {profile ? (
-        <Container sx={{ mb: 4, minHeight: '100vh' }}>
+        <Container sx={{ mb: 4, minHeight: '90vh' }}>
           <MyContainer profile={profile} myId={myId || 0} />
         </Container>
       ) : (

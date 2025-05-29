@@ -7,7 +7,6 @@ import { MemoData } from '@/shared/types/client'
 import CursorObserver from '@/components/common/CursorObserver'
 import MemoBox from './MemoBox'
 import MemoEditForm from './MemoEditForm'
-import { useRouter, usePathname } from 'next/navigation'
 
 interface Props {
   myId: number
@@ -16,15 +15,14 @@ interface Props {
   addLoadList: (items: MemoData[], nextCursor: number) => void
   AddEditedItem: (item: MemoData) => void
   removeItem: (itemId: number) => void
+  handleSetIndex: (index: number) => void
 }
 
 export default function MemoList(props: Props) {
-  const { myId, memos, query, addLoadList, AddEditedItem, removeItem } = props
+  const { myId, memos, query, addLoadList, AddEditedItem, removeItem, handleSetIndex } = props
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState('off')
   const [editId, setEdit] = useState(0)
-  const pathname = usePathname()
-  const router = useRouter()
 
   const loadMoreMemos = useCallback(() => {
     const cursor = query.cursor
@@ -37,14 +35,6 @@ export default function MemoList(props: Props) {
       .catch(() => setMessage('게시글을 조회 중 문제가 발생했습니다.'))
       .finally(() => setLoading('off'))
   }, [addLoadList, query])
-
-  const linkDetail = (index: number) => {
-    const selection = window.getSelection()
-    if (selection && selection.toString().length > 0) {
-      return
-    }
-    router.push(`${pathname}?index=${index}`)
-  }
 
   const MemoListItem = (memo: MemoData) => {
     const item = <MemoBox {...{ myId, memo }} remove={() => removeItem(memo.id)} edit={() => setEdit(memo.id)} />
@@ -59,7 +49,7 @@ export default function MemoList(props: Props) {
   return (
     <Stack spacing={2}>
       {memos.map((memo: MemoData, index) => (
-        <Paper key={'memo' + memo.id} sx={{ p: { sm: 1, xs: 0 } }} variant="outlined" onClick={() => linkDetail(index)}>
+        <Paper key={'memo' + memo.id} sx={{ p: { sm: 1, xs: 0 }, cursor: 'pointer' }} variant="outlined" onClick={() => handleSetIndex(index)}>
           <MemoListItem {...memo} />
         </Paper>
       ))}
