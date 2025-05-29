@@ -4,7 +4,7 @@ import { Dispatch, SetStateAction, useState, useCallback } from 'react'
 import { ExpandMore, DriveFileRenameOutline, Key } from '@mui/icons-material'
 import { swapOnOff } from '@/shared/utils/common'
 import { DecoData } from '@/shared/types/client'
-import Dialog from '@/components/common/Dialog'
+import DialogBox from '@/components/common/DialogBox'
 
 interface Props {
   decos: DecoData
@@ -109,7 +109,7 @@ export default function ToolItem(props: Props) {
         <Button autoFocus startIcon={<Key />} size="small" onClick={() => setOpen('on')}>
           감추기 비밀번호 설정
         </Button>
-        <Dialog {...dialogProps}>
+        <DialogBox {...dialogProps}>
           <InputBase
             id="secret"
             autoFocus
@@ -123,7 +123,7 @@ export default function ToolItem(props: Props) {
           <Typography id="secret-info" maxWidth={300} mt={2} variant="body2">
             간단한 비밀번호로 메모를 잠글 수 있어요. 하지만 완전한 보안은 아니니 개인정보나 중요한 내용은 적지 말아주세요!
           </Typography>
-        </Dialog>
+        </DialogBox>
       </Box>
     ),
     off: null,

@@ -2,7 +2,7 @@
 import { ImgPreview, ImgForm, ToolBox, ToolItem } from '@/components/memo/sub'
 import { ReactNode, useCallback, useState } from 'react'
 import { Button, Snackbar, Stack, Box, InputBase } from '@mui/material'
-import { DecoData, ImageData } from '@/shared/types/client'
+import { DecoData, ImageData, UploadData } from '@/shared/types/client'
 import { MemoParams } from '@/shared/types/api'
 import { swapOnOff } from '@/shared/utils/common'
 import TextCount from '@/components/common/TextCount'
@@ -15,7 +15,7 @@ interface IntiMemoValue {
   images?: ImageData[]
   decos?: DecoData
   children?: ReactNode
-  onSubmint: (params: MemoParams) => void
+  onSubmint: (params: MemoParams, uploads: UploadData[]) => void
 }
 
 const intiDecoValue = {
@@ -26,8 +26,7 @@ const intiDecoValue = {
 
 export default function MemoForm(inti: IntiMemoValue) {
   const [content, setContent] = useState(inti.content || '')
-  const [files, setFiles] = useState<File[]>([])
-  const [imgs, setImgs] = useState(inti?.images || [])
+  const [images, setImages] = useState<UploadData[]>(inti?.images || [])
   const [decos, setDecos] = useState<DecoData>({ ...intiDecoValue, ...inti.decos })
   const [message, setMessage] = useState('')
 
@@ -43,12 +42,11 @@ export default function MemoForm(inti: IntiMemoValue) {
       parentId,
       content,
     }
-    onSubmint({ formData, imgs, files })
+    onSubmint(formData, images)
     setContent('')
-    setFiles([])
-    setImgs([])
+    setImages([])
     setDecos(intiDecoValue)
-  }, [content, decos, id, parentId, files, imgs, onSubmint])
+  }, [content, decos, id, parentId, images, onSubmint])
 
   const handleContentChange = (value: string) => {
     if (value.length > 191) return
@@ -68,11 +66,11 @@ export default function MemoForm(inti: IntiMemoValue) {
           value={content}
           onChange={(e) => handleContentChange(e.target.value)}
         />
-        <ImgPreview imgs={imgs} setImgs={setImgs} setFiles={setFiles} />
+        <ImgPreview images={images} setImages={setImages} />
         <TextCount text={content} max={191} />
       </Stack>
       <Stack direction="row" alignItems="center">
-        <ImgForm imgs={imgs} setImgs={setImgs} setFiles={setFiles} />
+        <ImgForm images={images} setImages={setImages} />
         <ToolBox decos={decos} setDecos={setDecos} />
         <Box flexGrow={1} />
         {children}

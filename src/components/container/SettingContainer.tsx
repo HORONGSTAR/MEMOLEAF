@@ -4,7 +4,7 @@ import { deleteAllMemos, deleteUserAccount } from '@/shared/fetch/settingsApi'
 import { useCallback, useState } from 'react'
 import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import Dialog from '@/components/common/Dialog'
+import DialogBox from '@/components/common/DialogBox'
 
 export default function SettingContainer() {
   const [open1, setOpen1] = useState(false)
@@ -114,7 +114,7 @@ export default function SettingContainer() {
           </Box>
         </ListItem>
       </List>
-      <Dialog
+      <DialogBox
         open={open1}
         onClose={() => setOpen1(false)}
         closeLabel="취소"
@@ -123,10 +123,10 @@ export default function SettingContainer() {
         onAction={handleDelete}
       >
         <Typography>정말로 삭제할까요?</Typography>
-      </Dialog>
-      <Dialog open={open2} title={'삭제 완료'} actionLabel="확인" onAction={handleRedirect}>
+      </DialogBox>
+      <DialogBox open={open2} title={'삭제 완료'} actionLabel="확인" onAction={handleRedirect}>
         {{ account: '계정 삭제를 마쳤습니다.', allmemo: '모든 메모를 삭제했습니다.' }[aria] || ''}
-      </Dialog>
+      </DialogBox>
       <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
     </Container>
   )

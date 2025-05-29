@@ -3,31 +3,6 @@ import prisma from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
-export async function GET() {
-  try {
-    const session = await getServerSession(authOptions)
-    if (!session) {
-      return NRes.json({ status: 204 })
-    }
-
-    const authorId = session.user.id
-    const alarms = await prisma.alarm.findMany({
-      where: { authorId },
-      take: 10,
-      include: { reader: true },
-      orderBy: { id: 'desc' },
-    })
-
-    const count = await prisma.alarm.count({ where: { authorId } })
-
-    return NRes.json({ alarms, count })
-  } catch (error) {
-    console.error(error)
-    const message = '알림 조회 중 문제가 발생했습니다.'
-    return NRes.json({ success: false, message }, { status: 500 })
-  }
-}
-
 export async function DELETE() {
   try {
     const session = await getServerSession(authOptions)

@@ -4,7 +4,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { checkOnOff, imgPath } from '@/shared/utils/common'
 import { useState } from 'react'
 import { Button, Menu, MenuItem, Tooltip, IconButton, ListItemIcon, ListItemText, Avatar } from '@mui/material'
-import Dialog from '@/components/common/Dialog'
+import DialogBox from '@/components/common/DialogBox'
 import LoginBox from '@/components/auth/LoginBox'
 import { useRouter } from 'next/navigation'
 
@@ -31,9 +31,9 @@ export default function Account() {
     on: (
       <>
         <Button onClick={() => setDialogOpen(true)}>로그인</Button>
-        <Dialog {...dialogProps}>
+        <DialogBox {...dialogProps}>
           <LoginBox />
-        </Dialog>
+        </DialogBox>
       </>
     ),
     off: (

@@ -2,15 +2,14 @@
 import { Dispatch, SetStateAction, useRef, useState } from 'react'
 import { IconButton, Snackbar, Tooltip } from '@mui/material'
 import { ImageSearch } from '@mui/icons-material'
-import { ImageData } from '@/shared/types/client'
+import { UploadData } from '@/shared/types/client'
 
 interface Props {
-  imgs: ImageData[]
-  setImgs: Dispatch<SetStateAction<ImageData[]>>
-  setFiles: Dispatch<SetStateAction<File[]>>
+  images: UploadData[]
+  setImages: Dispatch<SetStateAction<UploadData[]>>
 }
 
-export default function ImgForm({ imgs, setImgs, setFiles }: Props) {
+export default function ImgForm({ images, setImages }: Props) {
   const [loading, setLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [message, setMessage] = useState('')
@@ -23,7 +22,7 @@ export default function ImgForm({ imgs, setImgs, setFiles }: Props) {
       return
     }
 
-    if (imgs.length + files.length > 4) {
+    if (images.length > 4) {
       setMessage('이미지는 최대 4장까지 첨부할 수 있어요.')
       setLoading(false)
       return
@@ -48,10 +47,12 @@ export default function ImgForm({ imgs, setImgs, setFiles }: Props) {
         }
       })
 
-      const newImgUrls = await Promise.all(readFilePromises)
+      const newImages = await Promise.all(readFilePromises)
 
-      setFiles((prev) => [...prev, ...fileArray])
-      setImgs((prev) => [...prev, ...newImgUrls.map((url) => ({ url, alt: '' }))])
+      setImages((prev) => {
+        const add = newImages.map((img, i) => ({ url: img, file: files[i], alt: '' }))
+        return [...prev, ...add]
+      })
     } catch (error) {
       console.error('파일 읽기 중 오류 발생:', error)
       setMessage('파일을 읽는 중 오류가 발생했습니다.')
@@ -68,7 +69,7 @@ export default function ImgForm({ imgs, setImgs, setFiles }: Props) {
           loading={loading}
           size="small"
           aria-label="이미지 업로드"
-          disabled={imgs.length > 3}
+          disabled={images.length > 3}
           onClick={() => fileInputRef.current?.click()}
         >
           <ImageSearch />

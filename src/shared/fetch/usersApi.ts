@@ -1,14 +1,8 @@
 import { usersUrl, buildApiCall } from '@/shared/utils/api'
 import { GetFollowParams, UserParams } from '@/shared/types/api'
-import { uploadImages } from '@/shared/fetch/uploadApi'
 
 export const updateProfile = async (params: UserParams) => {
-  const { name, info, file } = params
-  let image
-  if (file) {
-    const result = await uploadImages([file])
-    image = result[0]
-  }
+  const { name, info, image } = params
   const data = buildApiCall('PATCH', { name, info, image })
   const res = await fetch(usersUrl, data)
   if (!res.ok) throw new Error('유저 정보 수정 중 에러')

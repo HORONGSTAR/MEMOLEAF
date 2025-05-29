@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
 
-const now = dayjs()
+export const now = dayjs()
 
-export const convertDate = (date: Date) => {
+export const convertDate = (date?: Date) => {
   const isToday = now.isSame(date, 'day')
   return dayjs(date).format(isToday ? 'A hh:mm' : 'YYYY.MM.DD')
 }

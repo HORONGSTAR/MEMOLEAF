@@ -10,8 +10,6 @@ import { Container, IconButton } from '@mui/material'
 import { Search } from '@mui/icons-material'
 import Link from 'next/link'
 
-export const dynamic = 'force-dynamic'
-
 export default async function HomePage() {
   const session = await getServerSession(authOptions)
   const userId = session?.user.id
@@ -31,11 +29,12 @@ export default async function HomePage() {
 
   const memos = memolist.map((item) => ({ ...item, decos: decosToJson(item.decos) }))
 
-  const alarms = await prisma.alarm.findMany({
-    where: { authorId: userId },
-    take: 30,
-    include: { reader: true },
-  })
+  const alarms =
+    (await prisma.alarm.findMany({
+      where: { authorId: userId || 0 },
+      take: 10,
+      include: { reader: true },
+    })) || []
 
   return (
     <>
@@ -43,7 +42,7 @@ export default async function HomePage() {
         <IconButton aria-label="검색 페이지" component={Link} href="/page/search">
           <Search />
         </IconButton>
-        <AlarmBox {...alarms} count={alarms.length} />
+        <AlarmBox alarms={alarms} count={alarms.length} />
       </Navbar>
       <Container sx={{ mb: 4, minHeight: '100vh' }}>
         <HomeContainer firstLoadMemos={memos} myId={userId || 0} />

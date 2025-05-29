@@ -23,19 +23,20 @@ export default function CommentButton({ id, count }: Props) {
   const limit = 5
   const totalPage = Math.ceil(total / limit)
 
-  const isMobile = useMediaQuery(theme.breakpoints.down('xs'))
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   useEffect(() => {
-    if (!swapOnOff[active].bool) return
+    if (!count || !swapOnOff[active].bool) return
     setLoading('on')
     fetchComments(page, id)
       .then((result) => setComments(result.comments))
       .catch((err) => console.error(err))
       .finally(() => setLoading('off'))
-  }, [active, page, id])
+  }, [active, page, id, count])
 
   const onSubmit = useCallback(
     (text: string) => {
+      setLoading('on')
       createComment({ text, id })
         .then((result) => {
           const newComment = { ...result, user: profile }
@@ -43,6 +44,7 @@ export default function CommentButton({ id, count }: Props) {
           setTotal((prev) => prev + 1)
         })
         .catch((err) => console.error(err))
+        .finally(() => setLoading('off'))
     },
     [id, profile]
   )
@@ -79,18 +81,7 @@ export default function CommentButton({ id, count }: Props) {
           <CommentForm onSubmit={onSubmit} />
         </Box>
         <DialogContent>
-          {
-            {
-              on: (
-                <Stack py={2} spacing={1}>
-                  <Skeleton />
-                  <Skeleton />
-                  <Skeleton />
-                </Stack>
-              ),
-              off: null,
-            }[loading]
-          }
+          {{ on: <Skeleton />, off: null }[loading]}
           {comments.map((comment) => (
             <CommentBox key={'comment' + comment.id} onDelete={handleDelete} comment={comment} />
           ))}

@@ -7,7 +7,7 @@ import { convertDate } from '@/shared/utils/common'
 import { deleteMemo } from '@/shared/fetch/memosApi'
 import { LeafData } from '@/shared/types/client'
 import MemoMenu from '@/components/memo/MemoMenu'
-import Dialog from '@/components/common/Dialog'
+import DialogBox from '@/components/common/DialogBox'
 
 interface Props {
   memo: LeafData
@@ -67,9 +67,9 @@ export default function ThreadBox({ memo, children, isMine, editItem, removeItem
         onClose={() => setMessage('')}
         message={message}
       />
-      <Dialog {...dialogProps}>
+      <DialogBox {...dialogProps}>
         <Typography>삭제한 메모는 복구할 수 없습니다.</Typography>
-      </Dialog>
+      </DialogBox>
     </>
   )
 }

@@ -1,12 +1,6 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  compilerOptions: {
-    baseUrl: '.',
-    paths: {
-      '@/*': ['./src/*'],
-    },
-  },
   modularizeImports: {
     '@mui/material': {
       transform: '@mui/material/{{member}}',

@@ -1,70 +1,71 @@
 'use client'
-import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
 import { fetchMemos } from '@/shared/fetch/memosApi'
-import { swapOnOff } from '@/shared/utils/common'
+import { Paper, Skeleton, Snackbar, Stack } from '@mui/material'
+import { useCallback, useState } from 'react'
+import { GetMemosParams } from '@/shared/types/api'
 import { MemoData } from '@/shared/types/client'
-import { Stack } from '@mui/material'
-import { MemosAria } from '@/shared/types/api'
+import CursorObserver from '@/components/common/CursorObserver'
+import MemoBox from './MemoBox'
+import MemoEditForm from './MemoEditForm'
+import { useRouter, usePathname } from 'next/navigation'
 
 interface Props {
-  query: {
-    aria: MemosAria
-    id?: number
-    keyword?: string
-    filter?: string
-  }
-  nextCursor?: number
-  children: ReactNode
-  loadingBox: ReactNode
-  addMemoList: (values: MemoData[]) => void
+  myId: number
+  memos: MemoData[]
+  query: GetMemosParams
+  addLoadList: (items: MemoData[], nextCursor: number) => void
+  AddEditedItem: (item: MemoData) => void
+  removeItem: (itemId: number) => void
 }
 
 export default function MemoList(props: Props) {
-  const { nextCursor, query, children, loadingBox, addMemoList } = props
-  const [cursor, setCursor] = useState<undefined | number>(nextCursor)
+  const { myId, memos, query, addLoadList, AddEditedItem, removeItem } = props
+  const [message, setMessage] = useState('')
   const [loading, setLoading] = useState('off')
-  const isSameAria = useRef(JSON.stringify(query))
-  const observerRef = useRef(null)
-
-  useEffect(() => {
-    if (isSameAria.current !== JSON.stringify(query)) {
-      setCursor(nextCursor)
-      isSameAria.current = JSON.stringify(query)
-    }
-  }, [isSameAria, query, nextCursor])
+  const [editId, setEdit] = useState(0)
+  const pathname = usePathname()
+  const router = useRouter()
 
   const loadMoreMemos = useCallback(() => {
+    const cursor = query.cursor
     if (cursor && cursor < 0) return
     setLoading('on')
-    fetchMemos({ query: { ...query, cursor } })
+    fetchMemos(query)
       .then((result) => {
-        addMemoList(result.memos)
-        setCursor(result.nextCursor)
+        addLoadList(result.memos, result.nextCursor)
       })
-      .catch()
+      .catch(() => setMessage('게시글을 조회 중 문제가 발생했습니다.'))
       .finally(() => setLoading('off'))
-  }, [cursor, query, addMemoList])
+  }, [addLoadList, query])
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !swapOnOff[loading].bool) {
-          loadMoreMemos()
-        }
-      },
-      { threshold: 0.1 }
-    )
-    if (observerRef.current) {
-      observer.observe(observerRef.current)
+  const linkDetail = (index: number) => {
+    const selection = window.getSelection()
+    if (selection && selection.toString().length > 0) {
+      return
     }
-    return () => observer.disconnect()
-  }, [loadMoreMemos, loading])
+    router.push(`${pathname}?index=${index}`)
+  }
+
+  const MemoListItem = (memo: MemoData) => {
+    const item = <MemoBox {...{ myId, memo }} remove={() => removeItem(memo.id)} edit={() => setEdit(memo.id)} />
+    const edit = <MemoEditForm memo={memo} add={AddEditedItem} close={() => setEdit(0)} alert={(text: string) => setMessage(text)} />
+    return { [memo.id]: item, [editId]: edit }[memo.id]
+  }
+
+  const loadingBox = Array(3).map((_, i) => {
+    return <Skeleton variant="rounded" height={120} key={'loading' + i} />
+  })
 
   return (
-    <>
-      <Stack spacing={2}>{children}</Stack>
-      <div ref={observerRef} />
+    <Stack spacing={2}>
+      {memos.map((memo: MemoData, index) => (
+        <Paper key={'memo' + memo.id} sx={{ p: { sm: 1, xs: 0 } }} variant="outlined" onClick={() => linkDetail(index)}>
+          <MemoListItem {...memo} />
+        </Paper>
+      ))}
+      <CursorObserver loadMoreItems={loadMoreMemos} />
       {{ on: loadingBox, off: null }[loading]}
-    </>
+      <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
+    </Stack>
   )
 }

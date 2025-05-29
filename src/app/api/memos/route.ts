@@ -92,19 +92,17 @@ export async function POST(req: NextRequest) {
       return NRes.json({ success: false, message }, { status: 401 })
     }
     const id = session.user.id
-    const { content, images, decos, parentId } = await req.json()
+    const { content, decos, parentId } = await req.json()
     const newMemo = await prisma.memo.create({
       data: {
         userId: id,
         content,
         parentId,
-        ...(images?.length > 0 && { images: { create: images } }),
         ...(decos?.length > 0 && { decos: { create: decos } }),
       },
     })
 
-    const res = { ...newMemo, images, decos }
-    res.images = await prisma.image.findMany({ where: { memoId: newMemo.id } })
+    const res = { ...newMemo, decos }
     res.decos = decosToJson(await prisma.deco.findMany({ where: { memoId: newMemo.id } }))
     return NRes.json(res)
   } catch (error) {
@@ -121,7 +119,7 @@ export async function PATCH(req: NextRequest) {
       const message = '로그인이 필요합니다.'
       return NRes.json({ success: false, message }, { status: 401 })
     }
-    const { id, content, images, decos } = await req.json()
+    const { id, content, decos } = await req.json()
     const search = await prisma.memo.count({ where: { id } })
     if (!search) {
       const message = '메모를 찾을 수 없습니다.'
@@ -131,13 +129,12 @@ export async function PATCH(req: NextRequest) {
       where: { id },
       data: {
         content,
-        images: { deleteMany: {}, ...(images?.length > 0 && { create: images }) },
+        images: { deleteMany: {} },
         decos: { deleteMany: {}, ...(decos?.length > 0 && { create: decos }) },
       },
     })
 
-    const res = { ...memo, images, decos }
-    res.images = await prisma.image.findMany({ where: { memoId: memo.id } })
+    const res = { ...memo, decos }
     res.decos = decosToJson(await prisma.deco.findMany({ where: { memoId: memo.id } }))
 
     return NRes.json(res)

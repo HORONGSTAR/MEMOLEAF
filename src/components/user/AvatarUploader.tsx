@@ -4,8 +4,8 @@ import { Button, Stack, Box, Avatar, Snackbar } from '@mui/material'
 import { Dispatch, SetStateAction, useCallback, useState } from 'react'
 
 interface Props {
-  image: { file?: File; url: string }
-  setImage: Dispatch<SetStateAction<{ file?: File; url: string }>>
+  image: { new: boolean; url: string }
+  setImage: Dispatch<SetStateAction<{ new: boolean; url: string }>>
 }
 
 export default function ImgUploader(props: Props) {
@@ -29,7 +29,7 @@ export default function ImgUploader(props: Props) {
         reader.readAsDataURL(file)
       })
 
-      setImage({ file: file, url: newImgUrls })
+      setImage({ new: true, url: newImgUrls })
     },
     [setImage]
   )

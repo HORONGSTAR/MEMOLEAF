@@ -1,5 +1,5 @@
 'use client'
-import { Typography, List, ListItem, Stack, IconButton, TextField, Button } from '@mui/material'
+import { Typography, List, ListItem, Stack, IconButton, TextField, Button, Avatar } from '@mui/material'
 import { checkOnOff, imgPath, swapOnOff } from '@/shared/utils/common'
 import { useState, useCallback, useMemo } from 'react'
 import { DriveFileRenameOutline } from '@mui/icons-material'
@@ -10,11 +10,10 @@ import { UserParams } from '@/shared/types/api'
 import { ProfileData } from '@/shared/types/client'
 import AvatarUploader from '@/components/user/AvatarUploader'
 import FollowButton from '@/components/user/FollowButton'
-import Avatar from '@/components/common/Avatar'
 
 export default function MyProfile(inti: ProfileData) {
   const [profile, setProfile] = useState(inti)
-  const [image, setImage] = useState<{ file?: File; url: string }>({ url: imgPath + inti.image })
+  const [image, setImage] = useState<{ new: boolean; url: string }>({ new: false, url: imgPath + inti.image })
   const [name, setName] = useState(profile.name)
   const [info, setInfo] = useState(profile.info || '')
   const [edit, setEdit] = useState('off')
@@ -40,14 +39,14 @@ export default function MyProfile(inti: ProfileData) {
       name: name,
       info: info,
     }
-    if (image.file) {
-      userData.file = image.file
-      setImage({ file: undefined, url: '' })
+    if (image.new) {
+      userData.image = image.url
+      setImage({ new: false, url: '' })
     }
     dispatch(updateProfileThunk(userData))
       .unwrap()
       .then((result) => setProfile((prev) => ({ ...prev, ...result })))
-  }, [name, info, image.file, dispatch])
+  }, [name, info, image, dispatch])
 
   const followAction = useMemo(() => {
     if (swapOnOff[isMine].bool) return 'none'
@@ -65,7 +64,8 @@ export default function MyProfile(inti: ProfileData) {
 
   const profileBox = (
     <Stack direction={{ sm: 'row', xs: 'column' }}>
-      <Avatar size={120} user={profile} />
+      <Avatar src={imgPath + profile.image} alt={profile.name} sx={{ width: 120, height: 120 }} />
+
       <List dense sx={{ flexGrow: 1 }}>
         <ListItem>
           <Typography variant="h6">{profile.name}</Typography>

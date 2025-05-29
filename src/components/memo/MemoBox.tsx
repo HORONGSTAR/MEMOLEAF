@@ -1,36 +1,33 @@
 'use client'
-import { Snackbar, Typography, ListItem, ListItemAvatar, ListItemText } from '@mui/material'
-import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined, Launch } from '@mui/icons-material'
+import { Snackbar, Typography, ListItem, ListItemAvatar, ListItemText, Avatar } from '@mui/material'
+import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
 import { useCallback, useMemo, useState } from 'react'
 import { BookmarkButton, CommentButton } from '@/components/feedback'
-import { checkOnOff, convertDate } from '@/shared/utils/common'
+import { checkOnOff, convertDate, imgPath } from '@/shared/utils/common'
 import { DecoBox, ImgGrid } from '@/components/memo/sub'
 import { deleteMemo } from '@/shared/fetch/memosApi'
-import { useRouter } from 'next/navigation'
 import { MemoData } from '@/shared/types/client'
 import MemoMenu from '@/components/memo/MemoMenu'
 import LinkBox from '@/components/common/LinkBox'
-import Avatar from '@/components/common/Avatar'
-import Dialog from '@/components/common/Dialog'
+import DialogBox from '@/components/common/DialogBox'
 
 interface Props {
   myId: number
   memo: MemoData
-  editItem: () => void
-  removeItem: () => void
+  edit: () => void
+  remove: () => void
 }
 
-export default function MemoBox({ memo, myId, editItem, removeItem }: Props) {
+export default function MemoBox({ memo, myId, edit, remove }: Props) {
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
   const isMine = checkOnOff(memo.user.id, myId)
-  const router = useRouter()
 
   const handleDelete = useCallback(() => {
     deleteMemo(memo.id)
     setOpen(false)
-    removeItem()
-  }, [memo, removeItem])
+    remove()
+  }, [memo, remove])
 
   const copyText = async (text: string) => {
     try {
@@ -53,10 +50,9 @@ export default function MemoBox({ memo, myId, editItem, removeItem }: Props) {
       icon={<MoreHoriz fontSize="small" />}
       label="더 보기"
       items={[
-        { active: isMine, label: '글 수정', icon: <EditOutlined />, onClick: editItem },
+        { active: isMine, label: '글 수정', icon: <EditOutlined />, onClick: edit },
         { active: isMine, label: '삭제', icon: <DeleteOutline />, onClick: () => setOpen(true) },
         { active: 'on', label: '공유하기', icon: <LinkOutlined />, onClick: () => handleCopy() },
-        { active: 'on', label: '단독 페이지로 보기', icon: <Launch />, onClick: () => router.push(`/page/detail/${memo.id}`) },
       ]}
     />
   )
@@ -77,15 +73,15 @@ export default function MemoBox({ memo, myId, editItem, removeItem }: Props) {
     onAction: handleDelete,
   }
 
-  const isThread = checkOnOff(1, memo._count?.leafs || 0)
-  const threadCount = { on: `${memo._count?.leafs}개의 타래글`, off: null }[isThread]
+  const isThread = checkOnOff(0, memo._count?.leafs || 0)
+  const threadCount = { off: `${memo._count?.leafs}개의 타래글`, on: null }[isThread]
 
   return (
     <>
       <ListItem secondaryAction={memu}>
         <ListItemAvatar>
           <LinkBox link={`/page/profile/${memo.user.id}`}>
-            <Avatar user={memo.user} size={40} />
+            <Avatar src={imgPath + memo.user.image} alt={memo.user.name} />
           </LinkBox>
         </ListItemAvatar>
         <ListItemText primary={<LinkBox link={`/page/profile/${memo.user.id}`}>{memo.user?.name}</LinkBox>} secondary={convertDate(memo.createdAt)} />
@@ -112,9 +108,9 @@ export default function MemoBox({ memo, myId, editItem, removeItem }: Props) {
         onClose={() => setMessage('')}
         message={message}
       />
-      <Dialog {...dialogProps}>
+      <DialogBox {...dialogProps}>
         <Typography>삭제한 메모는 복구할 수 없습니다.</Typography>
-      </Dialog>
+      </DialogBox>
     </>
   )
 }

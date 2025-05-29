@@ -1,4 +1,0 @@
-export { default as MemoForm } from '@/components/memo/MemoForm'
-export { default as MemoList } from '@/components/memo/MemoList'
-export { default as MemoBox } from '@/components/memo/MemoBox'
-export { default as ThreadBox } from '@/components/memo/ThreadBox'

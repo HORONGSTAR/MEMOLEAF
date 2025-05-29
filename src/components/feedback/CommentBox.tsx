@@ -1,15 +1,14 @@
 'use client'
-import { List, ListItem, Box, Typography, IconButton, ListItemText, ListItemAvatar, Snackbar } from '@mui/material'
+import { List, ListItem, Box, Typography, IconButton, ListItemText, ListItemAvatar, Snackbar, Avatar } from '@mui/material'
 import { DriveFileRenameOutline, DeleteForever, ExitToApp } from '@mui/icons-material'
-import { convertDate, checkOnOff } from '@/shared/utils/common'
+import { convertDate, checkOnOff, imgPath } from '@/shared/utils/common'
 import { useCallback, useState } from 'react'
 import { updateComment } from '@/shared/fetch/commentsApi'
 import { CommentForm } from '@/components/feedback'
 import { CommentData } from '@/shared/types/client'
 import { useSession } from 'next-auth/react'
-import Dialog from '@/components/common/Dialog'
+import DialogBox from '@/components/common/DialogBox'
 import LinkBox from '@/components/common/LinkBox'
-import Avatar from '@/components/common/Avatar'
 
 interface Props {
   comment: CommentData
@@ -104,7 +103,7 @@ export default function CommentBox(props: Props) {
           <ListItem secondaryAction={menu}>
             <ListItemAvatar>
               <LinkBox link={`/page/profile/${comment.user.id}`}>
-                <Avatar user={comment.user} size={36} />
+                <Avatar src={imgPath + comment.user.image} alt={comment.user.name} />
               </LinkBox>
             </ListItemAvatar>
             <ListItemText
@@ -121,9 +120,9 @@ export default function CommentBox(props: Props) {
           </ListItem>
         </Box>
       </List>
-      <Dialog {...dialogProps}>
+      <DialogBox {...dialogProps}>
         <Typography>삭제한 댓글은 복구할 수 없습니다.</Typography>
-      </Dialog>
+      </DialogBox>
       <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
     </>
   )

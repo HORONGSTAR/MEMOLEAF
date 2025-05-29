@@ -1,46 +1,56 @@
 'use client'
-import { MemoForm } from '@/components/memo'
-import { createMemo } from '@/shared/fetch/memosApi'
-import { Paper, Snackbar, useTheme } from '@mui/material'
-import { useCallback, useState } from 'react'
-import { useAppSelector } from '@/store/hooks'
-import { MemoParams } from '@/shared/types/api'
+import { Snackbar } from '@mui/material'
+import { useState } from 'react'
 import { MemoData } from '@/shared/types/client'
-import MemoConnector from './sub/MemoConnector'
+import { useSearchParams } from 'next/navigation'
+import MemoList from '@/components/memo/MemoList'
+import MemoCreateForm from '@/components/memo/MemoCreateForm'
+import DetailContainer from '@/components/container/DetailContainer'
 
 interface Props {
   firstLoadMemos: MemoData[]
   myId: number
 }
 
-export default function HomeContainer({ firstLoadMemos }: Props) {
-  const { profile } = useAppSelector((state) => state.profile)
+export default function HomeContainer({ firstLoadMemos, myId }: Props) {
+  const [cursor, setCursor] = useState<undefined | number>(firstLoadMemos[9]?.id || undefined)
   const [memos, setMemos] = useState<MemoData[]>(firstLoadMemos || [])
   const [message, setMessage] = useState('')
-  const theme = useTheme()
+  const searchParams = useSearchParams()
+  const index = parseInt(searchParams.get('index') || 'NaN')
 
-  const handleCreateMemo = useCallback(
-    (params: MemoParams) => {
-      if (!profile) return
-      createMemo(params)
-        .then((result) => {
-          setMemos((prev) => {
-            return [{ ...result, user: profile, bookmarks: [] }, ...prev]
-          })
-          setMessage('메모를 게시했습니다.')
-        })
-        .catch(() => setMessage('메모 작성 중 문제가 발생했습니다.'))
-    },
-    [profile]
+  const addCreatedItem = (item: MemoData) => {
+    setMemos((prev) => [item, ...prev])
+  }
+
+  const addLoadList = (items: MemoData[], nextCursor: number) => {
+    setMemos((prev) => [...prev, ...items])
+    setCursor(nextCursor)
+  }
+  const AddEditedItem = (item: MemoData) => {
+    setMemos((prev) => {
+      return prev.map((p) => (p.id !== item.id ? p : { ...p, ...item }))
+    })
+  }
+
+  const removeItem = (itemId: number) => {
+    setMemos((prev) => {
+      return prev.filter((p) => p.id !== itemId)
+    })
+  }
+
+  const home = (
+    <>
+      <MemoCreateForm add={addCreatedItem} alert={(text: string) => setMessage(text)} />
+      <MemoList {...{ myId, memos, query: { cursor, aria: 'home' }, addLoadList, AddEditedItem, removeItem }} />
+    </>
   )
+
+  const detail = <DetailContainer firstLoadParent={memos[index]} myId={myId} />
 
   return (
     <>
-      <MemoConnector {...{ memos, setMemos, query: { aria: 'home' } }}>
-        <Paper variant="outlined" sx={{ bgcolor: theme.palette.secondary.light, p: 1, mb: 2 }}>
-          <MemoForm action="create" parentId={null} onSubmint={handleCreateMemo} />
-        </Paper>
-      </MemoConnector>
+      {{ [index]: detail, NaN: home }[index]}
       <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
     </>
   )

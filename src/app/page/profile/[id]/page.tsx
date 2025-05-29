@@ -4,8 +4,13 @@ import MyContainer from '@/components/container/MyContainer'
 import prisma from '@/lib/prisma'
 import Navbar from '@/components/shared/Navbar'
 import Footer from '@/components/shared/Footer'
+import { authOptions } from '@/lib/auth'
+import { getServerSession } from 'next-auth'
 
 export default async function MyPage({ params }: { params: Promise<{ id: string }> }) {
+  const session = await getServerSession(authOptions)
+  const myId = session?.user.id
+
   const { id } = await params
   const userId = parseInt(id)
   const profile = await prisma.user.findUnique({
@@ -25,7 +30,7 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
       <Navbar />
       {profile ? (
         <Container sx={{ mb: 4, minHeight: '100vh' }}>
-          <MyContainer profile={profile} />
+          <MyContainer profile={profile} myId={myId || 0} />
         </Container>
       ) : (
         <Stack alignItems="center" spacing={2} pt={3}>

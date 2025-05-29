@@ -5,7 +5,6 @@ import { getServerSession } from 'next-auth/next'
 import { decosToJson } from '@/shared/utils/common'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
-import BackButton from '@/components/shared/BackButton'
 import Navbar from '@/components/shared/Navbar'
 import Footer from '@/components/shared/Footer'
 
@@ -33,9 +32,7 @@ export default async function DetailPage({ params }: { params: Promise<{ id: str
       <Navbar />
       {memo ? (
         <Container sx={{ mb: 4, minHeight: '100vh' }}>
-          <DetailContainer firstLoadParent={{ ...memo, decos: decosToJson(memo.decos) }} myId={userId}>
-            <BackButton />
-          </DetailContainer>
+          <DetailContainer firstLoadParent={{ ...memo, decos: decosToJson(memo.decos) }} myId={userId || 0} />
         </Container>
       ) : (
         <Stack alignItems="center" spacing={2} pt={3}>

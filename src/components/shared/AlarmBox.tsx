@@ -1,12 +1,11 @@
 'use client'
-import { Badge, Box, Button, IconButton, List, ListItem, ListItemAvatar, Stack, Typography } from '@mui/material'
+import { Avatar, Badge, Box, Button, IconButton, List, ListItem, ListItemAvatar, Stack, Typography } from '@mui/material'
 import { CircleNotifications, Notifications } from '@mui/icons-material'
 import { useCallback, useState } from 'react'
 import { deleteAlarm } from '@/shared/fetch/alarmApi'
-import { checkOnOff } from '@/shared/utils/common'
+import { checkOnOff, imgPath } from '@/shared/utils/common'
 import { UserData } from '@/shared/types/client'
-import Dialog from '@/components/common/Dialog'
-import Avatar from '@/components/common/Avatar'
+import DialogBox from '@/components/common/DialogBox'
 import LinkBox from '@/components/common/LinkBox'
 
 interface AlarmData {
@@ -17,7 +16,7 @@ interface AlarmData {
 }
 
 interface Props {
-  alarms?: AlarmData[]
+  alarms: AlarmData[] | []
   count?: number
 }
 
@@ -45,7 +44,7 @@ export default function AlarmBox(props: Props) {
           <ListItem key={alarm.id}>
             <LinkBox link={`/page/profile/${alarm.reader.id}`}>
               <ListItemAvatar>
-                <Avatar user={alarm.reader} size={40} />
+                <Avatar src={imgPath + alarm.reader.image} alt={alarm.reader.name} />
               </ListItemAvatar>
             </LinkBox>
             <LinkBox
@@ -82,9 +81,9 @@ export default function AlarmBox(props: Props) {
           <Notifications />
         </Badge>
       </IconButton>
-      <Dialog open={open} onClose={() => setOpen(false)} title="알림창">
+      <DialogBox open={open} onClose={() => setOpen(false)} title="알림창">
         {components}
-      </Dialog>
+      </DialogBox>
     </>
   )
 }

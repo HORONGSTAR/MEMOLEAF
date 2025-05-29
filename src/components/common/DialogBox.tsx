@@ -1,4 +1,4 @@
-import { Dialog as MuiDialog, DialogTitle, DialogContent, DialogActions, Button, DialogProps } from '@mui/material'
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, DialogProps } from '@mui/material'
 
 import { ReactNode } from 'react'
 
@@ -12,11 +12,11 @@ interface Props extends DialogProps {
   children?: ReactNode
 }
 
-export default function Dialog(props: Props) {
+export default function DialogBox(props: Props) {
   const { open, closeLabel, actionLabel, onClose, onAction, children, title } = props
 
   return (
-    <MuiDialog
+    <Dialog
       open={open}
       onClose={onClose}
       onClick={(e) => {
@@ -34,6 +34,6 @@ export default function Dialog(props: Props) {
           </Button>
         )}
       </DialogActions>
-    </MuiDialog>
+    </Dialog>
   )
 }

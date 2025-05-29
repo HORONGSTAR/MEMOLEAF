@@ -1,8 +1,8 @@
 'use client'
-import { ListItem, ListItemAvatar, ListItemText, Stack, Typography } from '@mui/material'
-import Avatar from '@/components/common/Avatar'
+import { ListItem, ListItemAvatar, ListItemText, Stack, Avatar, Typography } from '@mui/material'
 import LinkBox from '@/components/common/LinkBox'
 import { ProfileData } from '@/shared/types/client'
+import { imgPath } from '@/shared/utils/common'
 
 export default function UserList(user: ProfileData) {
   return (
@@ -10,7 +10,7 @@ export default function UserList(user: ProfileData) {
       <ListItem disableGutters key={'followList' + user.id} alignItems="flex-start" divider>
         <ListItemAvatar>
           <LinkBox link={`/page/profile/${user.id}`}>
-            <Avatar user={user} size={40} />
+            <Avatar src={imgPath + user.image} alt={user.name} />
           </LinkBox>
         </ListItemAvatar>
         <ListItemText

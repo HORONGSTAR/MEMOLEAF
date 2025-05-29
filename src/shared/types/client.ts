@@ -11,6 +11,10 @@ export type ImageData = {
   alt: string
 }
 
+export interface UploadData extends ImageData {
+  file?: File
+}
+
 export type DecoData = {
   [key: 'subtext' | 'folder' | 'secret' | string]: {
     active: 'on' | 'off' | string

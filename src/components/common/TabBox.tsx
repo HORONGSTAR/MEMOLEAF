@@ -13,7 +13,7 @@ interface Props {
   }[]
 }
 
-export default function ContainerTab({ label, tabs, reset }: Props) {
+export default function TabBox({ label, tabs, reset }: Props) {
   const [index, setIndex] = useState(0)
   const [checked, setChecked] = useState({ ...tabs.map((tab) => tab.categorys[0].value) })
 

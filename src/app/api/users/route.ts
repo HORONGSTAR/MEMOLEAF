@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse as NRes } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import cloudinary, { CloudinaryUploadResponse } from '@/lib/cloudinary'
 
 export async function POST(req: NextRequest) {
   try {
@@ -45,7 +46,18 @@ export async function PATCH(req: NextRequest) {
 
     const id = session.user.id
     const { name, info, image } = await req.json()
-    const result = await prisma.user.update({ where: { id }, data: { name, info, image } })
+
+    let imageUrl = null
+
+    if (image) {
+      const uploadResult = (await cloudinary.uploader.upload(image, {
+        upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET,
+      })) as CloudinaryUploadResponse
+
+      imageUrl = uploadResult.public_id
+    }
+
+    const result = await prisma.user.update({ where: { id }, data: { name, info, ...(imageUrl && { image: imageUrl }) } })
     return NRes.json(result)
   } catch (err) {
     console.error(err)
