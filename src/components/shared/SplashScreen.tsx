@@ -1,6 +1,6 @@
 'use client'
 import { ReactNode, useEffect, useState } from 'react'
-import { Box } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import { setProfile } from '@/store/slices/profileSlice'
 import { useAppDispatch } from '@/store/hooks'
 import { useSession } from 'next-auth/react'
@@ -41,10 +41,10 @@ export default function SplashScreen({ children }: { children: ReactNode }) {
           </Box>
         </Box>
       ) : (
-        <div className="container">
+        <Stack minHeight="100vh">
           {children}
           <Footer />
-        </div>
+        </Stack>
       )}
     </>
   )
