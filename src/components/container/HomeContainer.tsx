@@ -1,6 +1,6 @@
 'use client'
 import { Snackbar } from '@mui/material'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { MemoData } from '@/shared/types/client'
 import { useSearchParams } from 'next/navigation'
 import MemoList from '@/components/memo/MemoList'
@@ -46,7 +46,7 @@ export default function HomeContainer({ firstLoadMemos, myId }: Props) {
     </>
   )
 
-  const detail = <DetailContainer firstLoadParent={memos[index]} myId={myId} />
+  const detail = useMemo(() => <DetailContainer firstLoadParent={memos[index]} myId={myId} />, [index, memos, myId])
 
   return (
     <>

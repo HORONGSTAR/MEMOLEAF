@@ -2,7 +2,7 @@
 import { Button, Chip, Skeleton, Snackbar } from '@mui/material'
 import { useCallback, useMemo, useState } from 'react'
 import { MemoData, LeafData } from '@/shared/types/client'
-import { checkOnOff } from '@/shared/utils/common'
+import { checkOnOff, swapOnOff } from '@/shared/utils/common'
 import { useRouter } from 'next/navigation'
 import { ArrowBack } from '@mui/icons-material'
 import MemoBox from '@/components/memo/MemoBox'
@@ -27,10 +27,10 @@ export default function DetailContainer(props: Props) {
   const router = useRouter()
   const isMine = checkOnOff(parent.user.id, myId || 0)
   const [loading, setLoading] = useState('off')
+  const [open, setOpen] = useState('off')
 
-  const digit = useMemo(() => {
-    return (parent._count?.leafs.toString().length || 0) + 1
-  }, [parent._count?.leafs])
+  const count = useMemo(() => parent._count?.leafs || 0, [parent._count?.leafs])
+  const digit = useMemo(() => (count.toString().length || 0) + 1, [count])
 
   const addCreatedItem = (item: MemoData) => {
     setLeafs((prev) => [item, ...prev])
@@ -50,6 +50,7 @@ export default function DetailContainer(props: Props) {
   }
 
   const loadMoreMemos = useCallback(() => {
+    if (open === 'off') return
     if (cursor && cursor < 0) return
     setLoading('on')
     fetchMemos({ id: parent.id, aria: 'thread', cursor })
@@ -59,10 +60,15 @@ export default function DetailContainer(props: Props) {
       })
       .catch()
       .finally(() => setLoading('off'))
-  }, [cursor, parent.id])
+  }, [cursor, parent.id, open])
+
+  const openButton = {
+    [count]: <Button onClick={() => setOpen((prev) => swapOnOff[prev].next)}>{{ on: '스레드 닫기', off: '스레드 펼치기' }[open]}</Button>,
+    0: null,
+  }[count]
 
   const ParentBox = () => {
-    const item = <MemoBox memo={parent} remove={() => router.push('/')} edit={() => setEdit(parent.id)} myId={myId} />
+    const item = <MemoBox theardButton={openButton} memo={parent} remove={() => router.push('/')} edit={() => setEdit(parent.id)} myId={myId} />
     const editForm = <MemoEditForm memo={parent} add={updateParent} close={() => setEdit(0)} alert={(text: string) => setMessage(text)} />
     return { [parent.id]: item, [editId]: editForm }[parent.id]
   }
@@ -93,7 +99,8 @@ export default function DetailContainer(props: Props) {
         목록으로 돌아가기
       </Button>
       <ParentBox />
-      {{ [leafs.length]: leafList, 0: null }[leafs.length]}
+
+      {{ on: leafList, off: null }[open]}
       {{ on: loadingBox, off: null }[loading]}
       {{ on: creatForm, off: null }[isMine]}
       <CursorObserver loadMoreItems={loadMoreMemos} />

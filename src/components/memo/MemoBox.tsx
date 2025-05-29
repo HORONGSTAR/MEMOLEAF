@@ -1,7 +1,7 @@
 'use client'
 import { Snackbar, Typography, ListItem, ListItemAvatar, ListItemText, Avatar } from '@mui/material'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
-import { useCallback, useMemo, useState } from 'react'
+import { ReactNode, useCallback, useMemo, useState } from 'react'
 import { BookmarkButton, CommentButton } from '@/components/feedback'
 import { checkOnOff, convertDate, imgPath } from '@/shared/utils/common'
 import { DecoBox, ImgGrid } from '@/components/memo/sub'
@@ -14,11 +14,12 @@ import DialogBox from '@/components/common/DialogBox'
 interface Props {
   myId: number
   memo: MemoData
+  theardButton?: ReactNode
   edit: () => void
   remove: () => void
 }
 
-export default function MemoBox({ memo, myId, edit, remove }: Props) {
+export default function MemoBox({ memo, myId, theardButton, edit, remove }: Props) {
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
   const isMine = checkOnOff(memo.user.id, myId)
@@ -95,7 +96,7 @@ export default function MemoBox({ memo, myId, edit, remove }: Props) {
       <ListItem>
         <ListItemText>
           <Typography variant="button" color="textSecondary">
-            {threadCount}
+            {theardButton ? theardButton : threadCount}
           </Typography>
         </ListItemText>
         <BookmarkButton {...bookmarkProps} count={memo._count?.bookmarks || 0} />
