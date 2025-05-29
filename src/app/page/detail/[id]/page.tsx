@@ -6,7 +6,6 @@ import { decosToJson } from '@/shared/utils/common'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import Navbar from '@/components/shared/Navbar'
-import Footer from '@/components/shared/Footer'
 import Link from 'next/link'
 
 export default async function DetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -32,7 +31,7 @@ export default async function DetailPage({ params }: { params: Promise<{ id: str
     <>
       <Navbar />
       {memo ? (
-        <Container sx={{ mb: 4, minHeight: '90vh' }}>
+        <Container component="main">
           <DetailContainer firstLoadParent={{ ...memo, decos: decosToJson(memo.decos) }} myId={userId || 0}>
             <Button startIcon={<ArrowBack />} LinkComponent={Link} href="/">
               메모리프 홈으로 가기
@@ -47,7 +46,6 @@ export default async function DetailPage({ params }: { params: Promise<{ id: str
           </Stack>
         </Stack>
       )}
-      <Footer />
     </>
   )
 }

@@ -3,7 +3,6 @@ import { Error } from '@mui/icons-material'
 import MyContainer from '@/components/container/MyContainer'
 import prisma from '@/lib/prisma'
 import Navbar from '@/components/shared/Navbar'
-import Footer from '@/components/shared/Footer'
 import { authOptions } from '@/lib/auth'
 import { getServerSession } from 'next-auth'
 
@@ -29,7 +28,7 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
     <>
       <Navbar />
       {profile ? (
-        <Container sx={{ mb: 4, minHeight: '90vh' }}>
+        <Container component="main">
           <MyContainer profile={profile} myId={myId || 0} />
         </Container>
       ) : (
@@ -40,7 +39,6 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
           </Stack>
         </Stack>
       )}
-      <Footer />
     </>
   )
 }

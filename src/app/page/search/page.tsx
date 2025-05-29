@@ -1,5 +1,4 @@
 import SearchContainer from '@/components/container/SearchContainer'
-import Footer from '@/components/shared/Footer'
 import Navbar from '@/components/shared/Navbar'
 import { Container } from '@mui/material'
 import { getServerSession } from 'next-auth'
@@ -11,10 +10,9 @@ export default async function SearchPage() {
   return (
     <>
       <Navbar />
-      <Container sx={{ mb: 4, minHeight: '90vh' }}>
+      <Container component="main">
         <SearchContainer myId={myId || 0} />
       </Container>
-      <Footer />
     </>
   )
 }

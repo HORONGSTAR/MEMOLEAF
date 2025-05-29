@@ -62,7 +62,9 @@ export default function UserList(props: Props) {
     following: { [count]: `${user?.name}님의 팔로잉 ${count}명`, 0: '팔로잉 정보가 없습니다.' }[count],
   }[endpoint]
 
-  const loadingBox = [1, 2, 3].map((el) => <Skeleton variant="rounded" height={120} key={'loading' + el} sx={{ mb: 2 }} />)
+  const loadingBox = Array(3)
+    .fill(0)
+    .map((el) => <Skeleton variant="rounded" height={120} key={'loading' + el} sx={{ mb: 2 }} />)
 
   return (
     <>

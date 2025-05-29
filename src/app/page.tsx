@@ -4,7 +4,6 @@ import { authOptions } from '@/lib/auth'
 import { decosToJson } from '@/shared/utils/common'
 import prisma from '@/lib/prisma'
 import Navbar from '@/components/shared/Navbar'
-import Footer from '@/components/shared/Footer'
 import AlarmBox from '@/components/shared/AlarmBox'
 import { Container, IconButton } from '@mui/material'
 import { Search } from '@mui/icons-material'
@@ -44,10 +43,9 @@ export default async function HomePage() {
         </IconButton>
         <AlarmBox alarms={alarms} count={alarms.length} />
       </Navbar>
-      <Container sx={{ mb: 4, minHeight: '90vh' }}>
+      <Container component="main">
         <HomeContainer firstLoadMemos={memos} myId={userId || 0} />
       </Container>
-      <Footer />
     </>
   )
 }

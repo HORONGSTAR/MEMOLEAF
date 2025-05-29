@@ -12,8 +12,8 @@ function Footer() {
       component="footer"
       sx={{
         bgcolor: grey[100],
-        py: 2,
         textAlign: 'center',
+        p: 2,
       }}
     >
       <Stack direction="row" justifyContent="center" spacing={2} mb={1}>

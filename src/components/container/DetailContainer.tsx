@@ -63,7 +63,7 @@ export default function DetailContainer(props: Props) {
   }, [cursor, parent.id, open])
 
   const openButton = {
-    [count]: <Button onClick={() => setOpen((prev) => swapOnOff[prev].next)}>{{ on: '스레드 닫기', off: '스레드 펼치기' }[open]}</Button>,
+    [count]: <Button onClick={() => setOpen((prev) => swapOnOff[prev].next)}>{{ on: '타래글 접기', off: `${count}개의 타래글 보기` }[open]}</Button>,
     0: null,
   }[count]
 
@@ -94,9 +94,15 @@ export default function DetailContainer(props: Props) {
     </>
   )
 
-  const loadingBox = Array(3).map((_, i) => {
-    return <Skeleton sx={{ mb: 2 }} key={'loading' + i} />
-  })
+  const loadingBox = (
+    <div>
+      {Array(3)
+        .fill(0)
+        .map((_, i) => (
+          <Skeleton sx={{ mx: 1 }} key={'loading' + i} />
+        ))}
+    </div>
+  )
 
   return (
     <>

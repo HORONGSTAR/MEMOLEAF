@@ -42,9 +42,11 @@ export default function MemoList(props: Props) {
     return { [memo.id]: item, [editId]: edit }[memo.id]
   }
 
-  const loadingBox = Array(3).map((_, i) => {
-    return <Skeleton variant="rounded" height={120} key={'loading' + i} />
-  })
+  const loadingBox = Array(3)
+    .fill(0)
+    .map((_, i) => {
+      return <Skeleton variant="rounded" height={120} key={'loading' + i} />
+    })
 
   return (
     <Stack spacing={2}>

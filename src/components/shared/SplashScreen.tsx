@@ -5,6 +5,7 @@ import { setProfile } from '@/store/slices/profileSlice'
 import { useAppDispatch } from '@/store/hooks'
 import { useSession } from 'next-auth/react'
 import Image from 'next/image'
+import Footer from './Footer'
 
 export default function SplashScreen({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false)
@@ -40,7 +41,10 @@ export default function SplashScreen({ children }: { children: ReactNode }) {
           </Box>
         </Box>
       ) : (
-        children
+        <div className="container">
+          {children}
+          <Footer />
+        </div>
       )}
     </>
   )
