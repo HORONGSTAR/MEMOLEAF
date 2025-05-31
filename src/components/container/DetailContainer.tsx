@@ -62,9 +62,9 @@ export default function DetailContainer(props: Props) {
     {
       label: '타래 목록',
       panel: {
-        [count.bookmarks]: <LeafList {...{ myId, leafs, query, setLeafs, setCursor }} />,
+        [count.leafs]: <LeafList {...{ myId, leafs, query, setLeafs, setCursor }} />,
         0: null,
-      }[count.bookmarks],
+      }[count.leafs],
       categorys: [
         { label: `${memo.user.name}님의 글`, value: 'serial' },
         { label: '댓글', value: 'comment' },

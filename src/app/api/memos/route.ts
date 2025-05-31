@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
       all: { titleId: undefined },
       thread: { leafs: { some: {} } },
       images: { images: { some: {} } },
-      leafs: { user: { id: title?.userId } },
+      serial: { user: { id: title?.userId } },
       comment: { user: { id: { not: title?.userId } } },
     }[filter || 'all']
 

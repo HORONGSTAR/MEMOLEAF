@@ -1,6 +1,6 @@
 'use client'
-import { Snackbar, Typography, ListItem, ListItemAvatar, ListItemText, Avatar } from '@mui/material'
-import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
+import { Snackbar, Typography, ListItem, ListItemAvatar, ListItemText, Avatar, IconButton } from '@mui/material'
+import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined, SmsOutlined } from '@mui/icons-material'
 import { useCallback, useState } from 'react'
 import { BookmarkToggle, FavoriteToggle, FeedbackCount } from '@/components/feedback'
 import { checkOnOff, convertDate, imgPath } from '@/shared/utils/common'
@@ -100,6 +100,11 @@ export default function MemoBox({ memo, myId, edit, remove, updateItem }: Props)
       </DecoBox>
       <ListItem>
         <ListItemText secondary={convertDate(memo.createdAt)} />
+        <FeedbackCount count={memo._count.leafs}>
+          <IconButton size="small">
+            <SmsOutlined sx={{ fontSize: 18 }} />
+          </IconButton>
+        </FeedbackCount>
 
         <FeedbackCount count={memo._count.bookmarks}>
           <BookmarkToggle {...bookmarkProps} update={(value, action) => handleUpdateCount(value, action, 'bookmarks')} />
