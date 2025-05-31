@@ -9,13 +9,13 @@ interface Props {
   children: ReactNode
   endpoint: 'follower' | 'following' | 'search' | string
   user?: { id: number; name: string }
-  filter?: string
-  keyword?: string
+  query?: { filter?: string; keyword?: string }
+
   addUserList: (values: UserData[]) => void
 }
 
 export default function UserList(props: Props) {
-  const { user, children, endpoint, filter, keyword, addUserList } = props
+  const { user, children, endpoint, query, addUserList } = props
   const [count, setCount] = useState(0)
   const [cursor, setCursor] = useState<undefined | number>(undefined)
   const [loading, setLoading] = useState('off')
@@ -32,7 +32,7 @@ export default function UserList(props: Props) {
   const loadMoreUser = useCallback(() => {
     if (cursor && cursor < 0) return
     setLoading('on')
-    fetchtUsers({ endpoint, query: { id: user?.id, endpoint, cursor, keyword, filter } })
+    fetchtUsers({ endpoint, query: { id: user?.id, cursor, ...query } })
       .then((result) => {
         setCount(result.searchTotal)
         addUserList(result.users)
@@ -40,7 +40,7 @@ export default function UserList(props: Props) {
       })
       .catch()
       .finally(() => setLoading('off'))
-  }, [addUserList, cursor, endpoint, filter, keyword, user?.id])
+  }, [addUserList, cursor, endpoint, query, user?.id])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -64,7 +64,7 @@ export default function UserList(props: Props) {
 
   const loadingBox = Array(3)
     .fill(0)
-    .map((el) => <Skeleton variant="rounded" height={120} key={'loading' + el} sx={{ mb: 2 }} />)
+    .map((_, i) => <Skeleton variant="rounded" height={120} key={'loading' + i} sx={{ mb: 2 }} />)
 
   return (
     <>

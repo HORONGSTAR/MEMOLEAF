@@ -9,24 +9,24 @@ import { uploadImages } from '@/shared/fetch/uploadApi'
 
 interface Props {
   memo: MemoData
-  add: (item: MemoData) => void
+  updateItem: (item: MemoData) => void
   close: () => void
   alert: (text: string) => void
 }
 
-export default function MemoEditForm({ memo, add, close, alert }: Props) {
+export default function MemoEditForm({ memo, updateItem, close, alert }: Props) {
   const handleUpdateMemo = useCallback(
     (params: MemoParams, images: UploadData[]) => {
       updateMemo(params)
         .then((result) => {
           alert('메모를 수정했습니다.')
           uploadImages(images, result.id)
-          add({ ...result, images })
+          updateItem({ ...result, images })
           close()
         })
         .catch(() => alert('메모 수정 중 문제가 발생했습니다.'))
     },
-    [add, close, alert]
+    [updateItem, close, alert]
   )
 
   return (

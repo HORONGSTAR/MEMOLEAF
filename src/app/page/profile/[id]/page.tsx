@@ -20,13 +20,19 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
       image: true,
       info: true,
       userNum: true,
-      toUsers: true,
+      followings: true,
     },
+  })
+
+  const alarms = await prisma.alarm.findMany({
+    where: { recipientId: userId || 0 },
+    take: 10,
+    include: { sander: true },
   })
 
   return (
     <>
-      <Navbar />
+      <Navbar alarms={alarms} />
       {profile ? (
         <Container component="main">
           <MyContainer profile={profile} myId={myId || 0} />

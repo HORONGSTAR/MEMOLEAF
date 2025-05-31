@@ -12,6 +12,7 @@ declare module 'next-auth' {
       id: number
       name?: string | null
       image?: string | unknown
+      userNum?: number | unknown
     }
   }
 
@@ -19,5 +20,6 @@ declare module 'next-auth' {
     id: number
     name?: string
     image?: string
+    userNum?: number | unknown
   }
 }

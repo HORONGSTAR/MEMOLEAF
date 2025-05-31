@@ -12,27 +12,43 @@ export default async function DetailPage({ params }: { params: Promise<{ id: str
   const session = await getServerSession(authOptions)
   const userId = session?.user.id
   const { id } = await params
-  const parentId = parseInt(id)
-  const limit = 10
+  const titleId = parseInt(id)
 
   const memo = await prisma.memo.findUnique({
-    where: { id: parentId },
+    where: { id: titleId },
     include: {
-      user: { select: { id: true, name: true, image: true } },
+      user: { select: { id: true, name: true, image: true, userNum: true } },
       decos: { select: { kind: true, extra: true } },
       images: { select: { id: true, url: true, alt: true } },
-      bookmarks: { where: { userId } },
-      leafs: { take: limit, select: { id: true } },
-      _count: { select: { comments: true, bookmarks: true, leafs: true } },
+      bookmarks: { where: { userId }, select: { id: true } },
+      favorites: {
+        where: { userId },
+        select: { id: true, user: { select: { name: true, image: true, id: true } } },
+      },
+      _count: { select: { favorites: true, bookmarks: true, leafs: true } },
     },
+  })
+
+  const alarms = await prisma.alarm.findMany({
+    where: { recipientId: userId || 0 },
+    take: 10,
+    include: { sander: true },
   })
 
   return (
     <>
-      <Navbar />
+      <Navbar alarms={alarms} />
       {memo ? (
         <Container component="main">
-          <DetailContainer firstLoadParent={{ ...memo, decos: decosToJson(memo.decos) }} myId={userId || 0}>
+          <DetailContainer
+            firstLoadMemo={{
+              ...memo,
+              decos: decosToJson(memo.decos),
+              bookmarks: memo.bookmarks[0],
+              favorites: memo.favorites[0],
+            }}
+            myId={userId || 0}
+          >
             <Button startIcon={<ArrowBack />} LinkComponent={Link} href="/">
               메모리프 홈으로 가기
             </Button>

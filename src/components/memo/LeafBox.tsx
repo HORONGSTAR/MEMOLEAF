@@ -1,39 +1,39 @@
 'use client'
-import { Snackbar, Typography, ListItem, ListItemText, ListItemIcon } from '@mui/material'
+import { Snackbar, Typography, ListItem, ListItemText, Avatar, ListItemAvatar } from '@mui/material'
 import { MoreHoriz, DeleteOutline, EditOutlined } from '@mui/icons-material'
-import { ReactNode, useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { DecoBox, ImgGrid } from '@/components/memo/sub'
-import { convertDate } from '@/shared/utils/common'
+import { checkOnOff, convertDate, imgPath } from '@/shared/utils/common'
 import { deleteMemo } from '@/shared/fetch/memosApi'
-import { LeafData } from '@/shared/types/client'
+import { MemoData } from '@/shared/types/client'
 import MemoMenu from '@/components/memo/MemoMenu'
 import DialogBox from '@/components/common/DialogBox'
+import LinkBox from '../common/LinkBox'
 
 interface Props {
-  memo: LeafData
-  children: ReactNode
-
-  isMine: 'on' | 'off'
-  editItem: () => void
-  removeItem: () => void
+  leaf: MemoData
+  myId: number
+  edit: () => void
+  remove: () => void
 }
 
-export default function ThreadBox({ memo, children, isMine, editItem, removeItem }: Props) {
+export default function LeafBox({ leaf, myId, edit, remove }: Props) {
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
+  const isMine = checkOnOff(leaf.user.id, myId || 0)
 
   const handleDelete = useCallback(() => {
-    deleteMemo(memo.id)
+    deleteMemo(leaf.id)
     setOpen(false)
-    removeItem()
-  }, [memo, removeItem])
+    remove()
+  }, [leaf, remove])
 
   const memu = (
     <MemoMenu
       icon={<MoreHoriz fontSize="small" />}
       label="더 보기"
       items={[
-        { active: 'on', label: '글 수정', icon: <EditOutlined />, onClick: editItem },
+        { active: 'on', label: '글 수정', icon: <EditOutlined />, onClick: edit },
         { active: 'on', label: '삭제', icon: <DeleteOutline />, onClick: () => setOpen(true) },
       ]}
     />
@@ -50,14 +50,21 @@ export default function ThreadBox({ memo, children, isMine, editItem, removeItem
 
   return (
     <>
-      <DecoBox decos={memo.decos}>
+      <DecoBox decos={leaf.decos}>
         <ListItem dense secondaryAction={{ on: memu, off: null }[isMine]}>
-          <ListItemIcon>{children}</ListItemIcon>
-          <ListItemText secondary={convertDate(memo.createdAt)} />
+          <ListItemAvatar>
+            <LinkBox link={`/page/profile/${leaf.user.id}`}>
+              <Avatar src={imgPath + leaf.user.image} alt={leaf.user.name} />
+            </LinkBox>
+          </ListItemAvatar>
+          <ListItemText
+            primary={<LinkBox link={`/page/profile/${leaf.user.id}`}>{leaf.user?.name}</LinkBox>}
+            secondary={convertDate(leaf.createdAt)}
+          />
         </ListItem>
-        <ListItem dense>{memo.content}</ListItem>
+        <ListItem dense>{leaf.content}</ListItem>
         <ListItem dense divider>
-          <ImgGrid images={memo.images} />
+          <ImgGrid images={leaf.images} />
         </ListItem>
       </DecoBox>
       <Snackbar

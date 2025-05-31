@@ -19,10 +19,10 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "Follow" (
-    "fromUserId" INTEGER NOT NULL,
-    "toUserId" INTEGER NOT NULL,
+    "followerId" INTEGER NOT NULL,
+    "followingId" INTEGER NOT NULL,
 
-    CONSTRAINT "Follow_pkey" PRIMARY KEY ("toUserId","fromUserId")
+    CONSTRAINT "Follow_pkey" PRIMARY KEY ("followingId","followerId")
 );
 
 -- CreateTable
@@ -30,7 +30,7 @@ CREATE TABLE "Memo" (
     "id" SERIAL NOT NULL,
     "content" TEXT NOT NULL,
     "userId" INTEGER NOT NULL,
-    "parentId" INTEGER,
+    "titleId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -95,16 +95,16 @@ CREATE UNIQUE INDEX "User_credit_key" ON "User"("credit");
 CREATE UNIQUE INDEX "BookMark_userId_memoId_key" ON "BookMark"("userId", "memoId");
 
 -- AddForeignKey
-ALTER TABLE "Follow" ADD CONSTRAINT "Follow_fromUserId_fkey" FOREIGN KEY ("fromUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Follow" ADD CONSTRAINT "Follow_followerId_fkey" FOREIGN KEY ("followerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Follow" ADD CONSTRAINT "Follow_toUserId_fkey" FOREIGN KEY ("toUserId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Follow" ADD CONSTRAINT "Follow_followingId_fkey" FOREIGN KEY ("followingId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Memo" ADD CONSTRAINT "Memo_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Memo" ADD CONSTRAINT "Memo_parentId_fkey" FOREIGN KEY ("parentId") REFERENCES "Memo"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Memo" ADD CONSTRAINT "Memo_titleId_fkey" FOREIGN KEY ("titleId") REFERENCES "Memo"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Deco" ADD CONSTRAINT "Deco_memoId_fkey" FOREIGN KEY ("memoId") REFERENCES "Memo"("id") ON DELETE CASCADE ON UPDATE CASCADE;

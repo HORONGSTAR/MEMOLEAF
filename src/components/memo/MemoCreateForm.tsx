@@ -9,12 +9,12 @@ import { MemoData, UploadData } from '@/shared/types/client'
 import { uploadImages } from '@/shared/fetch/uploadApi'
 
 interface Props {
-  parentId?: number
+  titleId?: number
   add: (memo: MemoData) => void
   alert: (text: string) => void
 }
 
-export default function MemoCreateForm({ parentId, add, alert }: Props) {
+export default function MemoCreateForm({ titleId, add, alert }: Props) {
   const { profile } = useAppSelector((state) => state.profile)
   const theme = useTheme()
 
@@ -22,20 +22,20 @@ export default function MemoCreateForm({ parentId, add, alert }: Props) {
     (params: MemoParams, images: UploadData[]) => {
       if (!profile) return
       alert('메모 업로드 중...')
-      createMemo({ ...params, ...(parentId && { parentId }) })
+      createMemo({ ...params, ...(titleId && { titleId }) })
         .then((result) => {
           uploadImages(images, result.id)
-          add({ ...result, user: profile, bookmarks: [], images })
+          add({ ...result, user: profile, images })
           alert('메모를 게시했습니다.')
         })
         .catch(() => alert('메모 작성 중 문제가 발생했습니다.'))
     },
-    [add, alert, parentId, profile]
+    [add, alert, titleId, profile]
   )
 
   return (
     <Paper variant="outlined" sx={{ bgcolor: theme.palette.secondary.light, p: 1, mb: 2 }}>
-      <PostForm action="create" parentId={null} onSubmint={handleCreateMemo} />
+      <PostForm action="create" titleId={null} onSubmint={handleCreateMemo} />
     </Paper>
   )
 }

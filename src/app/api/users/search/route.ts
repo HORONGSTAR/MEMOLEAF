@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
           profile: { OR: [{ name: { contains: keyword } }, { info: { contains: keyword } }] },
           userNum: { userNum: parseInt(keyword) },
         }[filter || 'profile']
-      : undefined
+      : { favorites: { some: { memoId: parseInt(filter || '0') } } }
 
     const selectData = { id: true, name: true, image: true, info: true, userNum: true }
 

@@ -15,35 +15,36 @@ model User {
   image        String
   info         String?
   memos        Memo[]
-  comments     Comment[]
   bookmarks    BookMark[]
-  alarms       Alarm[]
-  fromUsers    Follow[] @relation("fromUser")
-  toUsers      Follow[] @relation("toUser")
+  favorites    Favorite[]
+  sanders      Alarm[]  @relation("sander")
+  recipients   Alarm[]  @relation("recipient")
+  followers    Follow[] @relation("follower")
+  followings   Follow[] @relation("following")
   createdAt    DateTime @default(now())
 }
 
 model Follow {
-  fromUserId   Int
-  toUserId     Int
-  fromUser     User @relation("fromUser", fields: [fromUserId], references: [id])
-  toUser       User @relation("toUser", fields: [toUserId], references: [id])
-  @@id([toUserId, fromUserId])
+  followerId   Int
+  followingId  Int
+  follower     User @relation("follower", fields: [followerId], references: [id])
+  following    User @relation("following", fields: [followingId], references: [id])
+  @@id([followerId, followingId])
 }
 
 
 model Memo {
   id           Int        @id @default(autoincrement())
   content      String
-  leafs        Memo[]     @relation("Thread")
   decos        Deco[] 
   images       Image[]
-  comments     Comment[]
   bookmarks    BookMark[]
-  userId       Int
-  parentId     Int?
+  favorites    Favorite[]
+  leafs        Memo[]     @relation("Thread")
+  titleId      Int?
+  title        Memo?      @relation("Thread", fields: [titleId], references: [id],onDelete: Cascade)
   user         User       @relation(fields: [userId],references: [id],onDelete: Cascade)
-  parent       Memo?      @relation("Thread", fields: [parentId], references: [id],onDelete: Cascade)
+  userId       Int
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 }
@@ -74,14 +75,16 @@ model Image {
   createdAt    DateTime   @default(now())
 }
 
-model Comment{
+
+
+model Favorite {
   id           Int        @id @default(autoincrement())
-  text         String
   userId       Int
   memoId       Int
-  memo         Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
   user         User       @relation(fields: [userId],references: [id],onDelete: Cascade)
+  memo         Memo       @relation(fields: [memoId],references: [id],onDelete: Cascade)
   createdAt    DateTime   @default(now())
+  @@unique([userId, memoId])
 }
 
 model BookMark {
@@ -98,14 +101,17 @@ enum Aria {
   comment
   follow
   bookmark
+  favorite
 }
 
 model Alarm{
   id           Int        @id @default(autoincrement())
   aria         Aria
-  authorId     Int
-  linkId       Int
-  readerId     Int
-  reader       User       @relation(fields: [readerId],references: [id],onDelete: Cascade)
+  link         Int
+  sanderId     Int
+  recipientId  Int
+  sander       User @relation("sander", fields: [sanderId], references: [id])
+  recipient    User  @relation("recipient", fields: [recipientId], references: [id])
+
 }
 

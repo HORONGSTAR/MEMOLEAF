@@ -21,7 +21,7 @@ export default function MyContainer({ profile, myId }: Props) {
   const [cursor, setCursor] = useState<undefined | number>(undefined)
   const [index, setIndex] = useState<number>(NaN)
 
-  const handleSetIndex = (index: number) => {
+  const applyDetail = (index: number) => {
     setIndex(index)
   }
 
@@ -29,11 +29,11 @@ export default function MyContainer({ profile, myId }: Props) {
     setUsers((prev) => [...prev, ...values])
   }, [])
 
-  const addLoadList = (items: MemoData[], nextCursor: number) => {
+  const addItems = (items: MemoData[], nextCursor: number) => {
     setMemos((prev) => [...prev, ...items])
     setCursor(nextCursor)
   }
-  const AddEditedItem = (item: MemoData) => {
+  const updateItem = (item: MemoData) => {
     setMemos((prev) => {
       return prev.map((p) => (p.id !== item.id ? p : { ...p, ...item }))
     })
@@ -45,12 +45,13 @@ export default function MyContainer({ profile, myId }: Props) {
     })
   }
 
+  const actions = { addItems, updateItem, removeItem, applyDetail }
   const query = useMemo(() => ({ id: profile.id, aria, cursor }), [aria, cursor, profile.id])
 
   const panels = [
     {
       label: '다이어리',
-      panel: <MemoList {...{ myId, memos, removeItem, AddEditedItem, addLoadList, query, handleSetIndex }} />,
+      panel: <MemoList {...{ myId, memos, query, actions }} />,
       categorys: [
         { label: `${profile.name}님의 글`, value: 'mypost' },
         { label: '북마크', value: 'bookmark' },
@@ -96,7 +97,7 @@ export default function MyContainer({ profile, myId }: Props) {
   )
 
   const detail = (
-    <DetailContainer firstLoadParent={memos[index]} myId={myId}>
+    <DetailContainer firstLoadMemo={memos[index]} {...{ myId, updateItem }}>
       <Button startIcon={<ArrowBack />} onClick={() => setIndex(NaN)}>
         목록으로 돌아가기
       </Button>

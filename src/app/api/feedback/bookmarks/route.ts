@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
     if (userId !== memo.userId) {
       await prisma.alarm.create({
-        data: { linkId: id, readerId: userId, authorId: memo.userId, aria: 'bookmark' },
+        data: { link: id, sanderId: userId, recipientId: memo.userId, aria: 'bookmark' },
       })
     }
 
@@ -53,7 +53,7 @@ export async function DELETE(req: NextRequest) {
     return NRes.json(search.memoId)
   } catch (error) {
     console.error(error)
-    const message = '북마크 삭제 중 문제가 발생했습니다.'
+    const message = '북마크 취소 중 문제가 발생했습니다.'
     return NRes.json({ success: false, message }, { status: 500 })
   }
 }

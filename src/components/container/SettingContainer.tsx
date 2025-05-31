@@ -127,7 +127,13 @@ export default function SettingContainer() {
       <DialogBox open={open2} title={'삭제 완료'} actionLabel="확인" onAction={handleRedirect}>
         {{ account: '계정 삭제를 마쳤습니다.', allmemo: '모든 메모를 삭제했습니다.' }[aria] || ''}
       </DialogBox>
-      <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={message ? true : false}
+        autoHideDuration={6000}
+        onClose={() => setMessage('')}
+        message={message}
+      />
     </Container>
   )
 }

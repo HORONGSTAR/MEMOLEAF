@@ -1,116 +1,107 @@
 'use client'
-import { Button, Chip, Skeleton, Snackbar } from '@mui/material'
-import { ReactNode, useCallback, useMemo, useState } from 'react'
-import { MemoData, LeafData } from '@/shared/types/client'
-import { checkOnOff, swapOnOff } from '@/shared/utils/common'
-import { useRouter } from 'next/navigation'
+import { Snackbar, Typography } from '@mui/material'
+import { ReactNode, useState } from 'react'
+import { MemoData, UserData } from '@/shared/types/client'
 import MemoBox from '@/components/memo/MemoBox'
-import ThreadBox from '@/components/memo/ThreadBox'
-import MemoCreateForm from '../memo/MemoCreateForm'
 import MemoEditForm from '../memo/MemoEditForm'
-import { fetchMemos } from '@/shared/fetch/memosApi'
-import CursorObserver from '../common/CursorObserver'
+import LeafList from '../memo/LeafList'
+import TabBox from '../common/TabBox'
+import { UserBox, UserList } from '../user'
+import LeafCreateForm from '../memo/LeafCreateForm'
 
 interface Props {
   myId: number
-  firstLoadParent: MemoData
+  firstLoadMemo: MemoData
   children: ReactNode
+  updateItem?: (memo: MemoData) => void
+  removeItem?: (itemId: number) => void
 }
 
 export default function DetailContainer(props: Props) {
-  const { firstLoadParent, myId, children } = props
-  const [cursor, setCursor] = useState<undefined | number>(firstLoadParent.id)
+  const { firstLoadMemo, myId, children, updateItem, removeItem } = props
+  const [memo, setMemo] = useState<MemoData>(firstLoadMemo)
+  const [users, setUsers] = useState<UserData[]>([])
   const [message, setMessage] = useState('')
-  const [parent, setParent] = useState<MemoData>(firstLoadParent)
-  const [leafs, setLeafs] = useState<LeafData[]>([])
-  const [editId, setEdit] = useState(0)
-  const router = useRouter()
-  const isMine = checkOnOff(parent.user.id, myId || 0)
-  const [loading, setLoading] = useState('off')
-  const [open, setOpen] = useState('off')
+  const [box, setBox] = useState('item')
+  const [filter, setFilter] = useState('new')
+  const [cursor, setCursor] = useState<undefined | number>(undefined)
+  const [leafs, setLeafs] = useState<MemoData[]>([])
+  const count = memo._count
 
-  const count = useMemo(() => parent._count?.leafs || 0, [parent._count?.leafs])
-  const digit = useMemo(() => (count.toString().length || 0) + 1, [count])
-
-  const addCreatedItem = (item: MemoData) => {
-    setLeafs((prev) => [item, ...prev])
-  }
-  const AddEditedItem = (item: MemoData) => {
-    setLeafs((prev) => {
-      return prev.map((p) => (p.id !== item.id ? p : { ...p, ...item }))
-    })
-  }
-  const updateParent = (item: MemoData) => {
-    setParent((prev) => ({ ...prev, ...item }))
-  }
-  const removeItem = (itemId: number) => {
-    setLeafs((prev) => {
-      return prev.filter((p) => p.id !== itemId)
-    })
+  const updateDetail = (item: MemoData) => {
+    setMemo((prev) => ({ ...prev, ...item }))
+    if (updateItem) updateItem(item)
   }
 
-  const loadMoreMemos = useCallback(() => {
-    if (open === 'off') return
-    if (cursor && cursor < 0) return
-    setLoading('on')
-    fetchMemos({ id: parent.id, aria: 'thread', cursor })
-      .then((result) => {
-        setLeafs((prev) => [...prev, ...result.memos])
-        setCursor(result.nextCursor)
-      })
-      .catch()
-      .finally(() => setLoading('off'))
-  }, [cursor, parent.id, open])
-
-  const openButton = {
-    [count]: <Button onClick={() => setOpen((prev) => swapOnOff[prev].next)}>{{ on: '타래글 접기', off: `${count}개의 타래글 보기` }[open]}</Button>,
-    0: null,
-  }[count]
-
-  const ParentBox = () => {
-    const item = <MemoBox theardButton={openButton} memo={parent} remove={() => router.push('/')} edit={() => setEdit(parent.id)} myId={myId} />
-    const editForm = <MemoEditForm memo={parent} add={updateParent} close={() => setEdit(0)} alert={(text: string) => setMessage(text)} />
-    return { [parent.id]: item, [editId]: editForm }[parent.id]
+  const addUserList = (values: UserData[]) => {
+    setUsers((prev) => [...prev, ...values])
   }
 
-  const ThreadItem = ({ leaf, index }: { leaf: LeafData; index: number }) => {
-    const item = (
-      <ThreadBox memo={leaf} isMine={isMine} removeItem={() => removeItem(leaf.id)} editItem={() => setEdit(leaf.id)}>
-        <Chip size="small" label={(index + 1).toString().padStart(digit, '0')} />
-      </ThreadBox>
+  const TitleBox = () => {
+    const edit = () => setBox('edit')
+    const remove = () => (removeItem ? removeItem(memo.id) : setBox('empty'))
+    const actions = { close: () => setBox('item'), alert: (text: string) => setMessage(text) }
+    const item = <MemoBox {...{ memo, myId, remove, edit, updateItem: updateDetail }} />
+    const form = <MemoEditForm {...{ memo }} {...actions} updateItem={updateDetail} />
+    const empty = (
+      <Typography variant="body2" color="textDisabled" height={80} align="center">
+        삭제된 게시글 입니다.
+      </Typography>
     )
-    const editForm = <MemoEditForm memo={parent} add={AddEditedItem} close={() => setEdit(0)} alert={(text: string) => setMessage(text)} />
-    return { [leaf.id]: item, [editId]: editForm }[leaf.id]
+    return { item, form, empty }[box]
   }
 
-  const creatForm = <MemoCreateForm add={addCreatedItem} parentId={parent.id} alert={(text: string) => setMessage(text)} />
+  const query = { cursor, aria: 'thread', filter, id: memo.id }
 
-  const leafList = (
-    <>
-      {leafs.map((leaf: LeafData, index) => {
-        return <ThreadItem key={'detail-memo' + leaf.id} leaf={leaf} index={index} />
-      })}
-      <CursorObserver loadMoreItems={loadMoreMemos} />
-    </>
-  )
-
-  const loadingBox = (
-    <div>
-      {Array(3)
-        .fill(0)
-        .map((_, i) => (
-          <Skeleton sx={{ mx: 1 }} key={'loading' + i} />
-        ))}
-    </div>
-  )
+  const panels = [
+    {
+      label: '글쓰기',
+      panel: <LeafCreateForm {...{ myId, titleId: memo.id }} />,
+      categorys: [],
+    },
+    {
+      label: '타래 목록',
+      panel: {
+        [count.bookmarks]: <LeafList {...{ myId, leafs, query, setLeafs, setCursor }} />,
+        0: null,
+      }[count.bookmarks],
+      categorys: [
+        { label: `${memo.user.name}님의 글`, value: 'serial' },
+        { label: '댓글', value: 'comment' },
+      ],
+      select: (category: string) => {
+        setFilter(category)
+      },
+    },
+    {
+      label: '좋아요',
+      panel: {
+        [count.favorites]: (
+          <UserList {...{ endpoint: 'search', addUserList, query: { filter: `${memo.id}` } }}>
+            {users.map((user) => (
+              <UserBox key={'userlist' + user.id} {...user} />
+            ))}
+          </UserList>
+        ),
+        0: null,
+      }[count.favorites],
+      categorys: [],
+    },
+  ]
 
   return (
     <>
       {children}
-      <ParentBox />
-      {{ on: leafList, off: null }[open]}
-      {{ on: loadingBox, off: null }[loading]}
-      {{ on: creatForm, off: null }[isMine]}
+      <TitleBox />
+      <TabBox
+        label={'상세 보기'}
+        tabs={panels}
+        reset={() => {
+          setLeafs([])
+          setUsers([])
+          setCursor(undefined)
+        }}
+      />
       <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
     </>
   )

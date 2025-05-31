@@ -10,7 +10,7 @@ import TextCount from '@/components/common/TextCount'
 interface IntiMemoValue {
   action: 'create' | 'update'
   id?: number
-  parentId: number | null
+  titleId: number | null
   content?: string
   images?: ImageData[]
   decos?: DecoData
@@ -30,7 +30,7 @@ export default function MemoForm(inti: IntiMemoValue) {
   const [decos, setDecos] = useState<DecoData>({ ...intiDecoValue, ...inti.decos })
   const [message, setMessage] = useState('')
 
-  const { action, id, parentId, children, onSubmint } = inti
+  const { action, id, titleId, children, onSubmint } = inti
 
   const handleSubmit = useCallback(() => {
     if (!content) return setMessage('내용을 입력하세요.')
@@ -39,14 +39,14 @@ export default function MemoForm(inti: IntiMemoValue) {
         .filter((key) => swapOnOff[decos[key].active].bool)
         .map((key) => ({ kind: key, extra: decos[key].extra })),
       id,
-      parentId,
+      titleId,
       content,
     }
     onSubmint(formData, images)
     setContent('')
     setImages([])
     setDecos(intiDecoValue)
-  }, [content, decos, id, parentId, images, onSubmint])
+  }, [content, decos, id, titleId, images, onSubmint])
 
   const handleContentChange = (value: string) => {
     if (value.length > 191) return

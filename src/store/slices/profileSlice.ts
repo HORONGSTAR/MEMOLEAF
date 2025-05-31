@@ -21,7 +21,7 @@ const initialState: State = {
   status: 'idle',
 }
 
-export const authSlice = createSlice({
+export const profileSlice = createSlice({
   name: 'profile',
   initialState,
   reducers: {
@@ -44,6 +44,6 @@ export const authSlice = createSlice({
   },
 })
 
-export const { setProfile } = authSlice.actions
+export const { setProfile } = profileSlice.actions
 
-export default authSlice.reducer
+export default profileSlice.reducer

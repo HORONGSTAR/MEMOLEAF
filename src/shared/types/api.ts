@@ -24,7 +24,7 @@ export interface MemoParams {
   id?: number
   content: string
   decos: { kind: string; extra: string }[]
-  parentId?: number | null
+  titleId?: number | null
 }
 
 export interface UserParams {

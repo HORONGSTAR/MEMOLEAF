@@ -3,6 +3,7 @@ export type UserData = {
   name: string
   image: string
   info?: string | null
+  userNum?: number | null
 }
 
 export type ImageData = {
@@ -22,8 +23,7 @@ export type DecoData = {
   }
 }
 export interface ProfileData extends UserData {
-  userNum?: number | null
-  toUsers?: { fromUserId: number; toUserId: number }[]
+  followings?: { followerId: number; followingId: number }[]
 }
 
 export interface MemoData {
@@ -32,29 +32,27 @@ export interface MemoData {
   images: Required<ImageData>[]
   decos: DecoData
   user: UserData
-  parentId: number | null
-  bookmarks: { id: number }[]
+  titleId: number | null
   createdAt: Date
-  _count?: {
-    comments: number
+  bookmarks?: { id: number }
+  favorites?: { id: number }
+  _count: {
+    favorites: number
     bookmarks: number
     leafs: number
   }
 }
 
-export interface LeafData {
+export interface AlarmJoinUser {
+  link: number
   id: number
-  content: string
-  images: Required<ImageData>[]
-  decos: DecoData
-  parentId: number | null
-  createdAt: Date
+  aria: 'comment' | 'follow' | 'bookmark' | 'favorite'
+  sanderId: number
+  recipientId: number
+  sander: UserData
 }
 
-export interface CommentData {
-  id: number
-  text: string
-  user: UserData
-  memoId: number
-  createdAt: Date
+export interface AlarmData {
+  alarms?: AlarmJoinUser[] | []
+  count?: number
 }

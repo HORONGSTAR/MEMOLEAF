@@ -4,32 +4,36 @@ import { CircleNotifications, Notifications } from '@mui/icons-material'
 import { useCallback, useState } from 'react'
 import { deleteAlarm } from '@/shared/fetch/alarmApi'
 import { checkOnOff, imgPath } from '@/shared/utils/common'
-import { UserData } from '@/shared/types/client'
 import DialogBox from '@/components/common/DialogBox'
 import LinkBox from '@/components/common/LinkBox'
+import { AlarmData, AlarmJoinUser } from '@/shared/types/client'
 
-interface AlarmData {
-  id: number
-  aria: 'comment' | 'follow' | 'bookmark'
-  linkId: number
-  reader: UserData
-}
-
-interface Props {
-  alarms: AlarmData[] | []
-  count?: number
-}
-
-export default function AlarmBox(props: Props) {
+export default function AlarmBox(props: AlarmData) {
   const [open, setOpen] = useState(false)
-  const [alarms, setAlarms] = useState<AlarmData[]>(props.alarms || [])
-  const [count, setCount] = useState(props.count || 0)
+  const [alarms, setAlarms] = useState<AlarmJoinUser[]>(props.alarms || [])
+  const [count, setCount] = useState(alarms.length || 0)
 
   const handleDelete = useCallback(() => {
     deleteAlarm()
     setAlarms([])
     setCount(0)
   }, [])
+
+  const alarmLink = (alarm: AlarmJoinUser) =>
+    ({
+      comment: `/page/detail/${alarm.link}`,
+      follow: `/page/profile/${alarm.link}`,
+      bookmark: `/page/detail/${alarm.link}`,
+      favorite: `/page/detail/${alarm.link}`,
+    }[alarm.aria])
+
+  const alarmComment = (alarm: AlarmJoinUser) =>
+    ({
+      comment: `${alarm.sander.name}님이 내 메모에 타래글을 달았습니다.`,
+      follow: `${alarm.sander.name}님이 나를 팔로우했습니다.`,
+      bookmark: `${alarm.sander.name}님이 내 메모를 북마크했습니다.`,
+      favorite: `${alarm.sander.name}님이 내 메모를 좋아합니다.`,
+    }[alarm.aria])
 
   const components = {
     on: (
@@ -42,27 +46,13 @@ export default function AlarmBox(props: Props) {
       <List>
         {alarms.map((alarm) => (
           <ListItem key={alarm.id}>
-            <LinkBox link={`/page/profile/${alarm.reader.id}`}>
+            <LinkBox link={`/page/profile/${alarm.sander.id}`}>
               <ListItemAvatar>
-                <Avatar src={imgPath + alarm.reader.image} alt={alarm.reader.name} />
+                <Avatar src={imgPath + alarm.sander.image} alt={alarm.sander.name} />
               </ListItemAvatar>
             </LinkBox>
-            <LinkBox
-              variant="body2"
-              color="textPrimary"
-              link={
-                { comment: `/page/detail/${alarm.linkId}`, follow: `/page/profile/${alarm.linkId}`, bookmark: `/page/detail/${alarm.linkId}` }[
-                  alarm.aria
-                ]
-              }
-            >
-              {
-                {
-                  comment: `${alarm.reader.name}님이 내 메모에 댓글을 달았습니다.`,
-                  follow: `${alarm.reader.name}님이 나를 팔로우했습니다.`,
-                  bookmark: `${alarm.reader.name}님이 내 메모를 북마크했습니다.`,
-                }[alarm.aria]
-              }
+            <LinkBox variant="body2" color="textPrimary" link={alarmLink(alarm)}>
+              {alarmComment(alarm)}
             </LinkBox>
           </ListItem>
         ))}

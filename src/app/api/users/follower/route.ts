@@ -7,17 +7,17 @@ export async function GET(req: NextRequest) {
     const cursor = parseInt(searchParams.get('cursor') || '0')
     const id = parseInt(searchParams.get('id') || '0')
 
-    const whereData = { toUserId: id }
+    const whereData = { followingId: id }
     const selectData = { select: { id: true, name: true, image: true, info: true, userNum: true } }
 
     const follows = await prisma.follow.findMany({
-      where: { ...(cursor && { fromUserId: { lt: cursor } }), ...whereData },
+      where: { ...(cursor && { followerId: { lt: cursor } }), ...whereData },
       take: 10,
-      orderBy: { fromUserId: 'desc' },
-      include: { fromUser: selectData },
+      orderBy: { followerId: 'desc' },
+      include: { follower: selectData },
     })
 
-    const users = follows.map((follow) => follow.fromUser)
+    const users = follows.map((follow) => follow.follower)
     const nextCursor = users[9]?.id || -1
     const searchTotal = await prisma.follow.count({ where: whereData })
     return NRes.json({

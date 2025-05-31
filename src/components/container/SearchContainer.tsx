@@ -21,7 +21,7 @@ export default function SearchContainer({ myId }: Props) {
   const [cursor, setCursor] = useState<undefined | number>(undefined)
   const [index, setIndex] = useState<number>(NaN)
 
-  const handleSetIndex = (index: number) => {
+  const applyDetail = (index: number) => {
     setIndex(index)
   }
 
@@ -43,11 +43,11 @@ export default function SearchContainer({ myId }: Props) {
     setUsers((prev) => [...prev, ...values])
   }, [])
 
-  const addLoadList = (items: MemoData[], nextCursor: number) => {
+  const addItems = (items: MemoData[], nextCursor: number) => {
     setMemos((prev) => [...prev, ...items])
     setCursor(nextCursor)
   }
-  const AddEditedItem = (item: MemoData) => {
+  const updateItem = (item: MemoData) => {
     setMemos((prev) => {
       return prev.map((p) => (p.id !== item.id ? p : { ...p, ...item }))
     })
@@ -60,11 +60,12 @@ export default function SearchContainer({ myId }: Props) {
   }
 
   const query = { cursor, aria: 'search', filter: filter.memo, keyword }
+  const actions = { addItems, updateItem, removeItem, applyDetail }
 
   const panels = [
     {
       label: '게시글',
-      panel: keyword ? <MemoList {...{ myId, memos, removeItem, AddEditedItem, addLoadList, query, handleSetIndex }} /> : null,
+      panel: keyword ? <MemoList {...{ myId, memos, query, actions }} /> : null,
       categorys: [
         { label: '통합', value: 'all' },
         { label: '타래글', value: 'thread' },
@@ -78,7 +79,7 @@ export default function SearchContainer({ myId }: Props) {
     {
       label: '사용자',
       panel: keyword ? (
-        <UserList {...{ endpoint: 'search', addUserList, filter: filter.user, keyword }}>
+        <UserList {...{ endpoint: 'search', addUserList, query: { filter: filter.user, keyword } }}>
           {users.map((user) => (
             <UserBox key={'userlist' + user.id} {...user} />
           ))}
@@ -122,7 +123,7 @@ export default function SearchContainer({ myId }: Props) {
   )
 
   const detail = (
-    <DetailContainer firstLoadParent={memos[index]} myId={myId}>
+    <DetailContainer firstLoadMemo={memos[index]} {...{ myId, updateItem }}>
       <Button startIcon={<ArrowBack />} onClick={() => setIndex(NaN)}>
         목록으로 돌아가기
       </Button>

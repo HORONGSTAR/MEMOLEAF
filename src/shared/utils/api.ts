@@ -1,7 +1,7 @@
 export const memosUrl = '/api/memos'
 export const uploadUrl = '/api/upload'
 export const commentsUrl = '/api/comments'
-export const bookmarksUrl = '/api/bookmarks'
+export const feedbackUrl = '/api/feedback'
 export const alarmUrl = '/api/alarm'
 export const usersUrl = '/api/users'
 export const settingsUrl = '/api/settings'

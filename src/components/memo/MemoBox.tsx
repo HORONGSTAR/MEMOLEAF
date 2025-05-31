@@ -1,8 +1,8 @@
 'use client'
 import { Snackbar, Typography, ListItem, ListItemAvatar, ListItemText, Avatar } from '@mui/material'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined } from '@mui/icons-material'
-import { ReactNode, useCallback, useMemo, useState } from 'react'
-import { BookmarkButton, CommentButton } from '@/components/feedback'
+import { useCallback, useState } from 'react'
+import { BookmarkToggle, FavoriteToggle, FeedbackCount } from '@/components/feedback'
 import { checkOnOff, convertDate, imgPath } from '@/shared/utils/common'
 import { DecoBox, ImgGrid } from '@/components/memo/sub'
 import { deleteMemo } from '@/shared/fetch/memosApi'
@@ -14,12 +14,12 @@ import DialogBox from '@/components/common/DialogBox'
 interface Props {
   myId: number
   memo: MemoData
-  theardButton?: ReactNode
   edit: () => void
   remove: () => void
+  updateItem: (item: MemoData) => void
 }
 
-export default function MemoBox({ memo, myId, theardButton, edit, remove }: Props) {
+export default function MemoBox({ memo, myId, edit, remove, updateItem }: Props) {
   const [open, setOpen] = useState(false)
   const [message, setMessage] = useState('')
   const isMine = checkOnOff(memo.user.id, myId)
@@ -46,6 +46,17 @@ export default function MemoBox({ memo, myId, theardButton, edit, remove }: Prop
     setMessage(await reuslt)
   }, [memo])
 
+  const handleUpdateCount = useCallback(
+    (value: { id: number } | undefined, action: 'add' | 'remove', field: 'bookmarks' | 'favorites') => {
+      updateItem({
+        ...memo,
+        [field]: value,
+        _count: { ...memo._count, [field]: memo._count[field] + { add: 1, remove: -1 }[action] },
+      })
+    },
+    [memo, updateItem]
+  )
+
   const memu = (
     <MemoMenu
       icon={<MoreHoriz fontSize="small" />}
@@ -58,12 +69,9 @@ export default function MemoBox({ memo, myId, theardButton, edit, remove }: Prop
     />
   )
 
-  const bookmarkProps = useMemo(() => {
-    const isMyBookmark = checkOnOff(1, memo.bookmarks.length || 0)
-    const id = { on: memo.bookmarks[0]?.id || 0, off: memo.id }[isMyBookmark]
-    const checked = isMyBookmark
-    return { id, checked }
-  }, [memo])
+  const bookmarkProps = memo.bookmarks ? { id: memo.bookmarks.id, checked: 'on' } : { id: memo.id, checked: 'off' }
+
+  const favoriteProps = memo.favorites ? { id: memo.favorites.id, checked: 'on' } : { id: memo.id, checked: 'off' }
 
   const dialogProps = {
     open,
@@ -74,9 +82,6 @@ export default function MemoBox({ memo, myId, theardButton, edit, remove }: Prop
     onAction: handleDelete,
   }
 
-  const isThread = checkOnOff(0, memo._count?.leafs || 0)
-  const threadCount = { off: `${memo._count?.leafs}개의 타래글`, on: null }[isThread]
-
   return (
     <>
       <ListItem secondaryAction={memu}>
@@ -85,7 +90,7 @@ export default function MemoBox({ memo, myId, theardButton, edit, remove }: Prop
             <Avatar src={imgPath + memo.user.image} alt={memo.user.name} />
           </LinkBox>
         </ListItemAvatar>
-        <ListItemText primary={<LinkBox link={`/page/profile/${memo.user.id}`}>{memo.user?.name}</LinkBox>} secondary={convertDate(memo.createdAt)} />
+        <ListItemText primary={<LinkBox link={`/page/profile/${memo.user.id}`}>{memo.user?.name}</LinkBox>} secondary={'ID ' + memo.user.userNum} />
       </ListItem>
       <DecoBox decos={memo.decos}>
         <ListItem>{memo.content}</ListItem>
@@ -94,13 +99,14 @@ export default function MemoBox({ memo, myId, theardButton, edit, remove }: Prop
         </ListItem>
       </DecoBox>
       <ListItem>
-        <ListItemText>
-          <Typography variant="button" color="textSecondary">
-            {theardButton ? theardButton : threadCount}
-          </Typography>
-        </ListItemText>
-        <BookmarkButton {...bookmarkProps} count={memo._count?.bookmarks || 0} />
-        <CommentButton id={memo.id} count={memo._count?.comments || 0} />
+        <ListItemText secondary={convertDate(memo.createdAt)} />
+
+        <FeedbackCount count={memo._count.bookmarks}>
+          <BookmarkToggle {...bookmarkProps} update={(value, action) => handleUpdateCount(value, action, 'bookmarks')} />
+        </FeedbackCount>
+        <FeedbackCount count={memo._count.favorites}>
+          <FavoriteToggle {...favoriteProps} update={(value, action) => handleUpdateCount(value, action, 'favorites')} />
+        </FeedbackCount>
       </ListItem>
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}

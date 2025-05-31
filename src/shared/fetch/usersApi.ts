@@ -9,15 +9,15 @@ export const updateProfile = async (params: UserParams) => {
   return res.json()
 }
 
-export const followUser = async (toUserId: number) => {
-  const data = buildApiCall('POST', { toUserId })
+export const followUser = async (followingId: number) => {
+  const data = buildApiCall('POST', { followingId })
   const res = await fetch(usersUrl, data)
   if (!res.ok) throw new Error('팔로우 중 에러')
   return res.json()
 }
 
-export const unfollowUser = async (toUserId: number) => {
-  const data = buildApiCall('DELETE', { toUserId })
+export const unfollowUser = async (followingId: number) => {
+  const data = buildApiCall('DELETE', { followingId })
   const res = await fetch(usersUrl, data)
   if (!res.ok) throw new Error('팔로우 중 에러')
   return res.json()

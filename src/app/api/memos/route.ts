@@ -15,9 +15,18 @@ export async function GET(req: NextRequest) {
     const keyword = searchParams.get('keyword')
     const filter = searchParams.get('filter')
 
+    let title
+    if (id && aria === 'thread') {
+      title = await prisma.memo.findUnique({ where: { id }, select: { userId: true } })
+      if (!title) {
+        const message = '타래글을 찾을 수 없습니다.'
+        return NRes.json({ success: false, message }, { status: 404 })
+      }
+    }
+
     const whereData = {
       home: {},
-      thread: { parentId: id, ...(cursor && { id: { gt: cursor } }) },
+      thread: { titleId: id, ...(cursor && { id: { gt: cursor } }) },
       mypost: { userId: id },
       bookmark: { bookmarks: { some: { userId: id } } },
       search: { ...(keyword && { content: { contains: keyword } }) },
@@ -26,26 +35,21 @@ export async function GET(req: NextRequest) {
     const joinTeble = {
       user: { select: { id: true, name: true, image: true, userNum: true } },
       bookmarks: { where: { userId }, select: { id: true } },
-      _count: { select: { comments: true, bookmarks: true, leafs: true } },
+      favorites: { where: { userId }, select: { id: true } },
+      _count: { select: { favorites: true, bookmarks: true, leafs: true } },
     }
 
-    const includeData = {
-      home: joinTeble,
-      thread: undefined,
-      mypost: joinTeble,
-      bookmark: joinTeble,
-      search: joinTeble,
-    }[aria]
-
     const filterData = {
-      all: { parentId: undefined },
+      all: { titleId: undefined },
       thread: { leafs: { some: {} } },
       images: { images: { some: {} } },
+      leafs: { user: { id: title?.userId } },
+      comment: { user: { id: { not: title?.userId } } },
     }[filter || 'all']
 
     const memolist = await prisma.memo.findMany({
       where: {
-        parentId: null,
+        titleId: null,
         ...(cursor && { id: { lt: cursor } }),
         ...filterData,
         ...whereData,
@@ -55,19 +59,24 @@ export async function GET(req: NextRequest) {
       include: {
         images: { select: { id: true, url: true, alt: true } },
         decos: { select: { id: true, kind: true, extra: true } },
-        ...includeData,
+        ...joinTeble,
       },
     })
 
     const searchTotal = await prisma.memo.count({
       where: {
-        parentId: null,
+        titleId: null,
         ...whereData,
       },
     })
 
     const memos = memolist.map((item) => {
-      return { ...item, decos: decosToJson(item.decos) }
+      return {
+        ...item,
+        decos: decosToJson(item.decos),
+        bookmarks: item.bookmarks[0],
+        favorites: item.favorites[0],
+      }
     })
 
     const nextCursor = memos[9]?.id || -1
@@ -91,18 +100,33 @@ export async function POST(req: NextRequest) {
       const message = '로그인이 필요합니다.'
       return NRes.json({ success: false, message }, { status: 401 })
     }
+
     const id = session.user.id
-    const { content, decos, parentId } = await req.json()
+    const { content, decos, titleId } = await req.json()
+
     const newMemo = await prisma.memo.create({
       data: {
         userId: id,
         content,
-        parentId,
+        titleId,
         ...(decos?.length > 0 && { decos: { create: decos } }),
       },
     })
 
-    const res = { ...newMemo, decos }
+    if (titleId) {
+      const title = await prisma.memo.findUnique({ where: { id: titleId }, select: { userId: true } })
+      if (!title) {
+        const message = '타래글을 찾을 수 없습니다.'
+        return NRes.json({ success: false, message }, { status: 404 })
+      }
+      if (title.userId !== id) {
+        await prisma.alarm.create({
+          data: { sanderId: id, recipientId: title.userId, link: newMemo.id, aria: 'comment' },
+        })
+      }
+    }
+
+    const res = { ...newMemo, decos, _count: { bookmarks: 0, favorites: 0, leafs: 0 } }
     res.decos = decosToJson(await prisma.deco.findMany({ where: { memoId: newMemo.id } }))
     return NRes.json(res)
   } catch (error) {

@@ -10,8 +10,8 @@ export async function DELETE() {
       const message = '로그인이 필요합니다.'
       return NRes.json({ success: false, message }, { status: 401 })
     }
-    const authorId = session.user.id
-    await prisma.alarm.deleteMany({ where: { authorId } })
+    const recipientId = session.user.id
+    await prisma.alarm.deleteMany({ where: { recipientId } })
     return NRes.json('삭제 완료')
   } catch (error) {
     console.error(error)

@@ -1,7 +1,7 @@
 'use client'
 import { fetchMemos } from '@/shared/fetch/memosApi'
 import { Paper, Skeleton, Snackbar, Stack } from '@mui/material'
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { GetMemosParams } from '@/shared/types/api'
 import { MemoData } from '@/shared/types/client'
 import CursorObserver from '@/components/common/CursorObserver'
@@ -12,34 +12,46 @@ interface Props {
   myId: number
   memos: MemoData[]
   query: GetMemosParams
-  addLoadList: (items: MemoData[], nextCursor: number) => void
-  AddEditedItem: (item: MemoData) => void
-  removeItem: (itemId: number) => void
-  handleSetIndex: (index: number) => void
+  actions: {
+    addItems: (items: MemoData[], nextCursor: number) => void
+    updateItem: (item: MemoData) => void
+    removeItem: (itemId: number) => void
+    applyDetail: (index: number) => void
+  }
 }
 
 export default function MemoList(props: Props) {
-  const { myId, memos, query, addLoadList, AddEditedItem, removeItem, handleSetIndex } = props
+  const { myId, memos, query, actions } = props
+  const { addItems, updateItem, removeItem, applyDetail } = actions
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState('off')
   const [editId, setEdit] = useState(0)
+  const beforeQuery = useRef('')
 
   const loadMoreMemos = useCallback(() => {
     const cursor = query.cursor
+    if (beforeQuery.current === JSON.stringify(query)) return
+    beforeQuery.current = JSON.stringify(query)
+
     if (cursor && cursor < 0) return
     setLoading('on')
     fetchMemos(query)
       .then((result) => {
-        addLoadList(result.memos, result.nextCursor)
+        addItems(result.memos, result.nextCursor)
       })
       .catch(() => setMessage('게시글을 조회 중 문제가 발생했습니다.'))
       .finally(() => setLoading('off'))
-  }, [addLoadList, query])
+  }, [addItems, query])
 
   const MemoListItem = (memo: MemoData) => {
-    const item = <MemoBox {...{ myId, memo }} remove={() => removeItem(memo.id)} edit={() => setEdit(memo.id)} />
-    const edit = <MemoEditForm memo={memo} add={AddEditedItem} close={() => setEdit(0)} alert={(text: string) => setMessage(text)} />
-    return { [memo.id]: item, [editId]: edit }[memo.id]
+    const close = () => setEdit(0)
+    const alert = (text: string) => setMessage(text)
+    const remove = () => removeItem(memo.id)
+    const edit = () => setEdit(memo.id)
+
+    const listItem = <MemoBox {...{ myId, memo, remove, edit, updateItem }} />
+    const editForm = <MemoEditForm {...{ memo, updateItem, close, alert }} />
+    return { [memo.id]: listItem, [editId]: editForm }[memo.id]
   }
 
   const loadingBox = Array(3)
@@ -51,13 +63,19 @@ export default function MemoList(props: Props) {
   return (
     <Stack spacing={2}>
       {memos.map((memo: MemoData, index) => (
-        <Paper key={'memo' + memo.id} sx={{ p: { sm: 1, xs: 0 }, cursor: 'pointer' }} variant="outlined" onClick={() => handleSetIndex(index)}>
+        <Paper key={query.aria + memo.id} sx={{ p: { sm: 1, xs: 0 }, cursor: 'pointer' }} variant="outlined" onClick={() => applyDetail(index)}>
           <MemoListItem {...memo} />
         </Paper>
       ))}
       <CursorObserver loadMoreItems={loadMoreMemos} />
       {{ on: loadingBox, off: null }[loading]}
-      <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
+      <Snackbar
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        open={message ? true : false}
+        autoHideDuration={6000}
+        onClose={() => setMessage('')}
+        message={message}
+      />
     </Stack>
   )
 }
