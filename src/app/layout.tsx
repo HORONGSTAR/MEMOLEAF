@@ -4,6 +4,8 @@ import { ThemeProvider } from '@mui/material'
 import { theme } from '@/styles/MuiTheme'
 import Providers from '@/lib/Providers'
 import SplashScreen from '@/components/shared/SplashScreen'
+import { Analytics } from '@vercel/analytics/next'
+
 import './globals.css'
 
 export const notoSans = Noto_Sans_KR({
@@ -28,7 +30,10 @@ export default function RootLayout({
       <body className={`${notoSans.variable} antialiased`}>
         <Providers>
           <ThemeProvider theme={theme}>
-            <SplashScreen>{children}</SplashScreen>
+            <SplashScreen>
+              {children}
+              <Analytics />
+            </SplashScreen>
           </ThemeProvider>
         </Providers>
       </body>
