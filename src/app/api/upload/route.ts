@@ -9,10 +9,12 @@ interface ImageData {
 }
 
 export async function POST(request: NextRequest): Promise<NRes> {
+  const startTime = Date.now()
+
   try {
     const { images, id } = await request.json()
 
-    // 입력 검증 강화
+    // 입력 검증
     if (!images || !Array.isArray(images)) {
       return NRes.json({ error: '이미지 데이터가 제공되지 않았습니다.' }, { status: 400 })
     }
@@ -21,26 +23,31 @@ export async function POST(request: NextRequest): Promise<NRes> {
       return NRes.json({ error: 'memoId가 제공되지 않았습니다.' }, { status: 400 })
     }
 
-    const memo = await prisma.memo.findUnique({
-      where: { id: parseInt(id) },
-    })
-
-    if (!memo) {
-      return NRes.json({ error: '유효하지 않은 memoId입니다.' }, { status: 400 })
+    // 서버리스 환경: 이미지 개수 제한 (타임아웃 방지)
+    if (images.length > 10) {
+      return NRes.json({ error: '한 번에 최대 10개의 이미지만 업로드할 수 있습니다.' }, { status: 400 })
     }
 
-    const uploadPromises = images.map(async (image: ImageData) => {
+    const memoIdInt = parseInt(id)
+    console.log(`Processing ${images.length} images for memo ${memoIdInt}`)
+
+    // Cloudinary 업로드 (병렬 처리하되 제한적으로)
+    const uploadPromises = images.map(async (image: ImageData, index: number) => {
       try {
+        // 서버리스에서는 순차적으로 처리하는 것이 더 안정적
+        await new Promise((resolve) => setTimeout(resolve, index * 100)) // 100ms씩 지연
+
         if (!image.id) {
           const uploadResult = (await cloudinary.uploader.upload(image.url, {
             upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET,
+            timeout: 30000, // 30초 타임아웃
           })) as CloudinaryUploadResponse
           return { url: uploadResult.public_id, alt: image.alt }
         } else {
           return { url: image.url, alt: image.alt }
         }
       } catch (error) {
-        console.error('개별 이미지 업로드 실패:', error)
+        console.error(`이미지 ${index} 업로드 실패:`, error)
         return null
       }
     })
@@ -52,39 +59,48 @@ export async function POST(request: NextRequest): Promise<NRes> {
       return NRes.json({ error: '모든 이미지 업로드에 실패했습니다.' }, { status: 500 })
     }
 
+    console.log(`${successfulUploads.length}/${images.length} 이미지 업로드 성공`)
+
+    // 연결풀 절약을 위한 개선된 방법 (서버리스 최적화)
     try {
       const imageData = successfulUploads.map((img) => ({
-        memoId: parseInt(id),
+        memoId: memoIdInt,
         url: img!.url,
         alt: img!.alt,
       }))
 
       let createdImages
 
+      // 서버리스: 간단하고 빠른 방식 우선
       try {
         await prisma.image.createMany({
           data: imageData,
           skipDuplicates: true,
         })
 
-        createdImages = await prisma.image.findMany({
-          where: {
-            memoId: parseInt(id),
-            url: { in: imageData.map((img) => img.url) },
-          },
-          orderBy: { id: 'desc' },
-          take: imageData.length,
-        })
+        // 생성 확인을 위한 조회 (선택적)
+        createdImages = imageData // 간소화: 실제 DB 조회 생략
       } catch (createManyError) {
         console.warn('createMany 실패, 개별 생성으로 전환:', createManyError)
 
+        // 서버리스에서는 타임아웃을 피하기 위해 빠르게 포기
+        const timeElapsed = Date.now() - startTime
+        if (timeElapsed > 8000) {
+          // 8초 경과시 포기
+          throw new Error('처리 시간 초과')
+        }
+
+        // 개별 생성 (최대 5개까지만)
         createdImages = []
-        for (const data of imageData) {
+        const limitedData = imageData.slice(0, 5)
+
+        for (const data of limitedData) {
           try {
             const created = await prisma.image.create({ data })
             createdImages.push(created)
           } catch (individualError) {
             console.error('개별 이미지 생성 실패:', individualError)
+            // 서버리스에서는 빠르게 넘어감
           }
         }
       }
