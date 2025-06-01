@@ -121,7 +121,7 @@ export async function POST(req: NextRequest) {
       }
       if (title.userId !== id) {
         await prisma.alarm.create({
-          data: { sanderId: id, recipientId: title.userId, link: newMemo.id, aria: 'comment' },
+          data: { sanderId: id, recipientId: title.userId, link: titleId, aria: 'comment' },
         })
       }
     }

@@ -35,7 +35,7 @@ export default function ImgForm({ images, setImages }: Props) {
   return (
     <>
       <ImageList cols={4} sx={{ mt: 2, maxWidth: 600 }}>
-        {images.map((img) => (
+        {images.map((img, i) => (
           <ImageListItem key={img.url} sx={{ position: 'relative' }}>
             <Image
               src={img.id ? imgPath + img.url : img.url}
@@ -45,7 +45,7 @@ export default function ImgForm({ images, setImages }: Props) {
               style={{ width: '100%', height: '100%', aspectRatio: 1 / 1, objectFit: 'cover', borderRadius: 2 }}
             />
             <Box sx={{ position: 'absolute', top: 0, right: 0 }}>
-              <IconButton aria-label="이미지 삭제" size="small" onClick={() => removeFile(index)}>
+              <IconButton aria-label="이미지 삭제" size="small" onClick={() => removeFile(i)}>
                 <Cancel />
               </IconButton>
             </Box>
@@ -55,7 +55,7 @@ export default function ImgForm({ images, setImages }: Props) {
                 size="small"
                 onClick={() => {
                   setOpen(true)
-                  setIndex(index)
+                  setIndex(i)
                 }}
               >
                 <NoteAlt />

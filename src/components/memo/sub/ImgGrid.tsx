@@ -15,9 +15,9 @@ export default function ImgGrid({ images }: Props) {
   if (count === 0) return null
 
   return (
-    <Grid container spacing={1} minWidth="100%" minHeight={{ 1: 160, 2: 160, 3: { sm: 160, xs: 320 }, 4: 320 }[count]}>
+    <Grid container spacing={1} minWidth="100%">
       {images.map((img, index) => (
-        <Grid size={{ 1: 6, 2: 6, 3: { sm: 4, xs: { 0: 12, 1: 6, 2: 6 }[index] }, 4: 6 }[count]} position="relative" key={img.url}>
+        <Grid minHeight={160} size={{ 1: 6, 2: 6, 3: { sm: 4, xs: { 0: 12, 1: 6, 2: 6 }[index] }, 4: 6 }[count]} position="relative" key={img.url}>
           <Image
             tabIndex={0}
             src={img.id ? imgPath + img.url : img.url}
