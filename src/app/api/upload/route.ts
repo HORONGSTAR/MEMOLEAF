@@ -39,9 +39,12 @@ export async function POST(request: NextRequest): Promise<NRes> {
       return NRes.json({ error: '모든 이미지 업로드에 실패했습니다.' }, { status: 500 })
     }
 
-    await prisma.image.createMany({
-      data: successfulUploads.map((img) => ({ memoId: id, ...img })),
-    })
+    await prisma.image
+      .createMany({
+        data: successfulUploads.map((img) => ({ memoId: id, ...img })),
+      })
+      .then(() => console.log('됨'))
+      .catch((err) => console.error('ㄹㅇ끔찍한 에러' + err))
 
     return NRes.json({ status: 200 })
   } catch (error) {
