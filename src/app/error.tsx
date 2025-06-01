@@ -9,7 +9,7 @@ export default function Error({ error, reset }: { error: Error; reset: () => voi
   }, [error])
 
   return (
-    <Stack alignItems="center" spacing={2} minHeight="100vh">
+    <Stack alignItems="center" justifyContent="center" spacing={2} minHeight="100vh">
       <Stack alignItems="center" sx={{ bgcolor: '#eee', p: 2, borderRadius: 3 }}>
         <ErrorIcon color="warning" sx={{ mb: 1 }} fontSize="large" />
         <Typography color="textSecondary">문제가 발생했습니다.</Typography>
