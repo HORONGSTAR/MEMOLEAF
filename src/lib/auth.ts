@@ -57,7 +57,7 @@ export const authOptions: NextAuthOptions = {
         const user = await prisma.user.findUnique({ where: { credit } })
         if (!user) {
           const { name, image } = generateRandomProfile()
-          const newUser = await prisma.user.create({ data: { credit, name, image } })
+          const newUser = await prisma.user.create({ data: { credit, name, image, cover: '/default-cover.png' } })
 
           const userNum = generateUserNum(newUser.id)
 

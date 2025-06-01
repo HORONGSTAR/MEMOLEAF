@@ -51,7 +51,7 @@ export default function MyContainer({ profile, myId }: Props) {
 
   const panels = [
     {
-      label: '메인',
+      label: '노트',
       panel: <MyNote {...profile} />,
       categorys: [],
     },
