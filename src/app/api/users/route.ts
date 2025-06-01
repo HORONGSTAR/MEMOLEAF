@@ -41,19 +41,35 @@ export async function PATCH(req: NextRequest) {
     }
 
     const id = session.user.id
-    const { name, info, image } = await req.json()
+    const { name, info, note, image, cover } = await req.json()
 
     let imageUrl = null
+    let coverUrl = null
 
     if (image) {
       const uploadResult = (await cloudinary.uploader.upload(image, {
         upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET,
       })) as CloudinaryUploadResponse
-
       imageUrl = uploadResult.public_id
     }
 
-    const result = await prisma.user.update({ where: { id }, data: { name, info, ...(imageUrl && { image: imageUrl }) } })
+    if (cover) {
+      const uploadResult = (await cloudinary.uploader.upload(cover, {
+        upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET,
+      })) as CloudinaryUploadResponse
+      coverUrl = uploadResult.public_id
+    }
+
+    const result = await prisma.user.update({
+      where: { id },
+      data: {
+        name,
+        info,
+        note,
+        ...(imageUrl && { image: imageUrl }),
+        ...(coverUrl && { cover: coverUrl }),
+      },
+    })
     return NRes.json(result)
   } catch (err) {
     console.error(err)

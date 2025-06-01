@@ -1,6 +1,6 @@
 'use client'
 import { Snackbar, Stack } from '@mui/material'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { MemoData } from '@/shared/types/client'
 import LeafBox from './LeafBox'
 import MemoEditForm from './MemoEditForm'
@@ -8,11 +8,12 @@ import MemoCreateForm from './MemoCreateForm'
 
 interface Props {
   myId: number
-  titleId: number
+  memo: MemoData
+  updateItem: (item: MemoData) => void
 }
 
 export default function LeafCreateForm(props: Props) {
-  const { myId, titleId } = props
+  const { myId, memo, updateItem } = props
   const [message, setMessage] = useState('')
   const [leafs, setLeafs] = useState<MemoData[]>([])
   const [editId, setEdit] = useState(0)
@@ -36,9 +37,13 @@ export default function LeafCreateForm(props: Props) {
     })
   }
 
-  const addCreatedLeaf = (item: MemoData) => {
-    setLeafs((prev) => [...prev, item])
-  }
+  const addCreatedLeaf = useCallback(
+    (item: MemoData) => {
+      setLeafs((prev) => [...prev, item])
+      updateItem({ ...memo, _count: { ...memo._count, leafs: memo._count.leafs + 1 } })
+    },
+    [memo, updateItem]
+  )
 
   const LeafItem = (leaf: MemoData) => {
     const edit = () => setEdit(leaf.id)
@@ -53,7 +58,7 @@ export default function LeafCreateForm(props: Props) {
       {leafs.map((leaf: MemoData) => (
         <LeafItem key={'thread' + leaf.id} {...leaf} />
       ))}
-      <MemoCreateForm add={addCreatedLeaf} titleId={titleId} alert={(text: string) => setMessage(text)} />
+      <MemoCreateForm add={addCreatedLeaf} titleId={memo.id} alert={(text: string) => setMessage(text)} />
       <Snackbar
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         open={message ? true : false}

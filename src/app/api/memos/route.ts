@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
       thread: { titleId: id, ...(cursor && { id: { gt: cursor } }) },
       mypost: { userId: id },
       bookmark: { bookmarks: { some: { userId: id } } },
+      favorite: { favorites: { some: { userId: id } } },
       search: { ...(keyword && { content: { contains: keyword } }) },
     }[aria]
 

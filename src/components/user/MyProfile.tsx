@@ -8,7 +8,7 @@ import { useAppDispatch } from '@/store/hooks'
 import { useSession } from 'next-auth/react'
 import { UserParams } from '@/shared/types/api'
 import { ProfileData } from '@/shared/types/client'
-import AvatarUploader from '@/components/user/AvatarUploader'
+import ImageUploader from '@/components/user/ImageUploader'
 import FollowButton from '@/components/user/FollowButton'
 
 export default function MyProfile(inti: ProfileData) {
@@ -35,10 +35,7 @@ export default function MyProfile(inti: ProfileData) {
 
   const handleSubmit = useCallback(async () => {
     setEdit('off')
-    const userData: UserParams = {
-      name: name,
-      info: info,
-    }
+    const userData: UserParams = { name, info }
     if (image.new) {
       userData.image = image.url
       setImage({ new: false, url: '' })
@@ -83,7 +80,7 @@ export default function MyProfile(inti: ProfileData) {
 
   const editBox = (
     <Stack direction={{ sm: 'row', xs: 'column' }} spacing={2}>
-      <AvatarUploader image={image} setImage={setImage} />
+      <ImageUploader image={image} setImage={setImage} />
       <Stack width="100%" spacing={2}>
         <TextField
           fullWidth

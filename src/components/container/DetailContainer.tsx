@@ -56,7 +56,7 @@ export default function DetailContainer(props: Props) {
   const panels = [
     {
       label: '글쓰기',
-      panel: <LeafCreateForm {...{ myId, titleId: memo.id }} />,
+      panel: <LeafCreateForm {...{ myId, memo, updateItem: updateDetail }} />,
       categorys: [],
     },
     {

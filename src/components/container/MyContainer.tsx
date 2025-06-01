@@ -7,6 +7,7 @@ import MemoList from '@/components/memo/MemoList'
 import TabBox from '../common/TabBox'
 import { ArrowBack } from '@mui/icons-material'
 import { Button } from '@mui/material'
+import MyNote from '../user/MyNote'
 
 interface Props {
   profile: ProfileData
@@ -50,11 +51,17 @@ export default function MyContainer({ profile, myId }: Props) {
 
   const panels = [
     {
-      label: '다이어리',
+      label: '메인',
+      panel: <MyNote {...profile} />,
+      categorys: [],
+    },
+    {
+      label: '보관함',
       panel: <MemoList {...{ myId, memos, query, actions }} />,
       categorys: [
         { label: `${profile.name}님의 글`, value: 'mypost' },
         { label: '북마크', value: 'bookmark' },
+        { label: '좋아요', value: 'favorite' },
       ],
       select: (category: string) => {
         setAria(category)

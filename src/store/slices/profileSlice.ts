@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { updateProfile } from '@/shared/fetch/usersApi'
 import { UserParams } from '@/shared/types/api'
-import { UserData } from '@/shared/types/client'
+import { ProfileData, UserData } from '@/shared/types/client'
 
-export const updateProfileThunk = createAsyncThunk<UserData, UserParams>('user/updateProfile', async (params) => {
+export const updateProfileThunk = createAsyncThunk<ProfileData, UserParams>('user/updateProfile', async (params) => {
   try {
     return await updateProfile(params)
   } catch (error) {

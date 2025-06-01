@@ -12,8 +12,10 @@ model User {
   userNum      Int?
   credit       String   @unique
   name         String   
-  image        String
   info         String?
+  note         String?  @db.Text
+  image        String
+  cover        String?
   memos        Memo[]
   bookmarks    BookMark[]
   favorites    Favorite[]

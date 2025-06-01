@@ -6,10 +6,11 @@ import { Dispatch, SetStateAction, useCallback, useState } from 'react'
 interface Props {
   image: { new: boolean; url: string }
   setImage: Dispatch<SetStateAction<{ new: boolean; url: string }>>
+  isCover?: boolean
 }
 
 export default function ImgUploader(props: Props) {
-  const { image, setImage } = props
+  const { image, setImage, isCover } = props
   const [message, setMessage] = useState('')
 
   const handleImageChange = useCallback(
@@ -34,17 +35,21 @@ export default function ImgUploader(props: Props) {
     [setImage]
   )
 
+  const width = isCover ? '100%' : 120
+  const height = isCover ? 140 : 120
+  const borderRadius = isCover ? 2 : 60
+
   return (
     <Stack>
       <Button
         component="label"
         sx={{
-          width: 120,
+          width,
           justifyContent: 'center',
           overflow: 'hidden',
           background: '#666',
           p: 0,
-          borderRadius: 60,
+          borderRadius,
         }}
         variant="contained"
       >
@@ -59,7 +64,7 @@ export default function ImgUploader(props: Props) {
         >
           <AddPhotoAlternate />
         </Stack>
-        <Avatar sx={{ width: 120, height: 120 }} src={image.url} alt="새로운 프로필 사진" />
+        <Avatar sx={{ width, height }} variant={isCover ? 'rounded' : 'circular'} src={image.url} alt="새로운 프로필 사진" />
         <Box display="none">
           <input type="file" accept="image/*" onChange={handleImageChange} />
         </Box>

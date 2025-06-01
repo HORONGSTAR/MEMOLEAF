@@ -17,8 +17,10 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
     select: {
       id: true,
       name: true,
-      image: true,
       info: true,
+      note: true,
+      image: true,
+      cover: true,
       userNum: true,
       followings: true,
     },

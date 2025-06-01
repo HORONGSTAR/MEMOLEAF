@@ -1,4 +1,4 @@
-export type MemosAria = 'home' | 'mypost' | 'bookmark' | 'thread' | 'search' | string
+export type MemosAria = 'home' | 'mypost' | 'bookmark' | 'favorite' | 'thread' | 'search' | string
 
 export interface GetMemosParams {
   [key: string]: unknown
@@ -31,9 +31,6 @@ export interface UserParams {
   name?: string
   image?: string
   info?: string
-}
-
-export interface CommentParams {
-  id: number
-  text: string
+  note?: string
+  cover?: string
 }

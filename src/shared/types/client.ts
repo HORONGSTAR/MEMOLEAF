@@ -23,6 +23,8 @@ export type DecoData = {
   }
 }
 export interface ProfileData extends UserData {
+  note?: string | null
+  cover?: string | null
   followings?: { followerId: number; followingId: number }[]
 }
 

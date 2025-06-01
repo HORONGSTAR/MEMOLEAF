@@ -25,13 +25,15 @@ export default function SettingContainer() {
           setOpen2(true)
         })
         .catch(() => setMessage('메모 삭제 중 문제가 발생했습니다.'))
-    if (aria === 'account')
+    if (aria === 'account') {
+      if (myId === 1) return setMessage('데모 계정은 삭제할 수 없어요.')
       deleteUserAccount(myId)
         .then(() => {
           setOpen1(false)
           setOpen2(true)
         })
         .catch(() => setMessage('계정 삭제 중 문제가 발생했습니다.'))
+    }
   }, [aria, myId])
 
   const handleRedirect = useCallback(() => {
