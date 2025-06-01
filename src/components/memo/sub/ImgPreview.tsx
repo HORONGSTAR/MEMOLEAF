@@ -1,6 +1,6 @@
 'use client'
 import { Box, IconButton, ImageList, ImageListItem, Stack, TextField, Typography } from '@mui/material'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useState } from 'react'
 import { Cancel, NoteAlt } from '@mui/icons-material'
 import { UploadData } from '@/shared/types/client'
 import { imgPath } from '@/shared/utils/common'
@@ -17,15 +17,18 @@ export default function ImgForm({ images, setImages }: Props) {
   const [open, setOpen] = useState(false)
   const [index, setIndex] = useState(0)
 
-  const removeFile = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index))
-  }
+  const removeFile = useCallback(
+    (index: number) => {
+      setImages((prev) => prev.filter((_, i) => i !== index))
+    },
+    [setImages]
+  )
 
-  const addAlt = () => {
+  const addAlt = useCallback(() => {
     setAlt('')
     setOpen(false)
     setImages((prev) => prev.map((img, i) => (i !== index ? img : { ...img, alt })))
-  }
+  }, [alt, index, setImages])
 
   const handleChange = (value: string) => {
     if (value.length > 191) return

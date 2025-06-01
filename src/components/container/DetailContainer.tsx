@@ -1,13 +1,14 @@
 'use client'
-import { Snackbar, Typography } from '@mui/material'
 import { ReactNode, useState } from 'react'
+import { Typography } from '@mui/material'
 import { MemoData, UserData } from '@/shared/types/client'
+import MemoEditForm from '@/components/memo/MemoEditForm'
 import MemoBox from '@/components/memo/MemoBox'
-import MemoEditForm from '../memo/MemoEditForm'
-import LeafList from '../memo/LeafList'
-import TabBox from '../common/TabBox'
-import { UserBox, UserList } from '../user'
-import LeafCreateForm from '../memo/LeafCreateForm'
+import LeafCreateForm from '@/components/memo/LeafCreateForm'
+import LeafList from '@/components/memo/LeafList'
+import TabBox from '@/components/common/TabBox'
+import UserBox from '@/components/user/UserBox'
+import UserList from '@/components/user/UserList'
 
 interface Props {
   myId: number
@@ -19,10 +20,9 @@ interface Props {
 
 export default function DetailContainer(props: Props) {
   const { firstLoadMemo, myId, children, updateItem, removeItem } = props
+  const [box, setBox] = useState('item')
   const [memo, setMemo] = useState<MemoData>(firstLoadMemo)
   const [users, setUsers] = useState<UserData[]>([])
-  const [message, setMessage] = useState('')
-  const [box, setBox] = useState('item')
   const [filter, setFilter] = useState('new')
   const [cursor, setCursor] = useState<undefined | number>(undefined)
   const [leafs, setLeafs] = useState<MemoData[]>([])
@@ -40,7 +40,7 @@ export default function DetailContainer(props: Props) {
   const TitleBox = () => {
     const edit = () => setBox('edit')
     const remove = () => (removeItem ? removeItem(memo.id) : setBox('empty'))
-    const actions = { close: () => setBox('item'), alert: (text: string) => setMessage(text) }
+    const actions = { close: () => setBox('item') }
     const item = <MemoBox {...{ memo, myId, remove, edit, updateItem: updateDetail }} />
     const form = <MemoEditForm {...{ memo }} {...actions} updateItem={updateDetail} />
     const empty = (
@@ -102,7 +102,6 @@ export default function DetailContainer(props: Props) {
           setCursor(undefined)
         }}
       />
-      <Snackbar open={message ? true : false} autoHideDuration={6000} onClose={() => setMessage('')} message={message} />
     </>
   )
 }

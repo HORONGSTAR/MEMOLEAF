@@ -1,7 +1,9 @@
 'use client'
 import { followUser, unfollowUser } from '@/shared/fetch/usersApi'
-import { Button, Snackbar } from '@mui/material'
+import { Button } from '@mui/material'
 import { useState } from 'react'
+import { useAppDispatch } from '@/store/hooks'
+import { openAlert } from '@/store/slices/alertSlice'
 
 interface Props {
   followingId: number
@@ -10,20 +12,38 @@ interface Props {
 }
 
 export default function FollowButton(props: Props) {
-  const [message, setMessage] = useState('')
   const [state, setState] = useState(props.state || 'follow')
   const { followingId, followingName } = props
+  const dispatch = useAppDispatch()
 
   const handleFollow = () => {
     followUser(followingId)
-    setState('follow')
-    setMessage(followingName + '님을 팔로우 했습니다.')
+      .then(() => {
+        setState('follow')
+        dispatch(
+          openAlert({
+            message: followingName + '님을 팔로우 했습니다.',
+          })
+        )
+      })
+      .catch(({ message }) => {
+        dispatch(openAlert({ message, severity: 'error' }))
+      })
   }
 
   const handleUnFollow = () => {
     unfollowUser(followingId)
-    setState('unfollow')
-    setMessage(followingName + '님을 언팔로우 했습니다.')
+      .then(() => {
+        setState('unfollow')
+        dispatch(
+          openAlert({
+            message: followingName + '님을 언팔로우 했습니다.',
+          })
+        )
+      })
+      .catch(({ message }) => {
+        dispatch(openAlert({ message, severity: 'error' }))
+      })
   }
 
   const followButton = {
@@ -32,16 +52,5 @@ export default function FollowButton(props: Props) {
     none: null,
   }[state]
 
-  return (
-    <>
-      {followButton}
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={message ? true : false}
-        autoHideDuration={6000}
-        onClose={() => setMessage('')}
-        message={message}
-      />
-    </>
-  )
+  return followButton
 }

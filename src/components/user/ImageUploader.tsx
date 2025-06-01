@@ -1,7 +1,9 @@
 'use client'
 import { AddPhotoAlternate } from '@mui/icons-material'
-import { Button, Stack, Box, Avatar, Snackbar } from '@mui/material'
-import { Dispatch, SetStateAction, useCallback, useState } from 'react'
+import { Button, Stack, Box, Avatar } from '@mui/material'
+import { Dispatch, SetStateAction, useCallback } from 'react'
+import { useAppDispatch } from '@/store/hooks'
+import { openAlert } from '@/store/slices/alertSlice'
 
 interface Props {
   image: { new: boolean; url: string }
@@ -11,7 +13,7 @@ interface Props {
 
 export default function ImgUploader(props: Props) {
   const { image, setImage, isCover } = props
-  const [message, setMessage] = useState('')
+  const dispatch = useAppDispatch()
 
   const handleImageChange = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,7 +21,12 @@ export default function ImgUploader(props: Props) {
       const maxSize = 5 * 1024 * 1024
       if (!file) return
       if (file.size > maxSize) {
-        setMessage('파일 크기는 5MB 이하로 업로드해주세요.')
+        dispatch(
+          openAlert({
+            message: '파일 크기는 5MB 이하로 업로드해주세요.',
+            severity: 'info',
+          })
+        )
         e.target.value = ''
         return
       }
@@ -32,7 +39,7 @@ export default function ImgUploader(props: Props) {
 
       setImage({ new: true, url: newImgUrls })
     },
-    [setImage]
+    [dispatch, setImage]
   )
 
   const width = isCover ? '100%' : 120
@@ -69,13 +76,6 @@ export default function ImgUploader(props: Props) {
           <input type="file" accept="image/*" onChange={handleImageChange} />
         </Box>
       </Button>
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={message ? true : false}
-        autoHideDuration={6000}
-        onClose={() => setMessage('')}
-        message={message}
-      />
     </Stack>
   )
 }

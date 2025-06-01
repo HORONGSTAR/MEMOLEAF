@@ -1,11 +1,14 @@
 'use client'
 import { ImgPreview, ImgForm, ToolBox, ToolItem } from '@/components/memo/sub'
 import { ReactNode, useCallback, useState } from 'react'
-import { Button, Snackbar, Stack, Box, InputBase } from '@mui/material'
+import { Button, Stack, Box, InputBase } from '@mui/material'
 import { DecoData, ImageData, UploadData } from '@/shared/types/client'
 import { MemoParams } from '@/shared/types/api'
 import { swapOnOff } from '@/shared/utils/common'
 import TextCount from '@/components/common/TextCount'
+import { useAppDispatch } from '@/store/hooks'
+import { openAlert } from '@/store/slices/alertSlice'
+import LiveAnnouncer from '@/components/common/LiveAnnouncer'
 
 interface IntiMemoValue {
   action: 'create' | 'update'
@@ -28,12 +31,19 @@ export default function MemoForm(inti: IntiMemoValue) {
   const [content, setContent] = useState(inti.content || '')
   const [images, setImages] = useState<UploadData[]>(inti?.images || [])
   const [decos, setDecos] = useState<DecoData>({ ...intiDecoValue, ...inti.decos })
-  const [message, setMessage] = useState('')
-
   const { action, id, titleId, children, onSubmint } = inti
+  const dispatch = useAppDispatch()
 
   const handleSubmit = useCallback(() => {
-    if (!content) return setMessage('내용을 입력하세요.')
+    if (!content) {
+      dispatch(
+        openAlert({
+          message: '내용을 입력하세요.',
+          severity: 'info',
+        })
+      )
+      return
+    }
     const formData = {
       decos: Object.keys(decos)
         .filter((key) => swapOnOff[decos[key].active].bool)
@@ -46,12 +56,12 @@ export default function MemoForm(inti: IntiMemoValue) {
     setContent('')
     setImages([])
     setDecos(intiDecoValue)
-  }, [content, decos, id, titleId, images, onSubmint])
+  }, [content, decos, id, titleId, images, onSubmint, dispatch])
 
-  const handleContentChange = (value: string) => {
+  const handleContentChange = useCallback((value: string) => {
     if (value.length > 191) return
     setContent(value)
-  }
+  }, [])
 
   return (
     <div onClick={(e) => e.stopPropagation()}>
@@ -85,13 +95,7 @@ export default function MemoForm(inti: IntiMemoValue) {
           }[action]
         }
       </Stack>
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={message ? true : false}
-        autoHideDuration={6000}
-        onClose={() => setMessage('')}
-        message={message}
-      />
+      <LiveAnnouncer message={content.length > 191 ? '최대 글자수를 넘겼습니다.' : ''} />
     </div>
   )
 }

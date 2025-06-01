@@ -1,12 +1,14 @@
 'use client'
 import { fetchMemos } from '@/shared/fetch/memosApi'
-import { Skeleton, Snackbar, Stack } from '@mui/material'
+import { Skeleton, Stack } from '@mui/material'
 import { Dispatch, SetStateAction, useCallback, useRef, useState } from 'react'
 import { MemoData } from '@/shared/types/client'
 import CursorObserver from '@/components/common/CursorObserver'
 import LeafBox from './LeafBox'
 import MemoEditForm from './MemoEditForm'
 import { GetMemosParams } from '@/shared/types/api'
+import { useAppDispatch } from '@/store/hooks'
+import { openAlert } from '@/store/slices/alertSlice'
 
 interface Props {
   myId: number
@@ -19,10 +21,10 @@ interface Props {
 export default function LeafList(props: Props) {
   const { myId, leafs, query, setLeafs, setCursor } = props
   const [editId, setEdit] = useState(0)
-  const [message, setMessage] = useState('')
   const [loading, setLoading] = useState('off')
   const beforeQuery = useRef('')
 
+  const dispatch = useAppDispatch()
   const loadMoreLeafs = useCallback(() => {
     const cursor = query.cursor
     if (beforeQuery.current === JSON.stringify(query)) return
@@ -35,9 +37,11 @@ export default function LeafList(props: Props) {
         setLeafs((prev) => [...prev, ...result.memos])
         setCursor(result.nextCursor)
       })
-      .catch()
+      .catch(({ message }) => {
+        dispatch(openAlert({ message, severity: 'error' }))
+      })
       .finally(() => setLoading('off'))
-  }, [query, setCursor, setLeafs])
+  }, [dispatch, query, setCursor, setLeafs])
 
   const updateItem = (item: MemoData) => {
     setLeafs((prev) => {
@@ -46,7 +50,6 @@ export default function LeafList(props: Props) {
   }
   const actions = {
     close: () => setEdit(0),
-    alert: (text: string) => setMessage(text),
     updateItem,
   }
 
@@ -72,13 +75,6 @@ export default function LeafList(props: Props) {
 
       {{ on: loadingBox, off: null }[loading]}
       <CursorObserver loadMoreItems={loadMoreLeafs} />
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={message ? true : false}
-        autoHideDuration={6000}
-        onClose={() => setMessage('')}
-        message={message}
-      />
     </Stack>
   )
 }

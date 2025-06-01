@@ -1,5 +1,4 @@
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, DialogProps } from '@mui/material'
-
+import { Dialog, DialogTitle, DialogContent, DialogActions, DialogProps, Button } from '@mui/material'
 import { ReactNode } from 'react'
 
 interface Props extends DialogProps {

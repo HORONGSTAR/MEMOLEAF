@@ -1,13 +1,15 @@
 'use client'
 import { MemoData, ProfileData, UserData } from '@/shared/types/client'
-import { MyProfile, UserList, UserBox } from '@/components/user'
 import { useCallback, useMemo, useState } from 'react'
-import DetailContainer from '@/components/container/DetailContainer'
-import MemoList from '@/components/memo/MemoList'
-import TabBox from '../common/TabBox'
 import { ArrowBack } from '@mui/icons-material'
 import { Button } from '@mui/material'
+import DetailContainer from '@/components/container/DetailContainer'
+import MemoList from '@/components/memo/MemoList'
+import TabBox from '@/components/common/TabBox'
 import MyNote from '../user/MyNote'
+import MyProfile from '@/components/user/MyProfile'
+import UserList from '@/components/user/UserList'
+import UserBox from '@/components/user/UserBox'
 
 interface Props {
   profile: ProfileData
@@ -60,8 +62,8 @@ export default function MyContainer({ profile, myId }: Props) {
       panel: <MemoList {...{ myId, memos, query, actions }} />,
       categorys: [
         { label: `${profile.name}님의 글`, value: 'mypost' },
-        { label: '북마크', value: 'bookmark' },
         { label: '좋아요', value: 'favorite' },
+        { label: '북마크', value: 'bookmark' },
       ],
       select: (category: string) => {
         setAria(category)

@@ -1,9 +1,11 @@
 'use client'
 import { fetchtUsers } from '@/shared/fetch/usersApi'
 import { List, Skeleton, Typography } from '@mui/material'
-import { ReactNode, useCallback, useEffect, useRef, useState } from 'react'
-import { swapOnOff } from '@/shared/utils/common'
+import { ReactNode, useCallback, useRef, useState } from 'react'
 import { UserData } from '@/shared/types/client'
+import CursorObserver from '../common/CursorObserver'
+import { useAppDispatch } from '@/store/hooks'
+import { openAlert } from '@/store/slices/alertSlice'
 
 interface Props {
   children: ReactNode
@@ -20,16 +22,13 @@ export default function UserList(props: Props) {
   const [cursor, setCursor] = useState<undefined | number>(undefined)
   const [loading, setLoading] = useState('off')
   const isSameEndpoint = useRef(endpoint)
-  const observerRef = useRef(null)
+  const dispatch = useAppDispatch()
 
-  useEffect(() => {
+  const loadMoreUser = useCallback(() => {
     if (isSameEndpoint.current !== endpoint) {
       setCursor(undefined)
       isSameEndpoint.current = endpoint
     }
-  }, [endpoint])
-
-  const loadMoreUser = useCallback(() => {
     if (cursor && cursor < 0) return
     setLoading('on')
     fetchtUsers({ endpoint, query: { id: user?.id, cursor, ...query } })
@@ -38,24 +37,11 @@ export default function UserList(props: Props) {
         addUserList(result.users)
         setCursor(result.nextCursor)
       })
-      .catch()
+      .catch(({ message }) => {
+        dispatch(openAlert({ message, severity: 'error' }))
+      })
       .finally(() => setLoading('off'))
-  }, [addUserList, cursor, endpoint, query, user?.id])
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !swapOnOff[loading].bool) {
-          loadMoreUser()
-        }
-      },
-      { threshold: 0.1 }
-    )
-    if (observerRef.current) {
-      observer.observe(observerRef.current)
-    }
-    return () => observer.disconnect()
-  }, [loadMoreUser, loading])
+  }, [addUserList, cursor, dispatch, endpoint, query, user?.id])
 
   const followInfo = {
     follower: { [count]: `${user?.name}님의 팔로워 ${count}명`, 0: '팔로워 정보가 없습니다.' }[count],
@@ -72,7 +58,7 @@ export default function UserList(props: Props) {
         {user ? followInfo : null}
       </Typography>
       <List>{children}</List>
-      <div ref={observerRef} />
+      <CursorObserver loadMoreItems={loadMoreUser} />
       {{ on: loadingBox, off: null }[loading]}
     </>
   )

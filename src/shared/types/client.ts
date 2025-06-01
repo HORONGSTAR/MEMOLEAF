@@ -45,16 +45,9 @@ export interface MemoData {
   }
 }
 
-export interface AlarmJoinUser {
-  link: number
+export interface NotificationsData {
   id: number
-  aria: 'comment' | 'follow' | 'bookmark' | 'favorite'
-  sanderId: number
-  recipientId: number
+  aria: 'comment' | 'follow' | 'favorite'
+  memo?: { id: number; content: string } | null
   sander: UserData
-}
-
-export interface AlarmData {
-  alarms?: AlarmJoinUser[] | []
-  count?: number
 }

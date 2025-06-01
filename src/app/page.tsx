@@ -1,10 +1,10 @@
 import HomeContainer from '@/components/container/HomeContainer'
+import { Navbar, AlertBox } from '@/components/shared'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { decosToJson } from '@/shared/utils/common'
-import prisma from '@/lib/prisma'
-import Navbar from '@/components/shared/Navbar'
 import { Container } from '@mui/material'
+import prisma from '@/lib/prisma'
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions)
@@ -33,18 +33,17 @@ export default async function HomePage() {
     }
   })
 
-  const alarms = await prisma.alarm.findMany({
+  const notificationCount = await prisma.notification.count({
     where: { recipientId: userId || 0 },
-    take: 10,
-    include: { sander: true },
   })
 
   return (
     <>
-      <Navbar alarms={alarms} />
+      <Navbar count={notificationCount} />
       <Container component="main">
         <HomeContainer firstLoadMemos={memos} myId={userId || 0} />
       </Container>
+      <AlertBox />
     </>
   )
 }

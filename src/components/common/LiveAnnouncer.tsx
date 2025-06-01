@@ -1,10 +1,8 @@
 'use client'
-
 import React, { useEffect, useRef } from 'react'
 import Box from '@mui/material/Box'
 
 export type AriaLivePoliteness = 'off' | 'polite' | 'assertive'
-
 export interface LiveAnnouncerProps {
   message: string
   politeness?: AriaLivePoliteness
@@ -45,8 +43,6 @@ export default function LiveAnnouncer(props: LiveAnnouncerProps) {
         margin: '-1px',
         overflow: 'hidden',
         clip: 'rect(0, 0, 0, 0)',
-        whiteSpace: 'nowrap',
-        border: 0,
       }}
     >
       {message}

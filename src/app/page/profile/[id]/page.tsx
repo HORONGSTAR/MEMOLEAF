@@ -1,10 +1,9 @@
-import { Typography, Stack, Container } from '@mui/material'
-import { Error } from '@mui/icons-material'
 import MyContainer from '@/components/container/MyContainer'
-import prisma from '@/lib/prisma'
-import Navbar from '@/components/shared/Navbar'
+import { Container } from '@mui/material'
 import { authOptions } from '@/lib/auth'
 import { getServerSession } from 'next-auth'
+import prisma from '@/lib/prisma'
+import { NotFound, Navbar, AlertBox } from '@/components/shared'
 
 export default async function MyPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions)
@@ -26,27 +25,15 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
     },
   })
 
-  const alarms = await prisma.alarm.findMany({
+  const notificationCount = await prisma.notification.count({
     where: { recipientId: userId || 0 },
-    take: 10,
-    include: { sander: true },
   })
 
   return (
     <>
-      <Navbar alarms={alarms} />
-      {profile ? (
-        <Container component="main">
-          <MyContainer profile={profile} myId={myId || 0} />
-        </Container>
-      ) : (
-        <Stack alignItems="center" spacing={2} pt={3}>
-          <Stack alignItems="center" sx={{ bgcolor: '#eee', p: 2, borderRadius: 3 }}>
-            <Error color="warning" sx={{ mb: 1 }} fontSize="large" />
-            <Typography color="textSecondary">존재하지 않는 페이지입니다.</Typography>
-          </Stack>
-        </Stack>
-      )}
+      <Navbar count={notificationCount} />
+      <Container component="main">{profile ? <MyContainer profile={profile} myId={myId || 0} /> : <NotFound />}</Container>
+      <AlertBox />
     </>
   )
 }

@@ -13,7 +13,7 @@ export async function DELETE(req: NextRequest) {
     const { id } = await req.json()
     const search = await prisma.user.findUnique({ where: { id } })
     if (!search) {
-      const message = '유저를 찾을 수 없습니다.'
+      const message = '계정 정보를 찾을 수 없습니다.'
       return NRes.json({ success: false, message }, { status: 404 })
     }
     if (id == !session.user.id) {
@@ -21,7 +21,7 @@ export async function DELETE(req: NextRequest) {
       return NRes.json({ success: false, message }, { status: 405 })
     }
     await prisma.user.delete({ where: { id } })
-    return NRes.json('계정 삭제 완료')
+    return NRes.json('계정 삭제를 완료했습니다.')
   } catch (error) {
     console.error(error)
     const message = '계정 삭제 중 문제가 발생했습니다.'

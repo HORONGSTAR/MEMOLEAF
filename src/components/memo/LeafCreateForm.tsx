@@ -1,5 +1,5 @@
 'use client'
-import { Snackbar, Stack } from '@mui/material'
+import { Stack } from '@mui/material'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { MemoData } from '@/shared/types/client'
 import LeafBox from './LeafBox'
@@ -14,7 +14,6 @@ interface Props {
 
 export default function LeafCreateForm(props: Props) {
   const { myId, memo, updateItem } = props
-  const [message, setMessage] = useState('')
   const [leafs, setLeafs] = useState<MemoData[]>([])
   const [editId, setEdit] = useState(0)
   const formRef = useRef<HTMLDivElement>(null)
@@ -30,7 +29,7 @@ export default function LeafCreateForm(props: Props) {
     }
   }, [leafs.length])
 
-  const actions = { close: () => setEdit(0), alert: (text: string) => setMessage(text) }
+  const actions = { close: () => setEdit(0) }
   const updateLeaf = (item: MemoData) => {
     setLeafs((prev) => {
       return prev.map((p) => (p.id !== item.id ? p : { ...p, ...item }))
@@ -58,14 +57,7 @@ export default function LeafCreateForm(props: Props) {
       {leafs.map((leaf: MemoData) => (
         <LeafItem key={'thread' + leaf.id} {...leaf} />
       ))}
-      <MemoCreateForm add={addCreatedLeaf} titleId={memo.id} alert={(text: string) => setMessage(text)} />
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={message ? true : false}
-        autoHideDuration={6000}
-        onClose={() => setMessage('')}
-        message={message}
-      />
+      <MemoCreateForm add={addCreatedLeaf} titleId={memo.id} />
       <div ref={formRef} />
     </Stack>
   )

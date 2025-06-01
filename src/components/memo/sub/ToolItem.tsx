@@ -5,6 +5,7 @@ import { ExpandMore, DriveFileRenameOutline, Key } from '@mui/icons-material'
 import { swapOnOff } from '@/shared/utils/common'
 import { DecoData } from '@/shared/types/client'
 import DialogBox from '@/components/common/DialogBox'
+import LiveAnnouncer from '@/components/common/LiveAnnouncer'
 
 interface Props {
   decos: DecoData
@@ -15,11 +16,12 @@ export default function ToolItem(props: Props) {
   const { decos, setDecos } = props
   const [edit, setEdit] = useState('off')
   const [open, setOpen] = useState('off')
+  const [message, setMessage] = useState('')
   const theme = useTheme()
 
   const handleChangeSubtext = useCallback(
     (value: string) => {
-      if (value.length > 30) return
+      if (value.length > 30) return setMessage('덧붙임 내용의 최대 글자수를 넘겼습니다.')
       setDecos((prev) => ({ ...prev, subtext: { active: 'on', extra: value } }))
     },
     [setDecos]
@@ -27,7 +29,7 @@ export default function ToolItem(props: Props) {
 
   const handleChangeFolder = useCallback(
     (value: string) => {
-      if (value.length > 16) return
+      if (value.length > 16) return setMessage('접힌 글 라벨의 최대 글자수를 넘겼습니다.')
       setDecos((prev) => ({ ...prev, folder: { active: 'on', extra: value } }))
     },
     [setDecos]
@@ -35,7 +37,7 @@ export default function ToolItem(props: Props) {
 
   const handleChangeSecret = useCallback(
     (value: string) => {
-      if (value.length > 12) return
+      if (value.length > 12) return setMessage('비밀번호의 최대 글자수를 넘겼습니다.')
       setDecos((prev) => ({ ...prev, secret: { active: 'on', extra: value } }))
     },
     [setDecos]
@@ -134,6 +136,7 @@ export default function ToolItem(props: Props) {
       {secretBox}
       {subtextBox}
       {folderBox}
+      <LiveAnnouncer message={message} />
     </Stack>
   )
 }

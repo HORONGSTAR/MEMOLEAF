@@ -3,6 +3,8 @@ import { createFavorite, deleteFavorite } from '@/shared/fetch/feedbackApi'
 import { Favorite, FavoriteBorder } from '@mui/icons-material'
 import { IconButton } from '@mui/material'
 import { useCallback, useState } from 'react'
+import { useAppDispatch } from '@/store/hooks'
+import { openAlert } from '@/store/slices/alertSlice'
 
 interface Props {
   id: number
@@ -15,6 +17,7 @@ export default function FavoriteToggle(props: Props) {
   const [checked, setChecked] = useState(props.checked)
   const [loading, setLoading] = useState(false)
   const { update } = props
+  const dispatch = useAppDispatch()
 
   const handleCreateFavorite = useCallback(() => {
     setLoading(true)
@@ -23,12 +26,15 @@ export default function FavoriteToggle(props: Props) {
         setId(result)
         update({ id: result }, 'add')
         setChecked('on')
+        dispatch(openAlert({ message: '좋아요를 추가했습니다.' }))
       })
-      .catch()
+      .catch(({ message }) => {
+        dispatch(openAlert({ message, severity: 'error' }))
+      })
       .finally(() => {
         setLoading(false)
       })
-  }, [id, update])
+  }, [dispatch, id, update])
 
   const handleDeleteFavorite = useCallback(() => {
     setLoading(true)
@@ -37,12 +43,15 @@ export default function FavoriteToggle(props: Props) {
         setId(result)
         update(undefined, 'remove')
         setChecked('off')
+        dispatch(openAlert({ message: '좋아요를 취소했습니다.' }))
       })
-      .catch()
+      .catch(({ message }) => {
+        dispatch(openAlert({ message, severity: 'error' }))
+      })
       .finally(() => {
         setLoading(false)
       })
-  }, [id, update])
+  }, [dispatch, id, update])
 
   const button = {
     on: (

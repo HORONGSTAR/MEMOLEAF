@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
       return NRes.json({ success: false, message }, { status: 404 })
     }
     const followId = await prisma.follow.create({ data: { followerId, followingId } })
-    await prisma.alarm.create({
-      data: { link: followerId, sanderId: followerId, recipientId: followingId, aria: 'follow' },
+    await prisma.notification.create({
+      data: { sanderId: followerId, recipientId: followingId, aria: 'follow' },
     })
 
     return NRes.json(followId)
@@ -71,9 +71,10 @@ export async function PATCH(req: NextRequest) {
       },
     })
     return NRes.json(result)
-  } catch (err) {
-    console.error(err)
-    return NRes.json({ success: false, message: '프로필 수정 중 문제가 발생했습니다.' }, { status: 500 })
+  } catch (error) {
+    console.error(error)
+    const message = '프로필 수정 중 문제가 발생했습니다.'
+    return NRes.json({ success: false, message }, { status: 500 })
   }
 }
 

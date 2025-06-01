@@ -6,27 +6,32 @@ import { useCallback } from 'react'
 import { MemoParams } from '@/shared/types/api'
 import { MemoData, UploadData } from '@/shared/types/client'
 import { uploadImages } from '@/shared/fetch/uploadApi'
+import { useAppDispatch } from '@/store/hooks'
+import { openAlert } from '@/store/slices/alertSlice'
 
 interface Props {
   memo: MemoData
   updateItem: (item: MemoData) => void
   close: () => void
-  alert: (text: string) => void
 }
 
-export default function MemoEditForm({ memo, updateItem, close, alert }: Props) {
+export default function MemoEditForm({ memo, updateItem, close }: Props) {
+  const dispatch = useAppDispatch()
+
   const handleUpdateMemo = useCallback(
     (params: MemoParams, images: UploadData[]) => {
       updateMemo(params)
         .then((result) => {
-          alert('메모를 수정했습니다.')
+          dispatch(openAlert({ message: '메모를 수정했습니다.' }))
           uploadImages(images, result.id)
           updateItem({ ...result, images })
           close()
         })
-        .catch(() => alert('메모 수정 중 문제가 발생했습니다.'))
+        .catch(({ message }) => {
+          dispatch(openAlert({ message, severity: 'error' }))
+        })
     },
-    [updateItem, close, alert]
+    [dispatch, updateItem, close]
   )
 
   return (

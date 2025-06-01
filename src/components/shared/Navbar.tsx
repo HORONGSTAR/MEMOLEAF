@@ -1,13 +1,11 @@
 'use client'
-import { AppBar, Toolbar, Container, Box, IconButton } from '@mui/material'
+import { AppBar, Toolbar, Container, Box, IconButton, Badge } from '@mui/material'
 import Account from '@/components/auth/Account'
 import Image from 'next/image'
-import { Search } from '@mui/icons-material'
-import AlarmBox from './AlarmBox'
+import { Notifications, Search } from '@mui/icons-material'
 import Link from 'next/link'
-import { AlarmData } from '@/shared/types/client'
 
-export default function Navbar({ alarms }: AlarmData) {
+export default function Navbar({ count }: { count: number }) {
   return (
     <>
       <AppBar sx={{ bgcolor: 'Background', color: 'inherit' }} elevation={1}>
@@ -20,7 +18,11 @@ export default function Navbar({ alarms }: AlarmData) {
             <IconButton aria-label="검색 페이지" component={Link} href="/page/search">
               <Search />
             </IconButton>
-            <AlarmBox alarms={alarms} />
+            <IconButton aria-label="알림 페이지" component={Link} href="/page/notifications">
+              <Badge aria-controls="" badgeContent={count} color="primary" max={99}>
+                <Notifications />
+              </Badge>
+            </IconButton>
             <Account />
           </Toolbar>
         </Container>

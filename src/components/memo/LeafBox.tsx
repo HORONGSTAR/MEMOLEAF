@@ -1,5 +1,5 @@
 'use client'
-import { Snackbar, Typography, ListItem, ListItemText, Avatar, ListItemAvatar } from '@mui/material'
+import { Typography, ListItem, ListItemText, Avatar, ListItemAvatar } from '@mui/material'
 import { MoreHoriz, DeleteOutline, EditOutlined } from '@mui/icons-material'
 import { useCallback, useState } from 'react'
 import { DecoBox, ImgGrid } from '@/components/memo/sub'
@@ -9,6 +9,8 @@ import { MemoData } from '@/shared/types/client'
 import MemoMenu from '@/components/memo/MemoMenu'
 import DialogBox from '@/components/common/DialogBox'
 import LinkBox from '../common/LinkBox'
+import { useAppDispatch } from '@/store/hooks'
+import { openAlert } from '@/store/slices/alertSlice'
 
 interface Props {
   leaf: MemoData
@@ -19,14 +21,20 @@ interface Props {
 
 export default function LeafBox({ leaf, myId, edit, remove }: Props) {
   const [open, setOpen] = useState(false)
-  const [message, setMessage] = useState('')
   const isMine = checkOnOff(leaf.user.id, myId || 0)
 
+  const dispatch = useAppDispatch()
   const handleDelete = useCallback(() => {
     deleteMemo(leaf.id)
-    setOpen(false)
-    remove()
-  }, [leaf, remove])
+      .then(() => {
+        remove()
+        dispatch(openAlert({ message: '메모를 삭제했습니다.' }))
+      })
+      .catch(({ message }) => {
+        dispatch(openAlert({ message, severity: 'error' }))
+      })
+      .finally(() => setOpen(false))
+  }, [dispatch, leaf.id, remove])
 
   const memu = (
     <MemoMenu
@@ -67,13 +75,7 @@ export default function LeafBox({ leaf, myId, edit, remove }: Props) {
           <ImgGrid images={leaf.images} />
         </ListItem>
       </DecoBox>
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={message ? true : false}
-        autoHideDuration={6000}
-        onClose={() => setMessage('')}
-        message={message}
-      />
+
       <DialogBox {...dialogProps}>
         <Typography>삭제한 메모는 복구할 수 없습니다.</Typography>
       </DialogBox>

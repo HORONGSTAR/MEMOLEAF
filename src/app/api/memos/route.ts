@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse as NRes } from 'next/server'
-import prisma from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { decosToJson } from '@/shared/utils/common'
+import prisma from '@/lib/prisma'
 
 export async function GET(req: NextRequest) {
   try {
@@ -121,8 +121,8 @@ export async function POST(req: NextRequest) {
         return NRes.json({ success: false, message }, { status: 404 })
       }
       if (title.userId !== id) {
-        await prisma.alarm.create({
-          data: { sanderId: id, recipientId: title.userId, link: titleId, aria: 'comment' },
+        await prisma.notification.create({
+          data: { sanderId: id, recipientId: title.userId, memoId: titleId, aria: 'comment' },
         })
       }
     }

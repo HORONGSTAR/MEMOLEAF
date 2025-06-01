@@ -1,6 +1,6 @@
 import { IconButton, Stack, SvgIcon } from '@mui/material'
-import { signIn } from 'next-auth/react'
 import { googleIcon, kakaoIcon, naverIcon } from '@/styles/Icons'
+import { signIn } from 'next-auth/react'
 
 export default function LoginBox() {
   return (

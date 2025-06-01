@@ -1,5 +1,5 @@
 'use client'
-import { Button, Snackbar } from '@mui/material'
+import { Button } from '@mui/material'
 import { useState } from 'react'
 import { MemoData } from '@/shared/types/client'
 import MemoList from '@/components/memo/MemoList'
@@ -16,7 +16,6 @@ interface Props {
 export default function HomeContainer({ firstLoadMemos, myId }: Props) {
   const [cursor, setCursor] = useState<undefined | number>(firstLoadMemos[9]?.id || -1)
   const [memos, setMemos] = useState<MemoData[]>(firstLoadMemos || [])
-  const [message, setMessage] = useState('')
   const [index, setIndex] = useState<number>(NaN)
 
   const applyDetail = (index: number) => {
@@ -46,7 +45,7 @@ export default function HomeContainer({ firstLoadMemos, myId }: Props) {
 
   const actions = { addItems, updateItem, removeItem, applyDetail }
 
-  const form = <MemoCreateForm add={addCreatedItem} alert={(text: string) => setMessage(text)} />
+  const form = <MemoCreateForm add={addCreatedItem} />
 
   const home = (
     <>
@@ -67,16 +66,5 @@ export default function HomeContainer({ firstLoadMemos, myId }: Props) {
     </DetailContainer>
   )
 
-  return (
-    <>
-      {{ [index]: detail, NaN: home }[index]}
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={message ? true : false}
-        autoHideDuration={6000}
-        onClose={() => setMessage('')}
-        message={message}
-      />
-    </>
-  )
+  return { [index]: detail, NaN: home }[index]
 }

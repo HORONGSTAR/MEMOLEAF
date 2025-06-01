@@ -9,6 +9,7 @@ import { useSession } from 'next-auth/react'
 import { UserParams } from '@/shared/types/api'
 import { ProfileData } from '@/shared/types/client'
 import ImageUploader from '@/components/user/ImageUploader'
+import { openAlert } from '@/store/slices/alertSlice'
 
 export default function MyNote(inti: ProfileData) {
   const [profile, setProfile] = useState(inti)
@@ -21,10 +22,16 @@ export default function MyNote(inti: ProfileData) {
   const myId = session?.user.id
   const isMine = checkOnOff(profile.id, myId || 0)
 
-  const handleChangeNote = useCallback((value: string) => {
-    if (value.length === 0) return
-    setNote(value)
-  }, [])
+  const handleChangeNote = useCallback(
+    (value: string) => {
+      if (value.length === 0) {
+        dispatch(openAlert({ message: '내용을 입력하세요.', severity: 'info' }))
+        return
+      }
+      setNote(value)
+    },
+    [dispatch]
+  )
 
   const handleSubmit = useCallback(async () => {
     setEdit('off')
@@ -35,7 +42,13 @@ export default function MyNote(inti: ProfileData) {
     }
     dispatch(updateProfileThunk(userData))
       .unwrap()
-      .then((result) => setProfile((prev) => ({ ...prev, ...result })))
+      .then((result) => {
+        setProfile((prev) => ({ ...prev, ...result }))
+        dispatch(openAlert({ message: '노트를 수정했습니다.' }))
+      })
+      .catch(({ message }) => {
+        dispatch(openAlert({ message, severity: 'error' }))
+      })
   }, [note, cover, dispatch])
 
   const myButton = (

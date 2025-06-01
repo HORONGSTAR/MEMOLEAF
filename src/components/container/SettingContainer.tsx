@@ -1,17 +1,19 @@
 'use client'
-import { Typography, List, ListItem, Box, ListItemText, Button, Divider, Snackbar, Container } from '@mui/material'
+import { Typography, List, ListItem, Box, ListItemText, Button, Divider, Container } from '@mui/material'
 import { deleteAllMemos, deleteUserAccount } from '@/shared/fetch/settingsApi'
 import { useCallback, useState } from 'react'
 import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import DialogBox from '@/components/common/DialogBox'
+import { useAppDispatch } from '@/store/hooks'
+import { openAlert } from '@/store/slices/alertSlice'
 
 export default function SettingContainer() {
   const [open1, setOpen1] = useState(false)
   const [open2, setOpen2] = useState(false)
   const [aria, setAria] = useState('account')
   const { data: session } = useSession()
-  const [message, setMessage] = useState('')
+  const dispatch = useAppDispatch()
 
   const router = useRouter()
   const myId = session?.user.id
@@ -23,18 +25,31 @@ export default function SettingContainer() {
         .then(() => {
           setOpen1(false)
           setOpen2(true)
+          dispatch(openAlert({ message: '메모를 삭제했습니다.' }))
         })
-        .catch(() => setMessage('메모 삭제 중 문제가 발생했습니다.'))
+        .catch(({ message }) => {
+          dispatch(openAlert({ message, severity: 'error' }))
+        })
     if (aria === 'account') {
-      if (myId === 1) return setMessage('데모 계정은 삭제할 수 없어요.')
+      if (myId === 1) {
+        dispatch(
+          openAlert({
+            message: '데모 계정은 삭제할 수 없습니다.',
+            severity: 'info',
+          })
+        )
+        return
+      }
       deleteUserAccount(myId)
         .then(() => {
           setOpen1(false)
           setOpen2(true)
         })
-        .catch(() => setMessage('계정 삭제 중 문제가 발생했습니다.'))
+        .catch(({ message }) => {
+          dispatch(openAlert({ message, severity: 'error' }))
+        })
     }
-  }, [aria, myId])
+  }, [aria, dispatch, myId])
 
   const handleRedirect = useCallback(() => {
     if (!myId) return
@@ -129,13 +144,6 @@ export default function SettingContainer() {
       <DialogBox open={open2} title={'삭제 완료'} actionLabel="확인" onAction={handleRedirect}>
         {{ account: '계정 삭제를 마쳤습니다.', allmemo: '모든 메모를 삭제했습니다.' }[aria] || ''}
       </DialogBox>
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={message ? true : false}
-        autoHideDuration={6000}
-        onClose={() => setMessage('')}
-        message={message}
-      />
     </Container>
   )
 }

@@ -1,10 +1,11 @@
 'use client'
+import DetailContainer from '@/components/container/DetailContainer'
 import { Button, IconButton, Stack, TextField } from '@mui/material'
 import { MemoData, UserData } from '@/shared/types/client'
-import { UserList, UserBox } from '@/components/user'
 import { useCallback, useState } from 'react'
 import { ArrowBack, Search } from '@mui/icons-material'
-import DetailContainer from '@/components/container/DetailContainer'
+import UserList from '@/components/user/UserList'
+import UserBox from '@/components/user/UserBox'
 import MemoList from '@/components/memo/MemoList'
 import TabBox from '../common/TabBox'
 
@@ -101,6 +102,7 @@ export default function SearchContainer({ myId }: Props) {
       <Stack direction="row" component="form" justifyContent="center" py={1}>
         <TextField size="small" label="검색" value={text} onChange={(e) => handleChange(e.target.value)} />
         <IconButton
+          aria-label="검색하기"
           type="submit"
           onClick={(e) => {
             e.preventDefault()

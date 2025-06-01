@@ -23,8 +23,8 @@ export async function POST(req: NextRequest) {
     })
 
     if (userId !== memo.userId) {
-      await prisma.alarm.create({
-        data: { link: id, sanderId: userId, recipientId: memo.userId, aria: 'favorite' },
+      await prisma.notification.create({
+        data: { memoId: id, sanderId: userId, recipientId: memo.userId, aria: 'favorite' },
       })
     }
 
@@ -46,7 +46,7 @@ export async function DELETE(req: NextRequest) {
     const { id } = await req.json()
     const search = await prisma.favorite.findUnique({ where: { id } })
     if (!search) {
-      const message = '좋아요를 찾을 수 없습니다.'
+      const message = '등록한 좋아요를 찾을 수 없습니다.'
       return NRes.json({ success: false, message }, { status: 404 })
     }
     await prisma.favorite.delete({ where: { id } })

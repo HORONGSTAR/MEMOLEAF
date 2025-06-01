@@ -13,7 +13,8 @@ interface Props {
   }[]
 }
 
-export default function TabBox({ label, tabs, reset }: Props) {
+export default function TabBox(props: Props) {
+  const { label, tabs, reset } = props
   const [index, setIndex] = useState(0)
   const [checked, setChecked] = useState({ ...tabs.map((tab) => tab.categorys[0]?.value) })
 
@@ -54,7 +55,6 @@ export default function TabBox({ label, tabs, reset }: Props) {
             onClick={() => handleClick(category.value)}
           />
         ))}
-
         {tabs[index].panel}
       </div>
     </Box>

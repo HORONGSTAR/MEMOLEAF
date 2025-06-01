@@ -87,8 +87,8 @@ export default function ToolBox(props: Props) {
           ))}
         </Stack>
       </Collapse>
-      <LiveAnnouncer message={{ on: toolInfo, off: toolInfo + ' ' }[readToolInfo] || ''} />
-      <LiveAnnouncer message={{ on: '추가 기능창이 열렸습니다. 탭으로 탐색을 이어가세요.', off: '추가 기능창이 닫혔습니다.' }[extend] || ''} />
+      <LiveAnnouncer message={readToolInfo ? toolInfo : toolInfo + ' '} />
+      <LiveAnnouncer message={extend ? '추가 기능창이 열렸습니다.' : '추가 기능창이 닫혔습니다.'} />
     </Stack>
   )
 }

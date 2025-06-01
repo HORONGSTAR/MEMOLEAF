@@ -1,5 +1,5 @@
 'use client'
-import { Snackbar, Typography, ListItem, ListItemAvatar, ListItemText, Avatar, IconButton } from '@mui/material'
+import { Typography, ListItem, ListItemAvatar, ListItemText, Avatar, IconButton } from '@mui/material'
 import { MoreHoriz, DeleteOutline, EditOutlined, LinkOutlined, SmsOutlined } from '@mui/icons-material'
 import { useCallback, useState } from 'react'
 import { BookmarkToggle, FavoriteToggle, FeedbackCount } from '@/components/feedback'
@@ -10,6 +10,8 @@ import { MemoData } from '@/shared/types/client'
 import MemoMenu from '@/components/memo/MemoMenu'
 import LinkBox from '@/components/common/LinkBox'
 import DialogBox from '@/components/common/DialogBox'
+import { useAppDispatch } from '@/store/hooks'
+import { openAlert } from '@/store/slices/alertSlice'
 
 interface Props {
   myId: number
@@ -21,8 +23,9 @@ interface Props {
 
 export default function MemoBox({ memo, myId, edit, remove, updateItem }: Props) {
   const [open, setOpen] = useState(false)
-  const [message, setMessage] = useState('')
   const isMine = checkOnOff(memo.user.id, myId)
+
+  const dispatch = useAppDispatch()
 
   const handleDelete = useCallback(() => {
     deleteMemo(memo.id)
@@ -30,21 +33,18 @@ export default function MemoBox({ memo, myId, edit, remove, updateItem }: Props)
     remove()
   }, [memo, remove])
 
-  const copyText = async (text: string) => {
-    try {
-      await navigator.clipboard.writeText(text)
-      return '링크를 클립보드에 복사했습니다.'
-    } catch (err) {
-      console.error('복사 실패:', err)
-      return '링크 복사하는 중 문제가 발생했습니다.'
-    }
-  }
-
   const handleCopy = useCallback(async () => {
     const url = `${window.location.origin}/page/detail/${memo.id}`
-    const reuslt = copyText(url)
-    setMessage(await reuslt)
-  }, [memo])
+    try {
+      await navigator.clipboard.writeText(url)
+      const message = '링크를 클립보드에 복사했습니다.'
+      return dispatch(openAlert({ message, severity: 'info' }))
+    } catch (err) {
+      console.error('복사 실패:', err)
+      const message = '링크 복사하는 중 문제가 발생했습니다.'
+      return dispatch(openAlert({ message, severity: 'warning' }))
+    }
+  }, [dispatch, memo.id])
 
   const handleUpdateCount = useCallback(
     (value: { id: number } | undefined, action: 'add' | 'remove', field: 'bookmarks' | 'favorites') => {
@@ -101,7 +101,7 @@ export default function MemoBox({ memo, myId, edit, remove, updateItem }: Props)
       <ListItem>
         <ListItemText secondary={convertDate(memo.createdAt)} />
         <FeedbackCount count={memo._count.leafs}>
-          <IconButton size="small">
+          <IconButton size="small" aria-label="타래 보기">
             <SmsOutlined sx={{ fontSize: 18 }} />
           </IconButton>
         </FeedbackCount>
@@ -113,13 +113,6 @@ export default function MemoBox({ memo, myId, edit, remove, updateItem }: Props)
           <FavoriteToggle {...favoriteProps} update={(value, action) => handleUpdateCount(value, action, 'favorites')} />
         </FeedbackCount>
       </ListItem>
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={message ? true : false}
-        autoHideDuration={6000}
-        onClose={() => setMessage('')}
-        message={message}
-      />
       <DialogBox {...dialogProps}>
         <Typography>삭제한 메모는 복구할 수 없습니다.</Typography>
       </DialogBox>

@@ -22,12 +22,6 @@ export async function POST(req: NextRequest) {
       data: { memoId: id, userId },
     })
 
-    if (userId !== memo.userId) {
-      await prisma.alarm.create({
-        data: { link: id, sanderId: userId, recipientId: memo.userId, aria: 'bookmark' },
-      })
-    }
-
     return NRes.json(newBookmark.id)
   } catch (error) {
     console.error(error)
@@ -46,7 +40,7 @@ export async function DELETE(req: NextRequest) {
     const { id } = await req.json()
     const search = await prisma.bookMark.findUnique({ where: { id } })
     if (!search) {
-      const message = '북마크를 찾을 수 없습니다.'
+      const message = '등록한 북마크를 찾을 수 없습니다.'
       return NRes.json({ success: false, message }, { status: 404 })
     }
     await prisma.bookMark.delete({ where: { id } })

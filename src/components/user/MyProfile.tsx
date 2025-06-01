@@ -10,6 +10,7 @@ import { UserParams } from '@/shared/types/api'
 import { ProfileData } from '@/shared/types/client'
 import ImageUploader from '@/components/user/ImageUploader'
 import FollowButton from '@/components/user/FollowButton'
+import { openAlert } from '@/store/slices/alertSlice'
 
 export default function MyProfile(inti: ProfileData) {
   const [profile, setProfile] = useState(inti)
@@ -42,7 +43,13 @@ export default function MyProfile(inti: ProfileData) {
     }
     dispatch(updateProfileThunk(userData))
       .unwrap()
-      .then((result) => setProfile((prev) => ({ ...prev, ...result })))
+      .then((result) => {
+        setProfile((prev) => ({ ...prev, ...result }))
+        dispatch(openAlert({ message: '프로필을 수정했습니다.' }))
+      })
+      .catch(({ message }) => {
+        dispatch(openAlert({ message, severity: 'error' }))
+      })
   }, [name, info, image, dispatch])
 
   const followAction = useMemo(() => {

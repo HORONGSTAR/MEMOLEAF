@@ -1,12 +1,14 @@
 'use client'
 import { fetchMemos } from '@/shared/fetch/memosApi'
-import { Paper, Skeleton, Snackbar, Stack } from '@mui/material'
+import { Paper, Skeleton, Stack } from '@mui/material'
 import { useCallback, useRef, useState } from 'react'
 import { GetMemosParams } from '@/shared/types/api'
 import { MemoData } from '@/shared/types/client'
 import CursorObserver from '@/components/common/CursorObserver'
-import MemoBox from './MemoBox'
-import MemoEditForm from './MemoEditForm'
+import MemoBox from '@/components/memo/MemoBox'
+import MemoEditForm from '@/components/memo/MemoEditForm'
+import { useAppDispatch } from '@/store/hooks'
+import { openAlert } from '@/store/slices/alertSlice'
 
 interface Props {
   myId: number
@@ -23,10 +25,10 @@ interface Props {
 export default function MemoList(props: Props) {
   const { myId, memos, query, actions } = props
   const { addItems, updateItem, removeItem, applyDetail } = actions
-  const [message, setMessage] = useState('')
   const [loading, setLoading] = useState('off')
   const [editId, setEdit] = useState(0)
   const beforeQuery = useRef('')
+  const dispatch = useAppDispatch()
 
   const loadMoreMemos = useCallback(() => {
     const cursor = query.cursor
@@ -39,13 +41,14 @@ export default function MemoList(props: Props) {
       .then((result) => {
         addItems(result.memos, result.nextCursor)
       })
-      .catch(() => setMessage('게시글을 조회 중 문제가 발생했습니다.'))
+      .catch(({ message }) => {
+        dispatch(openAlert({ message, severity: 'error' }))
+      })
       .finally(() => setLoading('off'))
-  }, [addItems, query])
+  }, [addItems, dispatch, query])
 
   const MemoListItem = (memo: MemoData) => {
     const close = () => setEdit(0)
-    const alert = (text: string) => setMessage(text)
     const remove = () => removeItem(memo.id)
     const edit = () => setEdit(memo.id)
 
@@ -69,13 +72,6 @@ export default function MemoList(props: Props) {
       ))}
       <CursorObserver loadMoreItems={loadMoreMemos} />
       {{ on: loadingBox, off: null }[loading]}
-      <Snackbar
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        open={message ? true : false}
-        autoHideDuration={6000}
-        onClose={() => setMessage('')}
-        message={message}
-      />
     </Stack>
   )
 }

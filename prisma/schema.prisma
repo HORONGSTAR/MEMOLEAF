@@ -19,8 +19,8 @@ model User {
   memos        Memo[]
   bookmarks    BookMark[]
   favorites    Favorite[]
-  sanders      Alarm[]  @relation("sander")
-  recipients   Alarm[]  @relation("recipient")
+  sanders      Notification[]  @relation("sander")
+  recipients   Notification[]  @relation("recipient")
   followers    Follow[] @relation("follower")
   followings   Follow[] @relation("following")
   createdAt    DateTime @default(now())
@@ -36,19 +36,20 @@ model Follow {
 
 
 model Memo {
-  id           Int        @id @default(autoincrement())
-  content      String
-  decos        Deco[] 
-  images       Image[]
-  bookmarks    BookMark[]
-  favorites    Favorite[]
-  leafs        Memo[]     @relation("Thread")
-  titleId      Int?
-  title        Memo?      @relation("Thread", fields: [titleId], references: [id],onDelete: Cascade)
-  user         User       @relation(fields: [userId],references: [id],onDelete: Cascade)
-  userId       Int
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id             Int        @id @default(autoincrement())
+  content        String
+  decos          Deco[] 
+  images         Image[]
+  bookmarks      BookMark[]
+  favorites      Favorite[]
+  notifications  Notification[]
+  leafs          Memo[]     @relation("Thread")
+  titleId        Int?
+  title          Memo?      @relation("Thread", fields: [titleId], references: [id],onDelete: Cascade)
+  user           User       @relation(fields: [userId],references: [id],onDelete: Cascade)
+  userId         Int
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 }
 
 
@@ -102,18 +103,19 @@ model BookMark {
 enum Aria {
   comment
   follow
-  bookmark
   favorite
 }
 
-model Alarm{
+model Notification{
   id           Int        @id @default(autoincrement())
   aria         Aria
-  link         Int
   sanderId     Int
   recipientId  Int
-  sander       User @relation("sander", fields: [sanderId], references: [id])
-  recipient    User  @relation("recipient", fields: [recipientId], references: [id])
+  memoId       Int?
+  memo         Memo?       @relation(fields: [memoId], references: [id],onDelete: Cascade)
+  sander       User       @relation("sander", fields: [sanderId], references: [id])
+  recipient    User       @relation("recipient", fields: [recipientId], references: [id])
+  createdAt    DateTime   @default(now())
 
 }
 
