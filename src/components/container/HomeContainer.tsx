@@ -50,7 +50,7 @@ export default function HomeContainer({ firstLoadMemos, myId }: Props) {
   const home = (
     <>
       {{ [myId]: form, 0: <Welcome /> }[myId]}
-      <MemoList {...{ myId, memos, query: { cursor, aria: 'home' }, actions }} />
+      <MemoList {...{ myId, memos, query: { ...(cursor && { cursor }), aria: 'home' }, actions }} />
     </>
   )
   const detail = (

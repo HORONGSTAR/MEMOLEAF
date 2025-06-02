@@ -49,7 +49,7 @@ export default function MyContainer({ profile, myId }: Props) {
   }
 
   const actions = { addItems, updateItem, removeItem, applyDetail }
-  const query = useMemo(() => ({ id: profile.id, aria, cursor }), [aria, cursor, profile.id])
+  const query = useMemo(() => ({ id: profile.id, aria, ...(cursor && { cursor }) }), [aria, cursor, profile.id])
 
   const panels = [
     {

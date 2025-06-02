@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
     const session = await getServerSession(authOptions)
     const userId = session?.user.id
     const { searchParams } = new URL(req.url)
-    const cursor = parseInt(searchParams.get('cursor') || '0')
+    const cursor = searchParams.get('cursor')
     const id = parseInt(searchParams.get('id') || '0')
     const aria = searchParams.get('aria') || 'home'
     const keyword = searchParams.get('keyword')
@@ -27,30 +27,34 @@ export async function GET(req: NextRequest) {
 
     const whereData = {
       home: {},
-      thread: { titleId: id, ...(cursor && { id: { gt: cursor } }) },
+      thread: { titleId: id },
       mypost: { userId: id },
       bookmark: { bookmarks: { some: { userId: id } } },
       favorite: { favorites: { some: { userId: id } } },
       search: { ...(keyword && { content: { contains: keyword } }) },
-    }[aria]
+    }[aria || 'home']
 
     const filterData = {
+      none: {},
       all: { titleId: undefined },
       thread: { leafs: { some: {} } },
       images: { images: { some: {} } },
       serial: { user: { id: title?.userId } },
       comment: { user: { id: { not: title?.userId } } },
-    }[filter || 'all']
+    }[filter || 'none']
 
     const memolist = await prisma.memo.findMany({
       where: {
         titleId: null,
-        ...(cursor && { id: { lt: cursor } }),
         ...filterData,
         ...whereData,
       },
       take: 10,
-      orderBy: { createdAt: aria !== 'thread' ? 'desc' : 'asc' },
+      ...(cursor && {
+        cursor: { id: parseInt(cursor) },
+        skip: 1,
+      }),
+      orderBy: { id: aria !== 'thread' ? 'desc' : 'asc' },
       include: {
         images: { select: { id: true, url: true, alt: true } },
         decos: { select: { id: true, kind: true, extra: true } },

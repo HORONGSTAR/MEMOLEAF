@@ -45,31 +45,31 @@ async function migrateData() {
     console.log('✅ 사용자 데이터 마이그레이션 완료')
 
     // 2. 팔로우 데이터 마이그레이션
-    console.log('👥 팔로우 데이터 마이그레이션 중...')
-    const follows = await supabasePrisma.follow.findMany()
-    console.log(`${follows.length}개의 팔로우 관계 발견`)
+    // console.log('👥 팔로우 데이터 마이그레이션 중...')
+    // const follows = await supabasePrisma.follow.findMany()
+    // console.log(`${follows.length}개의 팔로우 관계 발견`)
 
-    for (const follow of follows) {
-      try {
-        await prismaPostgres.follow.upsert({
-          where: {
-            followerId_followingId: {
-              followerId: follow.followerId,
-              followingId: follow.followingId,
-            },
-          },
-          update: {},
-          create: {
-            followerId: follow.followerId,
-            followingId: follow.followingId,
-          },
-        })
-      } catch (error) {
-        console.error(`팔로우 관계 ${follow.followerId}->${follow.followingId} 마이그레이션 실패:`, error)
-        throw error
-      }
-    }
-    console.log('✅ 팔로우 데이터 마이그레이션 완료')
+    // for (const follow of follows) {
+    //   try {
+    //     await prismaPostgres.follow.upsert({
+    //       where: {
+    //         followerId_followingId: {
+    //           followerId: follow.followerId,
+    //           followingId: follow.followingId,
+    //         },
+    //       },
+    //       update: {},
+    //       create: {
+    //         followerId: follow.followerId,
+    //         followingId: follow.followingId,
+    //       },
+    //     })
+    //   } catch (error) {
+    //     console.error(`팔로우 관계 ${follow.followerId}->${follow.followingId} 마이그레이션 실패:`, error)
+    //     throw error
+    //   }
+    // }
+    // console.log('✅ 팔로우 데이터 마이그레이션 완료')
 
     // 3. 메모 데이터 마이그레이션
     console.log('📝 메모 데이터 마이그레이션 중...')
@@ -268,7 +268,7 @@ async function migrateData() {
     // 마이그레이션 결과 요약 출력
     console.log('\n📊 마이그레이션 결과 요약:')
     console.log(`- 사용자: ${users.length}명`)
-    console.log(`- 팔로우: ${follows.length}개`)
+    // console.log(`- 팔로우: ${follows.length}개`)
     console.log(`- 메모: ${memos.length}개`)
     console.log(`- 데코: ${decos.length}개`)
     console.log(`- 이미지: ${images.length}개`)

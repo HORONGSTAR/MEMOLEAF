@@ -5,14 +5,18 @@ import { NextRequest, NextResponse as NRes } from 'next/server'
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const cursor = parseInt(searchParams.get('cursor') || '0')
+    const cursor = searchParams.get('cursor')
     const id = parseInt(searchParams.get('id') || '0')
 
     const whereData = { followingId: id }
 
     const follows = await prisma.follow.findMany({
-      where: { ...(cursor && { followerId: { lt: cursor } }), ...whereData },
+      where: { ...whereData },
       take: 10,
+      ...(cursor && {
+        cursor: { id: parseInt(cursor) },
+        skip: 1,
+      }),
       orderBy: { followerId: 'desc' },
       include: {
         follower: { select: { id: true, name: true, image: true, info: true, userNum: true } },

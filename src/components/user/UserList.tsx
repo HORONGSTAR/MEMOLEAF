@@ -31,7 +31,7 @@ export default function UserList(props: Props) {
     }
     if (cursor && cursor < 0) return
     setLoading('on')
-    fetchtUsers({ endpoint, query: { id: user?.id, cursor, ...query } })
+    fetchtUsers({ endpoint, query: { id: user?.id, ...(cursor && { cursor }), ...query } })
       .then((result) => {
         setCount(result.searchTotal)
         addUserList(result.users)

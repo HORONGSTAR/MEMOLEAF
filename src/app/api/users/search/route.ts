@@ -4,7 +4,7 @@ import { NextRequest, NextResponse as NRes } from 'next/server'
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
-    const cursor = parseInt(searchParams.get('cursor') || '0')
+    const cursor = searchParams.get('cursor')
     const filter = searchParams.get('filter')
     const keyword = searchParams.get('keyword')
 
@@ -18,8 +18,12 @@ export async function GET(req: NextRequest) {
     const selectData = { id: true, name: true, image: true, info: true, userNum: true }
 
     const users = await prisma.user.findMany({
-      where: { ...(cursor && { id: { lt: cursor } }), ...whereData },
+      where: { ...whereData },
       take: 10,
+      ...(cursor && {
+        cursor: { id: parseInt(cursor) },
+        skip: 1,
+      }),
       orderBy: { createdAt: 'desc' },
       select: selectData,
     })

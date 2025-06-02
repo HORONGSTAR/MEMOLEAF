@@ -51,7 +51,7 @@ export default function DetailContainer(props: Props) {
     return { item, form, empty }[box]
   }
 
-  const query = { cursor, aria: 'thread', filter, id: memo.id }
+  const query = { ...(cursor && { cursor }), aria: 'thread', filter, id: memo.id }
 
   const panels = [
     {

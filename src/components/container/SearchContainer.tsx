@@ -60,7 +60,7 @@ export default function SearchContainer({ myId }: Props) {
     })
   }
 
-  const query = { cursor, aria: 'search', filter: filter.memo, keyword }
+  const query = { ...(cursor && { cursor }), aria: 'search', filter: filter.memo, keyword }
   const actions = { addItems, updateItem, removeItem, applyDetail }
 
   const panels = [

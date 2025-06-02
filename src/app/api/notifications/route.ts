@@ -9,11 +9,15 @@ export async function GET(req: NextRequest) {
     const session = await getServerSession(authOptions)
     const recipientId = session?.user.id
     const { searchParams } = new URL(req.url)
-    const cursor = parseInt(searchParams.get('cursor') || '0')
+    const cursor = searchParams.get('cursor')
 
     const notificationList = await prisma.notification.findMany({
-      where: { recipientId, id: { lt: cursor } },
+      where: { recipientId },
       take: 10,
+      ...(cursor && {
+        cursor: { id: parseInt(cursor) },
+        skip: 1,
+      }),
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
