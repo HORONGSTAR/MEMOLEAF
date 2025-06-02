@@ -1,5 +1,12 @@
 import prisma from '@/lib/prisma'
+import { Prisma } from '@prisma/client'
 import { NextRequest, NextResponse as NRes } from 'next/server'
+
+type FollowWithRelations = Prisma.FollowGetPayload<{
+  include: {
+    following: { select: { id: true; name: true; image: true; info: true; userNum: true } }
+  }
+}>
 
 export async function GET(req: NextRequest) {
   try {
@@ -7,16 +14,15 @@ export async function GET(req: NextRequest) {
     const cursor = parseInt(searchParams.get('cursor') || '0')
     const id = parseInt(searchParams.get('id') || '0')
     const whereData = { followerId: id }
-    const selectData = { select: { id: true, name: true, image: true, info: true, userNum: true } }
 
     const follows = await prisma.follow.findMany({
       where: { ...(cursor && { followingId: { lt: cursor } }), ...whereData },
       take: 10,
       orderBy: { followingId: 'desc' },
-      include: { following: selectData },
+      include: { following: { select: { id: true, name: true, image: true, info: true, userNum: true } } },
     })
 
-    const users = follows.map((follow) => follow.following)
+    const users = (follows as FollowWithRelations[]).map((follow) => follow.following)
     const searchTotal = await prisma.follow.count({ where: whereData })
     const nextCursor = users[9]?.id || -1
     return NRes.json({
