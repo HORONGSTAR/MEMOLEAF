@@ -2,6 +2,7 @@ import { NextRequest, NextResponse as NRes } from 'next/server'
 import prisma from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { NotificationWithRelations } from '@/shared/types/get'
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url)
     const cursor = parseInt(searchParams.get('cursor') || '0')
 
-    const notifications = await prisma.notification.findMany({
+    const notificationList = await prisma.notification.findMany({
       where: { recipientId, id: { lt: cursor } },
       take: 10,
       orderBy: { createdAt: 'desc' },
@@ -22,8 +23,9 @@ export async function GET(req: NextRequest) {
       },
     })
 
-    const nextCursor = notifications[9]?.id || -1
+    const notifications = notificationList as NotificationWithRelations[]
 
+    const nextCursor = notifications[9]?.id || -1
     return NRes.json({
       notifications,
       nextCursor,

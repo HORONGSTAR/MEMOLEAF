@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth'
 import { decosToJson } from '@/shared/utils/common'
 import { Container } from '@mui/material'
 import prisma from '@/lib/prisma'
+import { MemoWithRelations } from '@/shared/types/get'
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions)
@@ -24,7 +25,7 @@ export default async function HomePage() {
     },
   })
 
-  const memos = memolist.map((item) => {
+  const memos = (memolist as MemoWithRelations[]).map((item) => {
     return {
       ...item,
       decos: decosToJson(item.decos),

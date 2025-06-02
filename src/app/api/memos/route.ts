@@ -3,18 +3,7 @@ import { getServerSession } from 'next-auth'
 import { NextRequest, NextResponse as NRes } from 'next/server'
 import { decosToJson } from '@/shared/utils/common'
 import prisma from '@/lib/prisma'
-import { Prisma } from '@prisma/client'
-
-type MemoWithRelations = Prisma.MemoGetPayload<{
-  include: {
-    images: { select: { id: true; url: true; alt: true } }
-    decos: { select: { id: true; kind: true; extra: true } }
-    user: { select: { id: true; name: true; image: true; userNum: true } }
-    bookmarks: { where: { userId: number }; select: { id: true } }
-    favorites: { where: { userId: number }; select: { id: true } }
-    _count: { select: { favorites: true; bookmarks: true; leafs: true } }
-  }
-}>
+import { MemoWithRelations } from '@/shared/types/get'
 
 export async function GET(req: NextRequest) {
   try {

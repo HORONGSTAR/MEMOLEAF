@@ -1,12 +1,6 @@
 import prisma from '@/lib/prisma'
-import { Prisma } from '@prisma/client'
+import { FollowerWithRelations } from '@/shared/types/get'
 import { NextRequest, NextResponse as NRes } from 'next/server'
-
-type FollowWithRelations = Prisma.FollowGetPayload<{
-  include: {
-    follower: { select: { id: true; name: true; image: true; info: true; userNum: true } }
-  }
-}>
 
 export async function GET(req: NextRequest) {
   try {
@@ -25,7 +19,7 @@ export async function GET(req: NextRequest) {
       },
     })
 
-    const users = (follows as FollowWithRelations[]).map((follow) => follow.follower)
+    const users = (follows as FollowerWithRelations[]).map((follow) => follow.follower)
     const nextCursor = users[9]?.id || -1
     const searchTotal = await prisma.follow.count({ where: whereData })
     return NRes.json({

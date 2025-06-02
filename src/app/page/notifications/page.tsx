@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth'
 import AuthGuard from '@/components/auth/AuthGuard'
 import { Navbar, AlertBox } from '@/components/shared'
 import prisma from '@/lib/prisma'
+import { NotificationWithRelations } from '@/shared/types/get'
 
 export default async function notificationPage() {
   const session = await getServerSession(authOptions)
@@ -14,17 +15,17 @@ export default async function notificationPage() {
     where: { recipientId: myId || 0 },
   })
 
-  const notifications = await prisma.notification.findMany({
+  const notificationList = await prisma.notification.findMany({
     where: { recipientId: myId || 0 },
     take: 10,
     orderBy: { createdAt: 'desc' },
-    select: {
-      id: true,
-      aria: true,
+    include: {
       sander: { select: { id: true, name: true, image: true, info: true } },
       memo: { select: { id: true, content: true } },
     },
   })
+
+  const notifications = notificationList as NotificationWithRelations[]
 
   return (
     <>
