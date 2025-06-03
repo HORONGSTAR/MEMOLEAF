@@ -7,15 +7,17 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import DialogBox from '@/components/common/DialogBox'
 import LoginBox from '@/components/auth/LoginBox'
+import { useAppSelector } from '@/store/hooks'
 
 export default function Account() {
-  const { data: session } = useSession()
-  const myId = session?.user.id || 0
   const router = useRouter()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
-  const isNotLogin = checkOnOff(myId, 0)
+  const { data: session } = useSession()
+  const myId = session?.user.id || 0
+  const { profile } = useAppSelector((state) => state.profile)
 
+  const isNotLogin = checkOnOff(myId, 0)
   const menuOpen = Boolean(anchorEl)
 
   const dialogProps = {
@@ -46,7 +48,7 @@ export default function Account() {
         aria-haspopup="true"
         aria-expanded={menuOpen ? 'true' : undefined}
       >
-        <Avatar sx={{ width: 32, height: 32 }} src={imgPath + session?.user.image} alt={`${session?.user.name}프로필 사진`} />
+        <Avatar sx={{ width: 32, height: 32 }} src={imgPath + profile?.image} alt={`${profile?.name}의 계정`} />
       </IconButton>
     </Tooltip>
   )

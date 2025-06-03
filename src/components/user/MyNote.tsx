@@ -26,7 +26,7 @@ export default function MyNote(inti: ProfileData) {
     setNote(value)
   }
 
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = useCallback(() => {
     setEdit('off')
     const userData: UserParams = { note }
     if (cover.new) {

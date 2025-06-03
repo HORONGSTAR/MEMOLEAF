@@ -34,13 +34,14 @@ export default function MyProfile(inti: ProfileData) {
     setInfo(value)
   }, [])
 
-  const handleSubmit = useCallback(async () => {
+  const handleSubmit = useCallback(() => {
     setEdit('off')
     const userData: UserParams = { name, info }
     if (image.new) {
       userData.image = image.url
       setImage({ new: false, url: '' })
     }
+    dispatch(openAlert({ message: '프로필 수정 중...', severity: 'info' }))
     dispatch(updateProfileThunk(userData))
       .unwrap()
       .then((result) => {
