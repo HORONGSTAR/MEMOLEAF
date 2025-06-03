@@ -28,8 +28,9 @@ export default function FavoriteToggle(props: Props) {
         setChecked('on')
         dispatch(openAlert({ message: '좋아요를 추가했습니다.' }))
       })
-      .catch(({ message }) => {
-        dispatch(openAlert({ message, severity: 'error' }))
+      .catch((error) => {
+        console.error(error)
+        dispatch(openAlert({ message: '좋아요 추가 중 문제가 발생했습니다.', severity: 'error' }))
       })
       .finally(() => {
         setLoading(false)
@@ -45,8 +46,9 @@ export default function FavoriteToggle(props: Props) {
         setChecked('off')
         dispatch(openAlert({ message: '좋아요를 취소했습니다.' }))
       })
-      .catch(({ message }) => {
-        dispatch(openAlert({ message, severity: 'error' }))
+      .catch((error) => {
+        console.error(error)
+        dispatch(openAlert({ message: '좋아요 취소 중 문제가 발생했습니다.', severity: 'error' }))
       })
       .finally(() => {
         setLoading(false)

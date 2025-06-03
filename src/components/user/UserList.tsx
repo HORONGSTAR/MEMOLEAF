@@ -37,8 +37,9 @@ export default function UserList(props: Props) {
         addUserList(result.users)
         setCursor(result.nextCursor)
       })
-      .catch(({ message }) => {
-        dispatch(openAlert({ message, severity: 'error' }))
+      .catch((error) => {
+        console.error(error)
+        dispatch(openAlert({ message: '유저 조회 중 문제가 발생했습니다.', severity: 'error' }))
       })
       .finally(() => setLoading('off'))
   }, [addUserList, cursor, dispatch, endpoint, query, user?.id])

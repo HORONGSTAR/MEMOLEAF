@@ -22,16 +22,9 @@ export default function MyNote(inti: ProfileData) {
   const myId = session?.user.id
   const isMine = checkOnOff(profile.id, myId || 0)
 
-  const handleChangeNote = useCallback(
-    (value: string) => {
-      if (value.length === 0) {
-        dispatch(openAlert({ message: '내용을 입력하세요.', severity: 'info' }))
-        return
-      }
-      setNote(value)
-    },
-    [dispatch]
-  )
+  const handleChangeNote = (value: string) => {
+    setNote(value)
+  }
 
   const handleSubmit = useCallback(async () => {
     setEdit('off')
@@ -40,14 +33,16 @@ export default function MyNote(inti: ProfileData) {
       userData.cover = cover.url
       setCover({ new: false, url: '' })
     }
+    dispatch(openAlert({ message: '노트 업로드 중...', severity: 'info' }))
     dispatch(updateProfileThunk(userData))
       .unwrap()
       .then((result) => {
         setProfile((prev) => ({ ...prev, ...result }))
         dispatch(openAlert({ message: '노트를 수정했습니다.' }))
       })
-      .catch(({ message }) => {
-        dispatch(openAlert({ message, severity: 'error' }))
+      .catch((error) => {
+        console.error(error)
+        dispatch(openAlert({ message: '노트 업로드 중 문제가 발생했습니다.', severity: 'error' }))
       })
   }, [note, cover, dispatch])
 

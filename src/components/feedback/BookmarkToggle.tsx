@@ -28,8 +28,9 @@ export default function BookmarkToggle(props: Props) {
         setChecked('on')
         dispatch(openAlert({ message: '북마크를 추가했습니다.' }))
       })
-      .catch(({ message }) => {
-        dispatch(openAlert({ message, severity: 'error' }))
+      .catch((error) => {
+        console.error(error)
+        dispatch(openAlert({ message: '북마크 추가 중 문제가 발생했습니다.', severity: 'error' }))
       })
       .finally(() => {
         setLoading(false)
@@ -45,8 +46,9 @@ export default function BookmarkToggle(props: Props) {
         setChecked('off')
         dispatch(openAlert({ message: '북마크를 취소했습니다.' }))
       })
-      .catch(({ message }) => {
-        dispatch(openAlert({ message, severity: 'error' }))
+      .catch((error) => {
+        console.error(error)
+        dispatch(openAlert({ message: '북마크 취소 중 문제가 발생했습니다.', severity: 'error' }))
       })
       .finally(() => {
         setLoading(false)

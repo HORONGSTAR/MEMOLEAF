@@ -47,8 +47,9 @@ export default function MyProfile(inti: ProfileData) {
         setProfile((prev) => ({ ...prev, ...result }))
         dispatch(openAlert({ message: '프로필을 수정했습니다.' }))
       })
-      .catch(({ message }) => {
-        dispatch(openAlert({ message, severity: 'error' }))
+      .catch((error) => {
+        console.error(error)
+        dispatch(openAlert({ message: '프로필 업로드 중 문제가 발생했습니다.', severity: 'error' }))
       })
   }, [name, info, image, dispatch])
 

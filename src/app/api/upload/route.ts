@@ -10,37 +10,64 @@ interface ImageData {
 
 export async function POST(request: NextRequest): Promise<NRes> {
   const startTime = Date.now()
+  console.log('🚀 이미지 업로드 API 시작')
 
   try {
     const { images, id } = await request.json()
+    console.log('📥 요청 데이터:', {
+      imagesCount: images?.length,
+      id,
+      idType: typeof id,
+    })
 
+    // 입력 검증
     if (!images || !Array.isArray(images)) {
-      const message = '이미지 데이터가 제공되지 않았습니다.'
-      return NRes.json({ success: false, message }, { status: 400 })
+      console.log('❌ 이미지 데이터 없음')
+      return NRes.json(
+        {
+          success: false,
+          message: '이미지 데이터가 제공되지 않았습니다.',
+        },
+        { status: 400 }
+      )
     }
+
     if (!id) {
-      const message = 'memoId가 제공되지 않았습니다.'
-      return NRes.json({ success: false, message }, { status: 400 })
+      console.log('❌ memoId 없음')
+      return NRes.json(
+        {
+          success: false,
+          message: 'memoId가 제공되지 않았습니다.',
+        },
+        { status: 400 }
+      )
     }
 
     const memoIdInt = parseInt(id)
-    console.log(`Processing ${images.length} images for memo ${memoIdInt}`)
+    console.log(`📝 Processing ${images.length} images for memo ${memoIdInt}`)
 
+    // 1. Cloudinary 업로드 단계
+    console.log('☁️ Cloudinary 업로드 시작')
     const uploadPromises = images.map(async (image: ImageData, index: number) => {
       try {
+        // 순차 업로드를 위한 딜레이
         await new Promise((resolve) => setTimeout(resolve, index * 100))
 
         if (!image.id) {
+          console.log(`☁️ 이미지 ${index + 1}/${images.length} 업로드 중...`)
           const uploadResult = (await cloudinary.uploader.upload(image.url, {
             upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET,
             timeout: 30000,
           })) as CloudinaryUploadResponse
+
+          console.log(`✅ 이미지 ${index + 1} 업로드 성공: ${uploadResult.public_id}`)
           return { url: uploadResult.public_id, alt: image.alt }
         } else {
+          console.log(`♻️ 이미지 ${index + 1} 기존 이미지 재사용`)
           return { url: image.url, alt: image.alt }
         }
       } catch (error) {
-        console.error(`이미지 ${index} 업로드 실패:`, error)
+        console.error(`❌ 이미지 ${index + 1} 업로드 실패:`, error)
         return null
       }
     })
@@ -48,78 +75,104 @@ export async function POST(request: NextRequest): Promise<NRes> {
     const results = await Promise.all(uploadPromises)
     const successfulUploads = results.filter((result) => result !== null)
 
+    console.log(`📊 Cloudinary 업로드 완료: ${successfulUploads.length}/${images.length} 성공`)
+
     if (successfulUploads.length === 0) {
-      const message = '이미지 업로드에 실패했습니다.'
-      return NRes.json({ success: false, message }, { status: 500 })
-    }
-
-    console.log(`${successfulUploads.length}/${images.length} 이미지 업로드 성공`)
-
-    try {
-      const imageData = successfulUploads.map((img) => ({
-        memoId: memoIdInt,
-        url: img!.url,
-        alt: img!.alt,
-      }))
-
-      let createdImages
-
-      try {
-        await prisma.image.createMany({
-          data: imageData,
-          skipDuplicates: true,
-        })
-        createdImages = imageData
-      } catch (createManyError) {
-        console.warn('createMany 실패, 개별 생성으로 전환:', createManyError)
-
-        const timeElapsed = Date.now() - startTime
-        if (timeElapsed > 8000) {
-          throw new Error('처리 시간 초과')
-        }
-
-        createdImages = []
-
-        for (const data of imageData) {
-          try {
-            const created = await prisma.image.create({ data })
-            createdImages.push(created)
-          } catch (individualError) {
-            console.error('개별 이미지 생성 실패:', individualError)
-          }
-        }
-      }
-
-      console.log(`${createdImages.length}개의 이미지 저장 성공.`)
-
+      console.log('❌ 모든 이미지 업로드 실패')
       return NRes.json(
         {
-          message: '이미지 업로드 성공',
-          count: createdImages.length,
-          images: createdImages,
+          success: false,
+          message: '이미지 업로드에 실패했습니다.',
         },
-        { status: 200 }
+        { status: 500 }
       )
-    } catch (dbError) {
-      console.error('데이터베이스 저장 실패:', dbError)
+    }
 
-      const cleanupPromises = successfulUploads.map(async (img) => {
+    // 2. 데이터베이스 개별 저장 단계
+    console.log('💾 데이터베이스 개별 저장 시작')
+    const createdImages = []
+    const failedImages = []
+
+    for (const [index, imageData] of successfulUploads.entries()) {
+      if (!imageData) continue
+
+      const data = {
+        memoId: memoIdInt,
+        url: imageData.url,
+        alt: imageData.alt,
+      }
+
+      try {
+        console.log(`💾 DB 저장 ${index + 1}/${successfulUploads.length}: ${data.url}`)
+        const created = await prisma.image.create({ data })
+        createdImages.push(created)
+        console.log(`✅ DB 저장 ${index + 1} 성공 (ID: ${created.id})`)
+      } catch (error) {
+        console.error(`❌ DB 저장 ${index + 1} 실패:`, { error })
+        failedImages.push({ imageData, error })
+      }
+
+      // 서버리스 환경에서 안정성을 위한 작은 딜레이
+      if (index < successfulUploads.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 50))
+      }
+    }
+
+    console.log(`🎉 최종 결과: ${createdImages.length}/${successfulUploads.length} DB 저장 성공`)
+
+    // 실패한 이미지들 Cloudinary에서 정리
+    if (failedImages.length > 0) {
+      console.log(`🧹 실패한 이미지 ${failedImages.length}개 Cloudinary 정리 시작`)
+
+      const cleanupPromises = failedImages.map(async ({ imageData }, index) => {
         try {
-          if (img && !img.url.startsWith('http')) {
-            await cloudinary.uploader.destroy(img.url)
+          if (!imageData.url.startsWith('http')) {
+            await cloudinary.uploader.destroy(imageData.url)
+            console.log(`✅ 정리 완료 ${index + 1}: ${imageData.url}`)
           }
-        } catch (cleanupError) {
-          console.error('Cloudinary 이미지 정리 실패:', cleanupError)
+        } catch (error) {
+          console.error(`❌ 정리 실패 ${index + 1}:`, error)
         }
       })
 
       await Promise.allSettled(cleanupPromises)
-      const message = '데이터베이스 저장 중 문제가 발생했습니다.'
-      return NRes.json({ success: false, message }, { status: 500 })
     }
+
+    // 최종 성공 체크
+    if (createdImages.length === 0) {
+      return NRes.json(
+        {
+          success: false,
+          message: '데이터베이스 저장에 모두 실패했습니다.',
+        },
+        { status: 500 }
+      )
+    }
+
+    const totalTime = Date.now() - startTime
+    console.log(`⏱️ 전체 처리 시간: ${totalTime}ms`)
+
+    return NRes.json(
+      {
+        success: true,
+        message: `${createdImages.length}개의 이미지가 성공적으로 업로드되었습니다.`,
+        count: createdImages.length,
+        images: createdImages,
+        ...(failedImages.length > 0 && {
+          warning: `${failedImages.length}개의 이미지 저장에 실패했습니다.`,
+        }),
+      },
+      { status: 200 }
+    )
   } catch (error) {
-    console.error('업로드 중 오류 발생:', error)
-    const message = '이미지 업로드 중 문제가 발생했습니다.'
-    return NRes.json({ success: false, message }, { status: 500 })
+    console.error('💥 전체 프로세스 오류:', error)
+
+    return NRes.json(
+      {
+        success: false,
+        message: '이미지 업로드 중 예상치 못한 오류가 발생했습니다.',
+      },
+      { status: 500 }
+    )
   }
 }

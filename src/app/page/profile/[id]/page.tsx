@@ -26,7 +26,7 @@ export default async function MyPage({ params }: { params: Promise<{ id: string 
   })
 
   const notificationCount = await prisma.notification.count({
-    where: { recipientId: userId || 0 },
+    where: { recipientId: myId || 0 },
   })
 
   return (

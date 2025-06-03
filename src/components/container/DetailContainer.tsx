@@ -20,10 +20,10 @@ interface Props {
 
 export default function DetailContainer(props: Props) {
   const { firstLoadMemo, myId, children, updateItem, removeItem } = props
-  const [box, setBox] = useState('item')
+  const [box, setBox] = useState<'item' | 'form' | 'empty'>('item')
   const [memo, setMemo] = useState<MemoData>(firstLoadMemo)
   const [users, setUsers] = useState<UserData[]>([])
-  const [filter, setFilter] = useState('new')
+  const [filter, setFilter] = useState('serial')
   const [cursor, setCursor] = useState<undefined | number>(undefined)
   const [leafs, setLeafs] = useState<MemoData[]>([])
   const count = memo._count
@@ -38,7 +38,7 @@ export default function DetailContainer(props: Props) {
   }
 
   const TitleBox = () => {
-    const edit = () => setBox('edit')
+    const edit = () => setBox('form')
     const remove = () => (removeItem ? removeItem(memo.id) : setBox('empty'))
     const actions = { close: () => setBox('item') }
     const item = <MemoBox {...{ memo, myId, remove, edit, updateItem: updateDetail }} />

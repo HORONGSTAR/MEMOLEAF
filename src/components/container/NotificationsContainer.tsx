@@ -29,8 +29,9 @@ export default function NotificationsContainer({ firstLoadData }: Props) {
         setNotifications((prev) => [...prev, ...result.notifications])
         setCursor(result.nextCursor)
       })
-      .catch(({ message }) => {
-        dispatch(openAlert({ message, severity: 'error' }))
+      .catch((error) => {
+        console.error(error)
+        dispatch(openAlert({ message: '알림 조회 중 문제가 발생했습니다.', severity: 'error' }))
       })
   }, [cursor, dispatch, firstLoadData.length])
 
@@ -39,8 +40,9 @@ export default function NotificationsContainer({ firstLoadData }: Props) {
       .then(() => {
         dispatch(openAlert({ message: '알림을 삭제했습니다.' }))
       })
-      .catch(({ message }) => {
-        dispatch(openAlert({ message, severity: 'error' }))
+      .catch((error) => {
+        console.error(error)
+        dispatch(openAlert({ message: '알림 삭제 중 문제가 발생했습니다.', severity: 'error' }))
       })
     setNotifications([])
     setCount(0)

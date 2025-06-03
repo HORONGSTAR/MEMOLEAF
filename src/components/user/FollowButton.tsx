@@ -26,8 +26,9 @@ export default function FollowButton(props: Props) {
           })
         )
       })
-      .catch(({ message }) => {
-        dispatch(openAlert({ message, severity: 'error' }))
+      .catch((error) => {
+        console.error(error)
+        dispatch(openAlert({ message: '팔로우 중 문제가 발생했습니다.', severity: 'error' }))
       })
   }
 
@@ -41,8 +42,9 @@ export default function FollowButton(props: Props) {
           })
         )
       })
-      .catch(({ message }) => {
-        dispatch(openAlert({ message, severity: 'error' }))
+      .catch((error) => {
+        console.error(error)
+        dispatch(openAlert({ message: '언팔로우 중 문제가 발생했습니다.', severity: 'error' }))
       })
   }
 

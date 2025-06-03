@@ -27,8 +27,9 @@ export default function SettingContainer() {
           setOpen2(true)
           dispatch(openAlert({ message: '메모를 삭제했습니다.' }))
         })
-        .catch(({ message }) => {
-          dispatch(openAlert({ message, severity: 'error' }))
+        .catch((error) => {
+          console.error(error)
+          dispatch(openAlert({ message: '메모 삭제 중 문제가 발생했습니다.', severity: 'error' }))
         })
     if (aria === 'account') {
       if (myId === 1) {
@@ -45,8 +46,9 @@ export default function SettingContainer() {
           setOpen1(false)
           setOpen2(true)
         })
-        .catch(({ message }) => {
-          dispatch(openAlert({ message, severity: 'error' }))
+        .catch((error) => {
+          console.error(error)
+          dispatch(openAlert({ message: '계정 삭제 중 문제가 발생했습니다.', severity: 'error' }))
         })
     }
   }, [aria, dispatch, myId])

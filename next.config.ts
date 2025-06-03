@@ -1,6 +1,11 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  api: {
+    bodyParser: {
+      sizeLimit: '5mb',
+    },
+  },
   modularizeImports: {
     '@mui/material': {
       transform: '@mui/material/{{member}}',
