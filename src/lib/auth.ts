@@ -70,7 +70,7 @@ export const authOptions: NextAuthOptions = {
             id: newUser.id,
             name: newUser.name,
             image: newUser.image,
-            userNum: newUser.userNum,
+            userNum: userNum,
           }
         } else {
           token = {
