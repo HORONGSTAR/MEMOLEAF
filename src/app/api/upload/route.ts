@@ -2,6 +2,12 @@ import { NextRequest, NextResponse as NRes } from 'next/server'
 import cloudinary, { CloudinaryUploadResponse } from '@/lib/cloudinary'
 import prisma from '@/lib/prisma'
 
+interface ImageData {
+  id?: number
+  url: string
+  alt: string
+}
+
 export async function POST(request: NextRequest): Promise<NRes> {
   const startTime = Date.now()
   console.log('🚀 이미지 업로드 API 시작')
@@ -40,36 +46,34 @@ export async function POST(request: NextRequest): Promise<NRes> {
     const memoIdInt = parseInt(id)
     console.log(`📝 Processing ${images.length} images for memo ${memoIdInt}`)
 
-    // 1. Cloudinary 순차 업로드 단계
-    console.log('☁️ Cloudinary 순차 업로드 시작')
-    const successfulUploads = []
-
-    for (let i = 0; i < images.length; i++) {
-      const image = images[i]
+    // 1. Cloudinary 업로드 단계
+    console.log('☁️ Cloudinary 업로드 시작')
+    const uploadPromises = images.map(async (image: ImageData, index: number) => {
       try {
+        // 순차 업로드를 위한 딜레이
+        await new Promise((resolve) => setTimeout(resolve, index * 100))
+
         if (!image.id) {
-          console.log(`☁️ 이미지 ${i + 1}/${images.length} 업로드 중...`)
+          console.log(`☁️ 이미지 ${index + 1}/${images.length} 업로드 중...`)
           const uploadResult = (await cloudinary.uploader.upload(image.url, {
             upload_preset: process.env.CLOUDINARY_UPLOAD_PRESET,
             timeout: 30000,
           })) as CloudinaryUploadResponse
 
-          console.log(`✅ 이미지 ${i + 1} 업로드 성공: ${uploadResult.public_id}`)
-          successfulUploads.push({ url: uploadResult.public_id, alt: image.alt })
+          console.log(`✅ 이미지 ${index + 1} 업로드 성공: ${uploadResult.public_id}`)
+          return { url: uploadResult.public_id, alt: image.alt }
         } else {
-          console.log(`♻️ 이미지 ${i + 1} 기존 이미지 재사용`)
-          successfulUploads.push({ url: image.url, alt: image.alt })
+          console.log(`♻️ 이미지 ${index + 1} 기존 이미지 재사용`)
+          return { url: image.url, alt: image.alt }
         }
       } catch (error) {
-        console.error(`❌ 이미지 ${i + 1} 업로드 실패:`, error)
-        // 실패해도 계속 진행
+        console.error(`❌ 이미지 ${index + 1} 업로드 실패:`, error)
+        return null
       }
+    })
 
-      // 각 업로드 간 잠시 대기 (서버 부하 완화 및 네트워크 안정성)
-      if (i < images.length - 1) {
-        await new Promise((resolve) => setTimeout(resolve, 300))
-      }
-    }
+    const results = await Promise.all(uploadPromises)
+    const successfulUploads = results.filter((result) => result !== null)
 
     console.log(`📊 Cloudinary 업로드 완료: ${successfulUploads.length}/${images.length} 성공`)
 
