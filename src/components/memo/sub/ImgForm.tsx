@@ -16,7 +16,6 @@ export default function ImgForm({ images, setImages }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const dispatch = useAppDispatch()
 
-  // 압축 함수
   const compressImage = (file: File, maxWidth = 800, quality = 0.8): Promise<File> => {
     return new Promise((resolve) => {
       const canvas = document.createElement('canvas')
