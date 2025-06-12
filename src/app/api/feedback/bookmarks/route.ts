@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
       return NRes.json({ success: false, message }, { status: 401 })
     }
     const { id } = await req.json()
-    const memo = await prisma.memo.findUnique({ where: { id }, select: { userId: true } })
+    const memo = await prisma.memo.findUnique({ where: { id } })
 
     if (!memo) {
       const message = '메모를 찾을 수 없습니다.'
